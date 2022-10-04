@@ -1,0 +1,18 @@
+public class #SCRIPTNAME# : State {
+	
+	public #SCRIPTNAME#() : base() { 
+	#NOTRIM#
+	}
+
+	protected override void OnUpdate() { 
+	#NOTRIM#
+	}
+
+	protected override void OnEnter() {
+	#NOTRIM#	
+	}
+
+	protected override void OnExit() {
+	#NOTRIM#
+	}
+}
