@@ -2,11 +2,10 @@
     "name": "PrinceOfPersia.TimeRewind.Editor",
     "rootNamespace": "",
     "references": [
+        "GUID:75469ad4d38634e559750d17036d5f7c",
         "GUID:fbc40c85ba4a52844aa9cc813cf7a012"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

@@ -1,5 +1,7 @@
+// This is a modification of Ned Makes Games toon shader.
 #ifndef CUSTOM_LIGHTING_INCLUDED
 #define CUSTOM_LIGHTING_INCLUDED
+
 
 // This is a neat trick to work around a bug in the shader graph when
 // enabling shadow keywords. Created by @cyanilux
@@ -10,7 +12,7 @@
 		#undef REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR
 	#endif
 #endif
- 
+
 struct CustomLightingData {
 	float3 positionWS;
 	float3 normalWS;
@@ -125,8 +127,8 @@ void CalculateCustomLighting_float(float3 Position, float3 Normal, float3 ViewDi
 	#ifdef SHADERGRAPH_PREVIEW
 		d.shadowCoord = 0;
 	#else
-		float4 positionCS = TransformWorldToHClip(Position);
 		#if SHADOWS_SCREEN
+			float4 positionCS = TransformWorldToHClip(Position);
 			d.shadowCoord = ComputeScreenPos(positionCS);
 		#else
 			d.shadowCoord = TransformWorldToShadowCoord(Position);
