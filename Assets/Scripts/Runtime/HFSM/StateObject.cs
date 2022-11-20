@@ -475,6 +475,11 @@ namespace HFSM {
         /// </summary>
         protected virtual void OnExit() { }
 
+        public virtual StateObject Copy() {
+            StateObject copy = (StateObject)this.MemberwiseClone();
+            return copy;
+        }
+
     }
 }
 

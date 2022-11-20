@@ -414,7 +414,7 @@ namespace HFSM {
                 availableTransition = CurrentStateObject.GetAvailableTransition();
             }
 
-            foreach (EventTransition anyEventTransition in anyEventTransitions) {
+            foreach (EventTransitionBase anyEventTransition in anyEventTransitions) {
                 anyEventTransition.ConsumeEvent();
             }
 
@@ -618,6 +618,13 @@ namespace HFSM {
                 name += CurrentStateObject.GetCurrentStateName();
             }
             return name;
+        }
+
+        public override StateObject Copy() {
+            StateMachine copy = (StateMachine)this.MemberwiseClone();
+            copy.CurrentStateObject = CurrentStateObject.Copy();
+
+            return copy;
         }
     }
 }

@@ -33,6 +33,22 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""RewindTime"",
+                    ""type"": ""Button"",
+                    ""id"": ""c78b4cfd-9862-49cc-b6a0-c1f80684fb11"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)""
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""29b832d2-7d3a-4c89-b946-cbffbc6584e8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
                 }
             ],
             ""bindings"": [
@@ -101,6 +117,28 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fa89cfb5-84ab-4567-9fa7-a6fcbd982c18"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RewindTime"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2c336c95-39de-42c0-a1c1-f527358e0b28"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -111,6 +149,8 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         m_ActionMap = asset.FindActionMap("ActionMap", throwIfNotFound: true);
         m_ActionMap_CameraAim = m_ActionMap.FindAction("CameraAim", throwIfNotFound: true);
         m_ActionMap_Move = m_ActionMap.FindAction("Move", throwIfNotFound: true);
+        m_ActionMap_RewindTime = m_ActionMap.FindAction("RewindTime", throwIfNotFound: true);
+        m_ActionMap_Jump = m_ActionMap.FindAction("Jump", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -162,12 +202,16 @@ public class @PlayerInput : IInputActionCollection, IDisposable
     private IActionMapActions m_ActionMapActionsCallbackInterface;
     private readonly InputAction m_ActionMap_CameraAim;
     private readonly InputAction m_ActionMap_Move;
+    private readonly InputAction m_ActionMap_RewindTime;
+    private readonly InputAction m_ActionMap_Jump;
     public struct ActionMapActions
     {
         private @PlayerInput m_Wrapper;
         public ActionMapActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @CameraAim => m_Wrapper.m_ActionMap_CameraAim;
         public InputAction @Move => m_Wrapper.m_ActionMap_Move;
+        public InputAction @RewindTime => m_Wrapper.m_ActionMap_RewindTime;
+        public InputAction @Jump => m_Wrapper.m_ActionMap_Jump;
         public InputActionMap Get() { return m_Wrapper.m_ActionMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -183,6 +227,12 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                 @Move.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnMove;
                 @Move.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnMove;
                 @Move.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnMove;
+                @RewindTime.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnRewindTime;
+                @RewindTime.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnRewindTime;
+                @RewindTime.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnRewindTime;
+                @Jump.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
+                @Jump.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
+                @Jump.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
             }
             m_Wrapper.m_ActionMapActionsCallbackInterface = instance;
             if (instance != null)
@@ -193,6 +243,12 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
+                @RewindTime.started += instance.OnRewindTime;
+                @RewindTime.performed += instance.OnRewindTime;
+                @RewindTime.canceled += instance.OnRewindTime;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
             }
         }
     }
@@ -201,5 +257,7 @@ public class @PlayerInput : IInputActionCollection, IDisposable
     {
         void OnCameraAim(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
+        void OnRewindTime(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
     }
 }

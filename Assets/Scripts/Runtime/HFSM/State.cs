@@ -105,6 +105,11 @@ namespace HFSM {
             return GetType().ToString(); 
         }
 
+        public override StateObject Copy() {
+            State copy = (State)this.MemberwiseClone();
+            return copy;
+        }
+
         /// <summary>
         /// Definition of "Any State" used in <see cref="Transition"/>s from whose <see cref="Transition.OriginStateObject"/>
         /// can be any. 

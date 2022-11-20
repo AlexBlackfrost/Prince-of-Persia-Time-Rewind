@@ -388,6 +388,20 @@
             },
             "m_InputSlot": {
                 "m_Node": {
+                    "m_Id": "293c7b18dca1413dbf90900ffcee821e"
+                },
+                "m_SlotId": 1
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "8444edfd4a834f5d8a59ab93a41caa3c"
+                },
+                "m_SlotId": 1
+            },
+            "m_InputSlot": {
+                "m_Node": {
                     "m_Id": "c2e4f412d33f4ca18a2115d4fe9a39a4"
                 },
                 "m_SlotId": 0
@@ -545,20 +559,6 @@
                     "m_Id": "93fd9f078c01477f938c5a725f7a5005"
                 },
                 "m_SlotId": 0
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
-                    "m_Id": "c2e4f412d33f4ca18a2115d4fe9a39a4"
-                },
-                "m_SlotId": 2
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "293c7b18dca1413dbf90900ffcee821e"
-                },
-                "m_SlotId": 1
             }
         }
     ],
@@ -1614,8 +1614,8 @@
     "m_ObjectId": "4525a94658ed4a968d64154a248f0599",
     "m_Title": "Calculate exponential squared fog",
     "m_Position": {
-        "x": 10.0,
-        "y": 10.0
+        "x": -3097.60009765625,
+        "y": 342.40008544921877
     }
 }
 
@@ -1890,7 +1890,7 @@
     "m_Type": "UnityEditor.ShaderGraph.StickyNoteData",
     "m_ObjectId": "5dccf639d71e41b3a5232ed0e106e9d4",
     "m_Title": "Avoid banding",
-    "m_Content": "Scene depth has banding, and it's very noticeable with dark colors so I used dithering to reduce it",
+    "m_Content": "Scene depth has banding, and it's very noticeable with dark colors so I used dithering to reduce it. Update: it seems to be my crap monitor.",
     "m_TextSize": 0,
     "m_Theme": 0,
     "m_Position": {
@@ -2502,10 +2502,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -736.0000610351563,
-            "y": 653.5999755859375,
+            "x": -716.0000610351563,
+            "y": 649.5999755859375,
             "width": 128.0,
-            "height": 33.600040435791019
+            "height": 34.4000244140625
         }
     },
     "m_Slots": [
