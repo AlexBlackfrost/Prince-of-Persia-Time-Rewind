@@ -206,9 +206,9 @@ AnimatorController:
     m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
-    m_Name: Base Layer
+    m_Name: RootDisabled
     m_StateMachine: {fileID: 7204868551071801925}
-    m_Mask: {fileID: 0}
+    m_Mask: {fileID: 31900000, guid: 7aa210d1441d1f54b929351d8f1bb67d, type: 2}
     m_Motions: []
     m_Behaviours: []
     m_BlendingMode: 0
@@ -558,6 +558,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1ca5eeba3591d64eb069181df0e276e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1107 &6960605032055829481
+AnimatorStateMachine:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: DisableRoot
+  m_ChildStates: []
+  m_ChildStateMachines: []
+  m_AnyStateTransitions: []
+  m_EntryTransitions: []
+  m_StateMachineTransitions: {}
+  m_StateMachineBehaviours: []
+  m_AnyStatePosition: {x: 50, y: 20, z: 0}
+  m_EntryPosition: {x: 50, y: 120, z: 0}
+  m_ExitPosition: {x: 800, y: 120, z: 0}
+  m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
+  m_DefaultState: {fileID: 0}
 --- !u!1107 &7204868551071801925
 AnimatorStateMachine:
   serializedVersion: 6
@@ -565,7 +584,7 @@ AnimatorStateMachine:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Base Layer
+  m_Name: RootDisabled
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 2355985607594989958}

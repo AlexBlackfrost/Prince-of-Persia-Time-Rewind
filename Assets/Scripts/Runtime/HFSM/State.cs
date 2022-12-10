@@ -80,7 +80,7 @@ namespace HFSM {
         /// hierarchical finite state machine pattern as well as the logic defined in the extended classes.
         /// This function is called the first update cycle after this <see cref="State"/> has become active.
         /// </summary>
-        internal sealed override void Enter() {
+        public sealed override void Enter() {
             IsActive = true;
             OnEnter();
         }
@@ -90,7 +90,7 @@ namespace HFSM {
         /// hierarchical finite state machine pattern as well as the logic defined in the extended classes.
         /// This function is called the last update cycle before this <see cref="State"/> becomes inactive.
         /// </summary>
-        internal sealed override void Exit() {
+        public sealed override void Exit() {
             IsActive = false;
             OnExit();
         }

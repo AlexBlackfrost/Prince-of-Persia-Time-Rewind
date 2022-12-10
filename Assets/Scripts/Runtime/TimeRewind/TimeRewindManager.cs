@@ -22,14 +22,13 @@ public class TimeRewindManager : MonoBehaviour {
         }
     }
 
-    private bool isRewinding;
 
-    public void StartRewind() {
+    public static void StartTimeRewind() {
         TimeRewindStart.Invoke();
         Debug.Log("Start rewind");
     }
 
-    public void StopRewind() {
+    public static void StopTimeRewind() {
         TimeRewindStop.Invoke();
         Debug.Log("Stop rewind");
     }

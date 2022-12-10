@@ -81,24 +81,27 @@ namespace HFSM {
         /// <inheritdoc cref="EventTransitionBase.ConsumeEvent"/>
         public override void ConsumeEvent() {
             args.Clear();
-            currentArg = default(T);
-            base.ConsumeEvent();
+            base.ConsumeEvent(); 
         }
 
         /// <inheritdoc cref="EventTransition.ListenEvent"/>
         public void ListenEvent(T arg) {
-            if (OriginStateObject.IsActive ||
+            if (processInstantly) {
+                OriginStateObject.StateMachine.ProcessInstantEvent(this);
+
+            } else if (OriginStateObject.IsActive ||
                (OriginStateObject.GetType() == typeof(State.Any) && OriginStateObject.StateMachine.IsActive)) {
 
                 eventListened = true;
-                args.Add(arg);
+                args.Add(arg); 
             }
         }
 
         /// <inheritdoc cref="EventTransitionBase.ConditionsMet"/>
         private protected override bool ConditionsMet() {
             bool conditionsMet = true;
-            foreach(T arg in args) {
+            currentArg = default(T);
+            foreach (T arg in args) {
                 currentArg = arg;
                 foreach (Func<T, bool> condition in conditions) {
                     if (!condition(arg)) {
@@ -140,13 +143,15 @@ namespace HFSM {
         /// <inheritdoc cref="EventTransitionBase.ConsumeEvent"/>
         public override void ConsumeEvent() {
             args.Clear();
-            currentArgs = default((T1, T2));
             base.ConsumeEvent();
         }
 
         /// <inheritdoc cref="EventTransition.ListenEvent"/>
         public void ListenEvent(T1 arg1, T2 arg2) {
-            if (OriginStateObject.IsActive ||
+            if (processInstantly) {
+                OriginStateObject.StateMachine.ProcessInstantEvent(this);
+
+            } else if (OriginStateObject.IsActive ||
                (OriginStateObject.GetType() == typeof(State.Any) && OriginStateObject.StateMachine.IsActive)) {
 
                 eventListened = true;
@@ -157,7 +162,8 @@ namespace HFSM {
         /// <inheritdoc cref="EventTransitionBase.ConditionsMet"/>
         private protected override bool ConditionsMet() {
             bool conditionsMet = true;
-            foreach((T1, T2) argTuple in args) {
+            currentArgs = default((T1, T2));
+            foreach ((T1, T2) argTuple in args) {
                 currentArgs = argTuple;
                 foreach (Func<T1, T2, bool> condition in conditions) {
                     if (!condition(currentArgs.Item1, currentArgs.Item2)) {
@@ -199,7 +205,6 @@ namespace HFSM {
         /// <inheritdoc cref="EventTransitionBase.ConsumeEvent"/>
         public override void ConsumeEvent() {
             args.Clear();
-            currentArgs = default((T1, T2, T3));
             base.ConsumeEvent();
         }
 
@@ -220,7 +225,8 @@ namespace HFSM {
         /// <inheritdoc cref="EventTransitionBase.ConditionsMet"/>
         private protected override bool ConditionsMet() {
             bool conditionsMet = true;
-            foreach((T1, T2, T3) argTuple in args) {
+            currentArgs = default((T1, T2, T3));
+            foreach ((T1, T2, T3) argTuple in args) {
                 currentArgs = argTuple;
                 foreach (Func<T1, T2, T3, bool> condition in conditions) {
                     if (!condition(argTuple.Item1, argTuple.Item2, argTuple.Item3)) {

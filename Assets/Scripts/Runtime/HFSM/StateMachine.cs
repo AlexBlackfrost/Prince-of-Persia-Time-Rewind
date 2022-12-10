@@ -9,7 +9,7 @@ namespace HFSM {
 	/// </summary>
     public abstract class StateMachine : StateObject {
         public StateObject DefaultStateObject { get; set; }
-        public StateObject CurrentStateObject { get; private set; }
+        public StateObject CurrentStateObject { get; set; }
         /// <summary>
         /// A linked list of <see cref="StateMachine"/> starting from the root <see cref="StateMachine"/>. 
         /// </summary>
@@ -417,13 +417,13 @@ namespace HFSM {
             foreach (EventTransitionBase anyEventTransition in anyEventTransitions) {
                 anyEventTransition.ConsumeEvent();
             }
+            ConsumeTransitionsEvents();
 
             if (availableTransition != null) {
                 ChangeState(availableTransition);
                 changedState = true;
             }
 
-            CurrentStateObject.ConsumeTransitionsEvents();
             return changedState;
         }
 
@@ -581,7 +581,7 @@ namespace HFSM {
         /// This function is called the first update cycle after this <see cref="StateMachine"/> has become active.
         /// The hierarchical execution of <see cref="Enter"/> is performed in a top-down fashion.
         /// </summary>
-        internal sealed override void Enter() {
+        public sealed override void Enter() {
             IsActive = true;
             if (CurrentStateObject == null) {
                 CurrentStateObject = DefaultStateObject;
@@ -597,7 +597,7 @@ namespace HFSM {
         /// This function is called the last update cycle before this <see cref="StateMachine"/> becomes inactive.
         /// The hierarchical execution of <see cref="Exit"/> is performed in a bottom-up fashion.
         /// </summary>
-        internal sealed override void Exit() {
+        public sealed override void Exit() {
             CurrentStateObject.Exit();
             OnExit();
             IsActive = false;
@@ -622,9 +622,18 @@ namespace HFSM {
 
         public override StateObject Copy() {
             StateMachine copy = (StateMachine)this.MemberwiseClone();
-            copy.CurrentStateObject = CurrentStateObject.Copy();
-
+            copy.CurrentStateObject = CurrentStateObject?.Copy();
             return copy;
+        }
+
+        public override void RestorePropertiesValues(StateObject other) {
+            base.RestorePropertiesValues(other);
+            StateMachine otherStateMachine = (StateMachine) other;
+
+            initialized = otherStateMachine.initialized;
+            CurrentStateObject = otherStateMachine.CurrentStateObject;
+
+            CurrentStateObject.RestorePropertiesValues(otherStateMachine.CurrentStateObject);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace HFSM {
 	/// </summary>
     public abstract class StateObject {
         internal StateMachine StateMachine { get; set; }
-        internal bool IsActive { get; private protected set; }
+        public bool IsActive { get; private protected set; }
         private protected List<Transition> transitions;
         private protected List<EventTransitionBase> eventTransitions;
 
@@ -441,14 +441,14 @@ namespace HFSM {
         /// as well as the custom logic defined in concrete <see cref="StateObject"/> classes. It is executed when a 
         /// transition is performed; it is executed when entering a new <see cref="StateObject"/>.
         /// </summary>
-        internal abstract void Enter();
+        public abstract void Enter();
 
         /// <summary>
         /// Executes the logic needed to implement the hierarchical finite state machine pattern 
         /// as well as the custom logic defined in concrete <see cref="StateObject"/>s. It is executed when a 
         /// transition is performed; it is executed when leaving the current <see cref="StateObject"/>.
         /// </summary>
-        internal abstract void Exit();
+        public abstract void Exit();
 
         /// <summary>
         /// Custom logic defined in concrete <see cref="StateObject"/> classes that gets executed every update cycle.
@@ -478,6 +478,11 @@ namespace HFSM {
         public virtual StateObject Copy() {
             StateObject copy = (StateObject)this.MemberwiseClone();
             return copy;
+        }
+
+        public virtual void RestorePropertiesValues(StateObject other) {
+            IsActive = other.IsActive;
+
         }
 
     }
