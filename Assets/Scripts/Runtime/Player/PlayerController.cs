@@ -1,4 +1,5 @@
 
+using Cinemachine;
 using HFSM;
 using System;
 using System.Collections;
@@ -43,7 +44,7 @@ public class PlayerController : MonoBehaviour {
         MoveState moveState = new MoveState(moveSettings);
         JumpState jumpState = new JumpState(jumpSettings);
         //TimeRewindState timeRewindState = new TimeRewindState(timeRewindSettings);
-        TimeForwardStateMachine timeForwardStateMachine = new TimeForwardStateMachine(UpdateMode.UpdateBeforeChild, timeForwardSettings, idleState, moveState, jumpState);
+        TimeForwardStateMachine timeForwardStateMachine = new TimeForwardStateMachine(UpdateMode.UpdateAfterChild, timeForwardSettings, idleState, moveState, jumpState);
         rootStateMachine = new RootStateMachine(timeForwardStateMachine/*, timeRewindState*/);
         
         //timeRewindSettings.TimeForwardStateMachine = timeForwardStateMachine;

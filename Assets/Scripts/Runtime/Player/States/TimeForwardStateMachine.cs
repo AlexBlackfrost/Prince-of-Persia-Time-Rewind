@@ -38,10 +38,24 @@ public class TimeForwardStateMachine : StateMachine {
 		TimeRewindManager.TimeRewindStop += OnTimeRewindStop;
 	}
 
-	protected override void OnUpdate() {
-        if (timeIsRewinding) {
+    protected override void OnUpdate() {
+		if (timeIsRewinding) {
 			RewindPlayerRecord();
+		}
+	}
+
+    protected override void OnLateUpdate() {
+        if (timeIsRewinding) {
+			//RewindPlayerRecord();
         } else {
+			if(settings.TimeRewinder.records.Count != 0) {
+				PlayerRecord playerRecord = settings.TimeRewinder.records.Pop();
+				CameraRecord cameraRecord = playerRecord.cameraRecord;
+				cameraRecord.cameraTransform = RecordUtils.RecordCameraData(settings.Camera).cameraTransform;
+				playerRecord.cameraRecord = cameraRecord;
+				settings.TimeRewinder.records.Push(playerRecord);
+			}
+			
 			SavePlayerRecord();
         }
 	}
@@ -59,16 +73,11 @@ public class TimeForwardStateMachine : StateMachine {
 
 	private void OnTimeRewindStart() {
 		elapsedTimeSinceLastRecord = 0;
-		previousRecord = RecordUtils.RecordPlayerData(settings.Transform,
-													  settings.Camera,
-													  this,
-													  settings.Animator,
-													  settings.SkinnedMeshRenderer.bones);
-		previousRecord.deltaTime = 0.0f;
+		previousRecord = settings.TimeRewinder.records.Pop();
 
 		// Animation
 		settings.Animator.speed = 0;
-		//settings.Animator.enabled = false;
+		settings.Animator.enabled = false;
 		//settings.Animator.applyRootMotion = false;
 		//settings.Animator.Update(0);
 
@@ -152,11 +161,11 @@ public class TimeForwardStateMachine : StateMachine {
 		if (settings.TimeRewinder.records.Count != 0) {
 			nextRecord = settings.TimeRewinder.records.Peek();
 
-			while (elapsedTimeSinceLastRecord > nextRecord.deltaTime && settings.TimeRewinder.records.Count != 0) {
+			while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && settings.TimeRewinder.records.Count != 0) {
 				//elapsedTimeSinceLastRecord -= nextRecord.deltaTime;
 				//previousRecord = nextRecord;
 				//nextRecord = settings.TimeRewinder.records.Pop();
-				elapsedTimeSinceLastRecord -= nextRecord.deltaTime;
+				elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
 				previousRecord = settings.TimeRewinder.records.Pop();
 				nextRecord = settings.TimeRewinder.records.Peek(); 
 			}
@@ -166,24 +175,25 @@ public class TimeForwardStateMachine : StateMachine {
 		}
 	}
 
-	private void RestorePlayerRecord(PlayerRecord previousRecord, PlayerRecord nextRecord) {
-		RestoreCameraRecord(settings.timeRewindCamera, previousRecord.cameraRecord, nextRecord.cameraRecord, 
-							nextRecord.deltaTime);
 
+	private void RestorePlayerRecord(PlayerRecord previousRecord, PlayerRecord nextRecord) {
 		RestoreTransformRecord(settings.Transform, previousRecord.playerTransform, nextRecord.playerTransform, 
-							   nextRecord.deltaTime);
+							   previousRecord.deltaTime);
+
+		RestoreCameraRecord(settings.timeRewindCamera, previousRecord.cameraRecord, nextRecord.cameraRecord, 
+							previousRecord.deltaTime);
 
 		RestoreAnimationRecord(settings.Animator, previousRecord.animationRecord, nextRecord.animationRecord, 
-							   nextRecord.deltaTime);
+							   previousRecord.deltaTime);
 
 		Debug.Log("Rewinding... " + nextRecord.stateMachine.GetCurrentStateName());
 	}
 
 	private void RestoreTransformRecord(Transform transform, TransformRecord previousTransformRecord,
-										TransformRecord nextTransformRecord, float nextRecordDeltaTime) {
+										TransformRecord nextTransformRecord, float previousRecordDeltaTime) {
 
-		float lerpAlpha = elapsedTimeSinceLastRecord / nextRecordDeltaTime;
-
+		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
+        
 		//settings.CharacterMovement.CharacterController.Move(Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha) - transform.position);
 		transform.position = Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha);
 		transform.rotation = Quaternion.Slerp(previousTransformRecord.rotation, nextTransformRecord.rotation, lerpAlpha);
@@ -192,19 +202,19 @@ public class TimeForwardStateMachine : StateMachine {
 	} 
 
 	private void RestoreCameraRecord(CinemachineVirtualCamera timeRewindCamera, CameraRecord previousCameraRecord, 
-									 CameraRecord nextCameraRecord, float nextRecordDeltaTime) {
+									 CameraRecord nextCameraRecord, float previousRecordDeltaTime) {
 
 		TransformRecord previousTransformRecord = previousCameraRecord.cameraTransform;
 		TransformRecord nextTransformRecord = nextCameraRecord.cameraTransform;
-		float lerpAlpha = elapsedTimeSinceLastRecord / nextRecordDeltaTime;
+		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
 
-		RestoreTransformRecord(timeRewindCamera.transform, previousTransformRecord, nextTransformRecord, nextRecordDeltaTime);
+		RestoreTransformRecord(timeRewindCamera.transform, previousTransformRecord, nextTransformRecord, previousRecordDeltaTime);
 	}
 
 	private void RestoreAnimationRecord(Animator animator, AnimationRecord previousAnimationRecord, 
-										AnimationRecord nextAnimationRecord, float nextRecordDeltaTime) {
+										AnimationRecord nextAnimationRecord, float previousRecordDeltaTime) {
 
-		float lerpAlpha = elapsedTimeSinceLastRecord / nextRecordDeltaTime;
+		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime; 
 		int layer = 0;
 		if (previousAnimationRecord.isInTransition &&
 			nextAnimationRecord.isInTransition &&
