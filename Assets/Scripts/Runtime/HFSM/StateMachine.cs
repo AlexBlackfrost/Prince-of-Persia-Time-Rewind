@@ -4,6 +4,7 @@ using UnityEngine;
 
 
 namespace HFSM {
+    public enum UpdateMode {  UpdateBeforeChild, UpdateAfterChild }
     /// <summary>
 	/// Hierarchical finite state machine.
 	/// </summary>
@@ -39,6 +40,7 @@ namespace HFSM {
         private List<EventTransitionBase> anyEventTransitions;
         private bool initialized;
         private State anyState;
+        private UpdateMode updateMode;
 
         /// <summary>
         /// Class constructor. Creates a <see cref="StateMachine"/> and initializes it. Throws
@@ -51,7 +53,8 @@ namespace HFSM {
         /// <exception cref="StatelessStateMachineException">
         /// Thrown when no <see cref="StateObject"/> is passed as argument.
         /// </exception>
-        public StateMachine(params StateObject[] stateObjects) : base() {
+        public StateMachine(UpdateMode updateMode = UpdateMode.UpdateBeforeChild, params StateObject[] stateObjects ) : base() {
+            this.updateMode = updateMode;
             if (stateObjects.Length == 0) {
                 throw new StatelessStateMachineException(
                     "A State Machine must have at least one state object." +
@@ -539,8 +542,9 @@ namespace HFSM {
             CheckInitialization();
             bool changedState = TryChangeState();
             if (!changedState) {
-                OnUpdate();
-                CurrentStateObject.UpdateInternal();
+                //OnUpdate();
+                //CurrentStateObject.UpdateInternal();
+                UpdateInternal();
             }
         }
 
@@ -549,8 +553,13 @@ namespace HFSM {
         /// hiearchical finite state machine pattern.
         /// </summary>
         internal sealed override void UpdateInternal() {
-            OnUpdate();
+            if(updateMode == UpdateMode.UpdateBeforeChild) {
+                OnUpdate();
+            }
             CurrentStateObject.UpdateInternal();
+            if(updateMode == UpdateMode.UpdateAfterChild) {
+                OnUpdate();
+            }
         }
 
         /// <summary>
