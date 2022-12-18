@@ -68,7 +68,7 @@ public class TimeForwardStateMachine : StateMachine {
 
 		// Animation
 		settings.Animator.speed = 0;
-		//settings.Animator.enabled = false;
+		settings.Animator.enabled = false;
 		//settings.Animator.applyRootMotion = false;
 		//settings.Animator.Update(0);
 
