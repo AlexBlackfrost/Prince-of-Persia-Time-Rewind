@@ -14,8 +14,7 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private IdleState.IdleSettings idleSettings;
     [field: SerializeField] private MoveState.MoveSettings moveSettings;
     [field: SerializeField] private JumpState.JumpSettings jumpSettings;
-    [field: SerializeField] private TimeForwardStateMachine.TimeForwardSettings timeForwardSettings;
-    [field: SerializeField] private TimeRewindState.TimeRewindSettings timeRewindSettings;
+    [field: SerializeField] private TimeControlStateMachine.TimeForwardSettings timeForwardSettings;
 
     public InputController InputController { get; private set; }
     
@@ -43,11 +42,8 @@ public class PlayerController : MonoBehaviour {
         IdleState idleState = new IdleState(idleSettings);
         MoveState moveState = new MoveState(moveSettings);
         JumpState jumpState = new JumpState(jumpSettings);
-        //TimeRewindState timeRewindState = new TimeRewindState(timeRewindSettings);
-        TimeForwardStateMachine timeForwardStateMachine = new TimeForwardStateMachine(UpdateMode.UpdateAfterChild, timeForwardSettings, idleState, moveState, jumpState);
-        rootStateMachine = new RootStateMachine(timeForwardStateMachine/*, timeRewindState*/);
-        
-        //timeRewindSettings.TimeForwardStateMachine = timeForwardStateMachine;
+        TimeControlStateMachine timeForwardStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, timeForwardSettings, idleState, moveState, jumpState);
+        rootStateMachine = new RootStateMachine(timeForwardStateMachine);
 
         // Create transitions
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
@@ -58,14 +54,11 @@ public class PlayerController : MonoBehaviour {
 
         AnimatorUtils.AnimationEnded += jumpState.AddEventTransition<int>(idleState, JumpAnimationEnded);
 
-        //InputController.TimeRewind.performed += timeForwardStateMachine.AddAnyEventTransition<CallbackContext>(timeRewindState);
-        //InputController.TimeRewind.performed += timeRewindState.AddEventTransition<CallbackContext>(timeForwardStateMachine);
-
         // Store them to modify their values after rewinding
         stateObjects[typeof(IdleState)] = idleState;
         stateObjects[typeof(MoveState)] = moveState;
         stateObjects[typeof(JumpState)] = jumpState;
-        stateObjects[typeof(TimeForwardStateMachine)] = timeForwardStateMachine;
+        stateObjects[typeof(TimeControlStateMachine)] = timeForwardStateMachine;
 
     } 
 
@@ -87,12 +80,6 @@ public class PlayerController : MonoBehaviour {
         timeForwardSettings.StateObjects = stateObjects;
         timeForwardSettings.SkinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
         timeForwardSettings.CharacterMovement = characterMovement;
-
-        timeRewindSettings.TimeRewinder = timeRewinder;
-        timeRewindSettings.Animator = animator;
-        timeRewindSettings.Transform = transform;
-        timeRewindSettings.FreeLookCamera = timeForwardSettings.FreeLookCamera;
-        timeRewindSettings.Camera = timeForwardSettings.Camera;
     }
 
 

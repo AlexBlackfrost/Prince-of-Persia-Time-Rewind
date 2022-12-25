@@ -15,6 +15,7 @@ public class InputController : MonoBehaviour {
         TimeRewind = playerInput.ActionMap.RewindTime;
         Jump = playerInput.ActionMap.Jump;
     }
+    
 
     private void OnEnable() {
         playerInput.ActionMap.Enable();
@@ -30,6 +31,10 @@ public class InputController : MonoBehaviour {
 
     public Vector2 GetMoveDirection() {
         return playerInput.ActionMap.Move.ReadValue<Vector2>();
+    }
+
+    public bool IsTimeRewindPressed() {
+        return TimeRewind.ReadValue<float>() > 0;
     }
 }
 

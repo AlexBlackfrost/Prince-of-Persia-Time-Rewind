@@ -5,19 +5,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
 
-public class TimeForwardStateMachine : StateMachine {
+public class TimeControlStateMachine : StateMachine {
 	[Serializable]
 	public class TimeForwardSettings {
 		public TimeRewinder TimeRewinder { get; set; }
 		[field: SerializeField] public CinemachineFreeLook FreeLookCamera { get; set; }
 		public CinemachineVirtualCamera timeRewindCamera;
-		public Transform Transform { get; set; }
 		public Camera Camera { get; set; }
-		public Animator Animator { get; set; }
 		public InputController InputController { get; set; }
-		public Dictionary<Type, StateObject> StateObjects { get; set; }
-		public SkinnedMeshRenderer SkinnedMeshRenderer { get; set; }
+		public Transform Transform { get; set; }
 		public CharacterMovement CharacterMovement { get; set; }
+		public Animator Animator { get; set; }
+		public SkinnedMeshRenderer SkinnedMeshRenderer { get; set; }
+		public Dictionary<Type, StateObject> StateObjects { get; set; }
 	}
 
 	private TimeForwardSettings settings;
@@ -27,59 +27,47 @@ public class TimeForwardStateMachine : StateMachine {
 	private float rewindSpeed = 0.1f;
 	private NoneState noneState;
 	private int recordedFrames = 0;
+	private CinemachineBrain cinemachineBrain;
 
-	public TimeForwardStateMachine(UpdateMode updateMode, TimeForwardSettings settings, params StateObject[] states) : base(updateMode, states) {
+	public TimeControlStateMachine(UpdateMode updateMode, TimeForwardSettings settings, params StateObject[] states) : base(updateMode, states) {
 		this.settings = settings;
 		noneState = new NoneState();
-		
+
+		cinemachineBrain = settings.Camera.GetComponent<CinemachineBrain>();
+
 		timeIsRewinding = false;
-		settings.InputController.TimeRewind.performed += OnTimeRewindPressed;
 		TimeRewindManager.TimeRewindStart += OnTimeRewindStart;
 		TimeRewindManager.TimeRewindStop += OnTimeRewindStop;
-	}
-
-    protected override void OnUpdate() {
-		if (timeIsRewinding) {
-			RewindPlayerRecord();
-		}
+		Debug.Log(nameof(TimeControlStateMachine)+nameof(recordedFrames));
+		
 	}
 
     protected override void OnLateUpdate() {
+		bool timeRewindPressed = settings.InputController.IsTimeRewindPressed();
+		if (timeRewindPressed && !timeIsRewinding) {
+			TimeRewindManager.StartTimeRewind();
+		} else if (!timeRewindPressed && timeIsRewinding) {
+			TimeRewindManager.StopTimeRewind();
+        }
+		timeIsRewinding = timeRewindPressed;
+
         if (timeIsRewinding) {
-			//RewindPlayerRecord();
-        } else {
-			if(settings.TimeRewinder.records.Count != 0) {
-				PlayerRecord playerRecord = settings.TimeRewinder.records.Pop();
-				CameraRecord cameraRecord = playerRecord.cameraRecord;
-				cameraRecord.cameraTransform = RecordUtils.RecordCameraData(settings.Camera).cameraTransform;
-				playerRecord.cameraRecord = cameraRecord;
-				settings.TimeRewinder.records.Push(playerRecord);
-			}
-			
+			RewindPlayerRecord();
+			cinemachineBrain.ManualUpdate();
+		} else {
+			cinemachineBrain.ManualUpdate();
 			SavePlayerRecord();
         }
-	}
-
-	protected override void OnEnter() {}
-
-	private void OnTimeRewindPressed(CallbackContext ctx) {
-		timeIsRewinding = !timeIsRewinding;
-        if (timeIsRewinding) {
-			TimeRewindManager.StartTimeRewind();
-		} else {
-			TimeRewindManager.StopTimeRewind();
-		}
 	}
 
 	private void OnTimeRewindStart() {
 		elapsedTimeSinceLastRecord = 0;
 		previousRecord = settings.TimeRewinder.records.Pop();
+		nextRecord = settings.TimeRewinder.records.Peek();
 
 		// Animation
 		settings.Animator.speed = 0;
 		settings.Animator.enabled = false;
-		//settings.Animator.applyRootMotion = false;
-		//settings.Animator.Update(0);
 
 		// Camera
 		settings.timeRewindCamera.transform.position = settings.Camera.transform.position;
@@ -95,49 +83,10 @@ public class TimeForwardStateMachine : StateMachine {
 
 	private void OnTimeRewindStop() {
 		// Animation
-		//settings.Animator.enabled = true;
+		settings.Animator.enabled = true;
 		settings.Animator.speed = 1;
 		settings.Animator.applyRootMotion = previousRecord.animationRecord.applyRootMotion;
 		RestoreAnimatorParameters();
-        int layer = 0;
-		float lerpAlpha = elapsedTimeSinceLastRecord / nextRecord.deltaTime;
-        if (previousRecord.animationRecord.isInTransition) {
-			TransitionRecord previousTransitionRecord = previousRecord.animationRecord.transitionRecord;
-			TransitionRecord nextTransitionRecord = nextRecord.animationRecord.transitionRecord;
-			float currentStateNormalizedTime = Mathf.Lerp(previousRecord.animationRecord.normalizedTime,
-														  nextRecord.animationRecord.normalizedTime,
-														  lerpAlpha);
-			float nextStateNormalizedTime = Mathf.Lerp(previousTransitionRecord.nextStateNormalizedTime, 
-													   nextTransitionRecord.nextStateNormalizedTime, 
-													   lerpAlpha);
-			float transitionNormalizedTime = Mathf.Lerp(previousTransitionRecord.normalizedTime,
-														nextTransitionRecord.normalizedTime,
-														lerpAlpha);
-			/*settings.Animator.CrossFadeInFixedTime(previousTransitionRecord.nextStateNameHash,
-												   previousTransitionRecord.transitionDuration ,
-												   layer,
-												   normalizedTime);*/
-			Debug.Log("Is in transition, normalized time: "+ nextStateNormalizedTime);
-			settings.Animator.Play(previousRecord.animationRecord.shortNameHash,
-								   layer,
-								   currentStateNormalizedTime);
-			//settings.Animator.Update(0.0f);
-
-			settings.Animator.CrossFade(previousTransitionRecord.nextStateNameHash, 
-										previousTransitionRecord.transitionDuration, 
-										layer,
-										nextStateNormalizedTime,
-										transitionNormalizedTime);
-		} else {
-			float normalizedTime = Mathf.Lerp(previousRecord.animationRecord.normalizedTime, 
-											  nextRecord.animationRecord.normalizedTime, 
-											  lerpAlpha);
-			settings.Animator.Play(previousRecord.animationRecord.shortNameHash,
-								   layer,
-								   normalizedTime);
-			settings.Animator.Update(0.0f); //Call Update so that root motion is applied
-		}
-
 
 		// Camera
 		settings.timeRewindCamera.gameObject.SetActive(false);
@@ -159,12 +108,8 @@ public class TimeForwardStateMachine : StateMachine {
 
 	private void RewindPlayerRecord() {
 		if (settings.TimeRewinder.records.Count != 0) {
-			nextRecord = settings.TimeRewinder.records.Peek();
 
 			while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && settings.TimeRewinder.records.Count != 0) {
-				//elapsedTimeSinceLastRecord -= nextRecord.deltaTime;
-				//previousRecord = nextRecord;
-				//nextRecord = settings.TimeRewinder.records.Pop();
 				elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
 				previousRecord = settings.TimeRewinder.records.Pop();
 				nextRecord = settings.TimeRewinder.records.Peek(); 
@@ -194,7 +139,6 @@ public class TimeForwardStateMachine : StateMachine {
 
 		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
         
-		//settings.CharacterMovement.CharacterController.Move(Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha) - transform.position);
 		transform.position = Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha);
 		transform.rotation = Quaternion.Slerp(previousTransformRecord.rotation, nextTransformRecord.rotation, lerpAlpha);
 		transform.localScale = Vector3.Lerp(previousTransformRecord.localScale, nextTransformRecord.localScale, lerpAlpha);
@@ -220,6 +164,8 @@ public class TimeForwardStateMachine : StateMachine {
 			nextAnimationRecord.isInTransition &&
 			previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash) {
 
+			// Here we need to interpolate between two frames that belong to the same transition.
+
 			TransitionRecord previousTransitionRecord = previousRecord.animationRecord.transitionRecord;
 			TransitionRecord nextTransitionRecord = nextRecord.animationRecord.transitionRecord;
 
@@ -234,59 +180,34 @@ public class TimeForwardStateMachine : StateMachine {
 														nextTransitionRecord.normalizedTime,
 														lerpAlpha);
 
-			// replace next and current
-			//settings.Animator.speed = 1;
-			/*
-			Debug.Log("Is in transition, normalized time: " + nextStateNormalizedTime);
-			float currentLength = previousAnimationRecord.duration;
-			float currentTime = currentStateNormalizedTime * currentLength;
-			float transitionTime = nextStateNormalizedTime * previousTransitionRecord.nextStateDuration;
-			float transitionLength = transitionTime / transitionNormalizedTime;
-
-			float playTime = ((currentTime - transitionTime) / currentLength) % 1;
-			animator.Play(previousAnimationRecord.shortNameHash, layer, playTime);
-			animator.Update(0f);
-
-			//set crossfade time and update to the required point
-			float crossPlayTime = (transitionTime / previousTransitionRecord.nextStateDuration)% 1f;
-			animator.CrossFade(previousTransitionRecord.nextStateNameHash, transitionLength/currentLength, layer, crossPlayTime);
-			animator.Update(transitionTime);*/
-			
 			settings.Animator.speed = 1;
 			animator.Play(previousAnimationRecord.shortNameHash, layer, currentStateNormalizedTime);
 			animator.Update(0.0f);
 
 			float nextStateFixedTime = nextStateNormalizedTime * previousTransitionRecord.nextStateDuration;
 			// CrossFadeInFixedTime only works if transitionInfo.DurationUnity is fixed. If it's Normalized, use CrossFade instead.
-			animator.CrossFadeInFixedTime(previousTransitionRecord.nextStateNameHash, previousTransitionRecord.transitionDuration, 
+			animator.CrossFadeInFixedTime(previousTransitionRecord.nextStateNameHash, previousTransitionRecord.transitionDuration,
 										  layer, nextStateFixedTime, transitionNormalizedTime);
 			animator.Update(0.0f);
 			settings.Animator.speed = 0;
 			Debug.Log("Transition previous original normalized time = " + previousTransitionRecord.normalizedTime);
 			Debug.Log("Transition next original normalized time = " + nextTransitionRecord.normalizedTime);
-			Debug.Log("Case 0 Current anim short name hash: " + previousAnimationRecord.shortNameHash +
+			Debug.Log("Case0 Current anim short name hash: " + previousAnimationRecord.shortNameHash +
 					  " Next anim short name hash: " + nextTransitionRecord.nextStateNameHash +
 					  " Current anim normalized time: " + currentStateNormalizedTime +
 					  " Next anim normalized time: " + nextStateNormalizedTime +
-					  " TransitionNormalizedTime: " + transitionNormalizedTime); 
+					  " TransitionNormalizedTime: " + transitionNormalizedTime);
 
-		}else if (previousAnimationRecord.isInTransition &&
-				  nextAnimationRecord.isInTransition &&
-				  previousAnimationRecord.shortNameHash != nextAnimationRecord.shortNameHash) {
+		} else if (previousAnimationRecord.isInTransition &&
+				   nextAnimationRecord.isInTransition &&
+				   previousAnimationRecord.shortNameHash != nextAnimationRecord.shortNameHash) {
 
-			// Here we need to interpolate between frames belonging to different transitions, that is,
-			// interpolating between the first frame of a transition and the last frame of another transition
-			
+			/* Here we need to interpolate between frames belonging to different transitions, that is,
+			 interpolating between the first frame of a transition and the last frame of another transition.*/
+
 			TransitionRecord previousTransitionRecord = previousRecord.animationRecord.transitionRecord;
 			TransitionRecord nextTransitionRecord = nextRecord.animationRecord.transitionRecord;
 
-
-			float currentStateNormalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
-														  nextAnimationRecord.normalizedTime,
-														  lerpAlpha);
-			float nextStateNormalizedTime = Mathf.Lerp(previousTransitionRecord.nextStateNormalizedTime,
-													   nextTransitionRecord.nextStateNormalizedTime,
-													   lerpAlpha);
 			float transitionNormalizedTime = Mathf.Lerp(previousTransitionRecord.normalizedTime,
 														nextTransitionRecord.normalizedTime,
 														lerpAlpha);
@@ -304,64 +225,95 @@ public class TimeForwardStateMachine : StateMachine {
 					  " TransitionNormalizedTime: " + transitionNormalizedTime);
 
 
-		} else if(!previousAnimationRecord.isInTransition && nextAnimationRecord.isInTransition) {
+		} else if (!previousAnimationRecord.isInTransition && nextAnimationRecord.isInTransition) {
 			// Here we need to interpolate between the last frame of a transition and the first frame after the transition ends
 			settings.Animator.speed = 1;
 			TransitionRecord transitionRecord = nextAnimationRecord.transitionRecord;
-			float transitionNormalizedTime = transitionRecord.normalizedTime + 
-											 (previousRecord.deltaTime-elapsedTimeSinceLastRecord) / 
+			float transitionNormalizedTime = transitionRecord.normalizedTime +
+											 (previousRecord.deltaTime - elapsedTimeSinceLastRecord) /
 											 transitionRecord.transitionDuration;
-            if (transitionNormalizedTime < 1) {
+			if (transitionNormalizedTime < 1) {
 				float nextStateNormalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
 															  transitionRecord.nextStateNormalizedTime,
 															  lerpAlpha);
 				float nextStateFixedTime = nextStateNormalizedTime * transitionRecord.nextStateDuration;
 				float currentNormalizedTime = nextAnimationRecord.normalizedTime +
-												(previousRecord.deltaTime - elapsedTimeSinceLastRecord) / nextAnimationRecord.duration;
-				float currentFixedTime = currentNormalizedTime * nextAnimationRecord.duration;
-				float transitionFixedTime = transitionNormalizedTime * transitionRecord.transitionDuration;
-				
+											  (previousRecord.deltaTime - elapsedTimeSinceLastRecord) / nextAnimationRecord.duration;
 
-				animator.Play(nextAnimationRecord.shortNameHash, layer, currentNormalizedTime); 
+
+				animator.Play(nextAnimationRecord.shortNameHash, layer, currentNormalizedTime);
 				animator.Update(0.0f);
 				animator.CrossFadeInFixedTime(transitionRecord.nextStateNameHash, transitionRecord.transitionDuration,
 											  layer, nextStateFixedTime, transitionNormalizedTime);
 				animator.Update(0.0f);
-				Debug.Log("Transition original normalized time = " + transitionRecord.normalizedTime + 
-						  " PreviousRecordDeltaTime = " + previousRecord.deltaTime + 
-						  " ElapsedTimeSinceLastRecord = " + elapsedTimeSinceLastRecord + 
+				Debug.Log("Transition original normalized time = " + transitionRecord.normalizedTime +
+						  " PreviousRecordDeltaTime = " + previousRecord.deltaTime +
+						  " ElapsedTimeSinceLastRecord = " + elapsedTimeSinceLastRecord +
 						  " Transition duration = " + transitionRecord.transitionDuration);
-				Debug.Log("Case 2Ttime<1 Current anim normalized time: " + currentNormalizedTime +
+				Debug.Log("Case2 Ttime<1 Current anim normalized time: " + currentNormalizedTime +
 						  " current anim duration: " + previousAnimationRecord.duration +
-						  " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash)+
+						  " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash) +
 						  " Next state normalized time: " + nextStateNormalizedTime +
-						  " Transition normalizedTime: " +  transitionNormalizedTime);
+						  " Transition normalizedTime: " + transitionNormalizedTime);
 			} else {
 				float normalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
 												  nextAnimationRecord.transitionRecord.nextStateNormalizedTime,
 												  lerpAlpha);
 				animator.Play(previousAnimationRecord.shortNameHash, layer, normalizedTime);
 				animator.Update(0.0f);
-				Debug.Log("Case2 Ttime>=1 Current anim normalized time: " + normalizedTime + 
-						  " current anim duration: " + previousAnimationRecord.duration + 
+				Debug.Log("Case2 Ttime>=1 Current anim normalized time: " + normalizedTime +
+						  " current anim duration: " + previousAnimationRecord.duration +
 						  " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));
 			}
-			
-		
-		} else { 
-			// (previousAnimationRecord.isInTransition && !nextAnimationRecord.isInTransition) || (!previousAnimationRecord.isInTransition && !nextAnimationRecord.isInTransition)
-			// Here we need to interpolate between frames 
-			// 1. where the previous frame is the first frame of a transition and the next frame is not part of a transition 
-			// or
-			// 2. that are not part of a transition
+
+
+		} else if (!previousAnimationRecord.isInTransition && !nextAnimationRecord.isInTransition) {
+			// Here we need to interpolate between frames that do not belong to a transition
 			settings.Animator.speed = 1;
-			float normalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime, 
-											  nextAnimationRecord.normalizedTime, 
+			float normalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
+											  nextAnimationRecord.normalizedTime,
 											  lerpAlpha);
 			animator.Play(previousAnimationRecord.shortNameHash, layer, normalizedTime);
 			animator.Update(0.0f);
 			settings.Animator.speed = 0;
 			Debug.Log("Case3 Current anim normalized time: " + normalizedTime + " current anim duration: " + previousAnimationRecord.duration + " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));
+		
+		} else if (previousAnimationRecord.isInTransition && !nextAnimationRecord.isInTransition) {
+			/* Here we need to interpolate between a frame that does not belong to a transition and
+			the first frame of a transition */ 
+			settings.Animator.speed = 1;
+			TransitionRecord transitionRecord = previousAnimationRecord.transitionRecord;
+			float transitionNormalizedTime = transitionRecord.normalizedTime -
+											 elapsedTimeSinceLastRecord / transitionRecord.transitionDuration;
+
+			if (transitionNormalizedTime > 0) {
+				float nextStateNormalizedTime = transitionRecord.nextStateNormalizedTime -
+												elapsedTimeSinceLastRecord / transitionRecord.nextStateDuration;
+				float nextStateFixedTime = nextStateNormalizedTime * transitionRecord.nextStateDuration;
+				float currentNormalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
+														 nextAnimationRecord.normalizedTime,
+														 lerpAlpha);
+
+
+				animator.Play(previousAnimationRecord.shortNameHash, layer, currentNormalizedTime);
+				animator.Update(0.0f);
+				animator.CrossFadeInFixedTime(transitionRecord.nextStateNameHash, transitionRecord.transitionDuration,
+											  layer, nextStateFixedTime, transitionNormalizedTime);
+				animator.Update(0.0f);
+				Debug.Log("Case4 Ttime>0 Current anim normalized time: " + currentNormalizedTime +
+						  " current anim duration: " + previousAnimationRecord.duration +
+						  " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash) +
+						  " Next state normalized time: " + nextStateNormalizedTime +
+						  " Transition normalizedTime: " + transitionNormalizedTime);
+			} else {
+				float normalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
+												  nextAnimationRecord.normalizedTime,
+												  lerpAlpha);
+				animator.Play(previousAnimationRecord.shortNameHash, layer, normalizedTime);
+				animator.Update(0.0f);
+				Debug.Log("Case4 Ttime<=0 Current anim normalized time: " + normalizedTime + " current anim duration: " + previousAnimationRecord.duration + " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));
+			}
+			settings.Animator.speed = 0;
 		}
 	}
 
