@@ -9,11 +9,13 @@ public class InputController : MonoBehaviour {
     private PlayerInput playerInput;
     public InputAction TimeRewind{ get; private set;}
     public InputAction Jump { get; private set;  }
+    public InputAction WallRun { get; private set;  }
 
     private void Awake() {
         playerInput = new PlayerInput();
         TimeRewind = playerInput.ActionMap.RewindTime;
         Jump = playerInput.ActionMap.Jump;
+        WallRun = playerInput.ActionMap.WallRun;
     }
     
 
@@ -35,6 +37,13 @@ public class InputController : MonoBehaviour {
 
     public bool IsTimeRewindPressed() {
         return TimeRewind.ReadValue<float>() > 0;
+    }
+
+    public bool IsWallRunPressed() {
+        return WallRun.ReadValue<float>() > 0;
+    }
+    public bool IsWallRunNotPressed() {
+        return !IsWallRunPressed();
     }
 }
 

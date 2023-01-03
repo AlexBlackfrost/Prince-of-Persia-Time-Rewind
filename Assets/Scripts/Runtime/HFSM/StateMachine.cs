@@ -4,6 +4,13 @@ using UnityEngine;
 
 
 namespace HFSM {
+    public struct StateMachineRecord {
+        public bool initialized;
+        public StateMachineRecord(bool initialized) {
+            this.initialized = initialized;
+        }
+    }
+
     public enum UpdateMode {  UpdateBeforeChild, UpdateAfterChild }
     /// <summary>
 	/// Hierarchical finite state machine.
@@ -584,6 +591,11 @@ namespace HFSM {
             CurrentStateObject.LateUpdate();
         }
 
+        public sealed override void OnAnimatorMove() {
+            OnOnAnimatorMove();
+            CurrentStateObject.OnAnimatorMove();
+        }
+
         /// <summary>
         /// Executes the code needed to implement the state machine beahviour of a 
         /// hierarchical finite state machine pattern as well as the logic defined in the extended classes.
@@ -635,14 +647,13 @@ namespace HFSM {
             return copy;
         }
 
-        public override void RestorePropertiesValues(StateObject other) {
-            base.RestorePropertiesValues(other);
-            StateMachine otherStateMachine = (StateMachine) other;
+        public override object RecordFieldsAndProperties() {
+            return new StateMachineRecord(initialized);
+        }
 
-            initialized = otherStateMachine.initialized;
-            CurrentStateObject = otherStateMachine.CurrentStateObject;
-
-            CurrentStateObject.RestorePropertiesValues(otherStateMachine.CurrentStateObject);
+        public override void RestoreFieldsAndProperties(object stateObjectRecord) {
+            StateMachineRecord stateMachineRecord = (StateMachineRecord)stateObjectRecord;
+            initialized = stateMachineRecord.initialized;
         }
     }
 }

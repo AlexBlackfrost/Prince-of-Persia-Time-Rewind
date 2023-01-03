@@ -75,6 +75,10 @@ namespace HFSM {
             OnLateUpdate();
         }
 
+        public sealed override void OnAnimatorMove() {
+            OnOnAnimatorMove();
+        }
+
         /// <summary>
         /// Executes the code needed to implement the state beahviour of a 
         /// hierarchical finite state machine pattern as well as the logic defined in the extended classes.

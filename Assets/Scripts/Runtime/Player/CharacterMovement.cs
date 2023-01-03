@@ -7,22 +7,52 @@ using System;
     [SerializeField] private float rotationSpeed = 12;
     [SerializeField] private float acceleration = 500f;
     [SerializeField] private float gravity = -40f;
+
     public CharacterController CharacterController { get; set; }
     public Transform Transform {get;set;}
-
+    public Vector3 Velocity {
+        get {
+            return velocity;
+        }
+        set {
+            velocity = value;
+        }
+    }
     private Vector3 velocity;
 
     public void Move(Vector3 direction) {
         velocity += direction.normalized * acceleration * Time.deltaTime;
-        velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
-
+        Vector2 clampedVelocity = Vector2.ClampMagnitude(velocity.XZ(), maxSpeed);
+        velocity.x = clampedVelocity.x;
+        velocity.z = clampedVelocity.y;
         ApplyGravity();
 
         CharacterController.Move(velocity * Time.deltaTime);
 
-        Vector3 velocityXZ = new Vector3(velocity.x, 0, velocity.z);
-        Quaternion targetRotation = Quaternion.LookRotation(velocityXZ);
-        Transform.rotation = Quaternion.Slerp(Transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        if(direction.magnitude> float.Epsilon) {
+            Quaternion targetRotation = Quaternion.LookRotation(new Vector3(velocity.x, 0.0f, velocity.z));
+            Transform.rotation = Quaternion.Slerp(Transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+    }
+
+    public void Move(Vector3 direction, float speed) {
+        velocity = direction * speed;
+        ApplyGravity();
+        CharacterController.Move(velocity * Time.deltaTime);
+    }
+
+    public void MoveAmount(Vector3 displacement) {
+        velocity = displacement/Time.deltaTime;
+        CharacterController.Move(displacement);
+    }
+
+    public void SetPosition(Vector3 position) {
+        Vector3 delta = position - Transform.position;
+        CharacterController.Move(delta);
+    }
+
+    public void SetRotation(Quaternion rotation) {
+        Transform.rotation = rotation;
     }
 
     public void ApplyGravity() {
@@ -33,5 +63,8 @@ using System;
         }
     }
 
+    public bool IsGrounded() {
+        return CharacterController.isGrounded;
+    }
 }
 

@@ -9,7 +9,7 @@ namespace HFSM {
 	/// </summary>
     public abstract class StateObject {
         internal StateMachine StateMachine { get; set; }
-        public bool IsActive { get; private protected set; }
+        public bool IsActive { get; set; }
         private protected List<Transition> transitions;
         private protected List<EventTransitionBase> eventTransitions;
 
@@ -435,6 +435,7 @@ namespace HFSM {
         /// the regular Update cycle. It should be called from MonoBehaviour.LateUpdate function.
         /// </summary>
         public abstract void LateUpdate();
+        public abstract void OnAnimatorMove();
 
         /// <summary>
         /// Executes the logic needed to implement the hierarchical finite state machine pattern 
@@ -465,6 +466,8 @@ namespace HFSM {
         /// </summary>
         protected virtual void OnLateUpdate() { }
 
+        protected virtual void OnOnAnimatorMove() { }
+
         /// <summary>
         /// Custom logic defined in concrete <see cref="StateObject"/> classes that gets executed when a new <see cref="StateObject"/> is entered.
         /// </summary>
@@ -480,11 +483,14 @@ namespace HFSM {
             return copy;
         }
 
-        public virtual void RestorePropertiesValues(StateObject other) {
-            IsActive = other.IsActive;
+        public virtual void RestoreFieldsAndProperties(object stateObjectRecord) { }
 
+        public virtual object RecordFieldsAndProperties() {
+            return null; 
         }
 
     }
 }
+
+
 

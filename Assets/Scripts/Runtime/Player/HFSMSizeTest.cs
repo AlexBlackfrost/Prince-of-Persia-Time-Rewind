@@ -23,7 +23,7 @@ public class HFSMSizeTest : MonoBehaviour {
         }
     }
     private void Start() {
-        Test2();
+        Test3();
 
     }
     private void Test1() {
@@ -51,7 +51,40 @@ public class HFSMSizeTest : MonoBehaviour {
         //Dictionary<int, Test2Struct> dict = new Dictionary<int, Test2Struct>(5);
     }
 
-    // Update is called once per frame
+    public class Dummy {
+        public float var1;
+        public float var2;
+        public float var3;
+        public Dummy(float var1, float var2, float var3) {
+            this.var1 = var1;
+            this.var2 = var2;
+            this.var3 = var3;
+        }
+    }
+
+    public struct DummyStruct {
+        public Dummy dummyObj;
+        public DummyStruct(Dummy dummyObj) {
+            //this.dummyObj = new Dummy(dummyObj.var1, dummyObj.var2, dummyObj.var3);
+            this.dummyObj = dummyObj;
+        }
+    }
+
+    private void Test3() {
+        Dummy dummy1 = new Dummy(1, 2, 3);
+        DummyStruct dummyStruct1 = new DummyStruct(dummy1);
+        DummyStruct dummyStruct2 = new DummyStruct(dummy1);
+        DummyStruct dummyStruct3 = new DummyStruct(dummy1);
+        DummyStruct dummyStruct4 = new DummyStruct(dummy1);
+        DummyStruct dummyStruct5 = new DummyStruct(dummy1);
+        DummyStruct dummyStruct6 = new DummyStruct(dummy1);
+        DummyStruct dummyStruct7 = new DummyStruct(dummy1);
+        DummyStruct dummyStruct8 = new DummyStruct(dummy1);
+        //Dummy dummy2 = dummy1;
+        //Dummy dummy3 = dummy1;
+    }
+   
+
     private void Update() {
         
     }

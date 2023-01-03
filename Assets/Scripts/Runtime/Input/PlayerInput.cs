@@ -49,6 +49,14 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press""
+                },
+                {
+                    ""name"": ""WallRun"",
+                    ""type"": ""Button"",
+                    ""id"": ""0bc605db-c802-4393-a0f3-cbb4a4b0f00f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)""
                 }
             ],
             ""bindings"": [
@@ -139,6 +147,17 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1b557da4-8661-4666-a807-1900b286e9d4"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""WallRun"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -151,6 +170,7 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         m_ActionMap_Move = m_ActionMap.FindAction("Move", throwIfNotFound: true);
         m_ActionMap_RewindTime = m_ActionMap.FindAction("RewindTime", throwIfNotFound: true);
         m_ActionMap_Jump = m_ActionMap.FindAction("Jump", throwIfNotFound: true);
+        m_ActionMap_WallRun = m_ActionMap.FindAction("WallRun", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -204,6 +224,7 @@ public class @PlayerInput : IInputActionCollection, IDisposable
     private readonly InputAction m_ActionMap_Move;
     private readonly InputAction m_ActionMap_RewindTime;
     private readonly InputAction m_ActionMap_Jump;
+    private readonly InputAction m_ActionMap_WallRun;
     public struct ActionMapActions
     {
         private @PlayerInput m_Wrapper;
@@ -212,6 +233,7 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         public InputAction @Move => m_Wrapper.m_ActionMap_Move;
         public InputAction @RewindTime => m_Wrapper.m_ActionMap_RewindTime;
         public InputAction @Jump => m_Wrapper.m_ActionMap_Jump;
+        public InputAction @WallRun => m_Wrapper.m_ActionMap_WallRun;
         public InputActionMap Get() { return m_Wrapper.m_ActionMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -233,6 +255,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                 @Jump.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
                 @Jump.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
                 @Jump.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
+                @WallRun.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
+                @WallRun.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
+                @WallRun.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
             }
             m_Wrapper.m_ActionMapActionsCallbackInterface = instance;
             if (instance != null)
@@ -249,6 +274,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
+                @WallRun.started += instance.OnWallRun;
+                @WallRun.performed += instance.OnWallRun;
+                @WallRun.canceled += instance.OnWallRun;
             }
         }
     }
@@ -259,5 +287,6 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnRewindTime(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnWallRun(InputAction.CallbackContext context);
     }
 }

@@ -14,7 +14,10 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private IdleState.IdleSettings idleSettings;
     [field: SerializeField] private MoveState.MoveSettings moveSettings;
     [field: SerializeField] private JumpState.JumpSettings jumpSettings;
-    [field: SerializeField] private TimeControlStateMachine.TimeForwardSettings timeForwardSettings;
+    [field: SerializeField] private TimeControlStateMachine.TimeControlSettings timeControlSettings;
+    [field: SerializeField] private WallRunState.WallRunSettings wallRunSettings;
+    [field: SerializeField] private FallState.FallSettings fallSettings;
+    [field: SerializeField] private LandState.LandSettings landSettings;
 
     public InputController InputController { get; private set; }
     
@@ -22,17 +25,19 @@ public class PlayerController : MonoBehaviour {
     public RootStateMachine rootStateMachine;
     private TimeRewinder timeRewinder;
     private Dictionary<Type, StateObject> stateObjects;
-
+    private GameObject wall;
+    private PerceptionSystem perceptionSystem;
 
     private void Awake() {
         characterMovement.Transform = transform;
         characterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         InputController = GetComponent<InputController>();
+        perceptionSystem = GetComponent<PerceptionSystem>();
         timeRewinder = GetComponent<TimeRewinder>();
         stateObjects = new Dictionary<Type, StateObject>();
 
-        InitHFSMSettings();
+        InjectDependencies();
         BuildHFSM();
         rootStateMachine.Init();
     }
@@ -42,27 +47,50 @@ public class PlayerController : MonoBehaviour {
         IdleState idleState = new IdleState(idleSettings);
         MoveState moveState = new MoveState(moveSettings);
         JumpState jumpState = new JumpState(jumpSettings);
-        TimeControlStateMachine timeForwardStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, timeForwardSettings, idleState, moveState, jumpState);
+        WallRunState wallRunState = new WallRunState(wallRunSettings);
+        FallState fallState = new FallState(fallSettings);
+        LandState landState = new LandState(landSettings);
+        TimeControlStateMachine timeForwardStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, 
+                                                                                      timeControlSettings, 
+                                                                                      idleState, moveState, jumpState,
+                                                                                      wallRunState, fallState, landState);
         rootStateMachine = new RootStateMachine(timeForwardStateMachine);
 
         // Create transitions
+        // Idle ->
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         idleState.AddTransition(moveState, IsMoving);
          
+        // Move ->
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
         moveState.AddTransition(idleState, IsNotMoving);
+        moveState.AddTransition(wallRunState, SetWall, InputController.IsWallRunPressed, perceptionSystem.IsRunnableWallNear);
 
+        // Jump ->
         AnimatorUtils.AnimationEnded += jumpState.AddEventTransition<int>(idleState, JumpAnimationEnded);
+
+        // WallRun ->
+        AnimatorUtils.AnimationEnded += wallRunState.AddEventTransition<int>(fallState, WallRunAnimationEnded);
+        wallRunState.AddTransition(fallState, InputController.IsWallRunNotPressed);
+
+        // Fall ->
+        fallState.AddTransition(landState, perceptionSystem.IsGroundNear);
+
+        // Land ->
+        AnimatorUtils.AnimationEnded += landState.AddEventTransition<int>(idleState, LandAnimationEnded);
 
         // Store them to modify their values after rewinding
         stateObjects[typeof(IdleState)] = idleState;
         stateObjects[typeof(MoveState)] = moveState;
         stateObjects[typeof(JumpState)] = jumpState;
+        stateObjects[typeof(WallRunState)] = wallRunState;
+        stateObjects[typeof(FallState)] = fallState;
+        stateObjects[typeof(LandState)] = landState;
         stateObjects[typeof(TimeControlStateMachine)] = timeForwardStateMachine;
 
     } 
 
-    private void InitHFSMSettings() {
+    private void InjectDependencies() {
         idleSettings.Animator = animator;
         idleSettings.CharacterMovement = characterMovement;
 
@@ -72,24 +100,62 @@ public class PlayerController : MonoBehaviour {
 
         jumpSettings.Animator = animator;
 
-        timeForwardSettings.TimeRewinder = timeRewinder;
-        timeForwardSettings.Transform = transform;
-        timeForwardSettings.Camera = Camera.main;
-        timeForwardSettings.Animator = animator;
-        timeForwardSettings.InputController = InputController;
-        timeForwardSettings.StateObjects = stateObjects;
-        timeForwardSettings.SkinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
-        timeForwardSettings.CharacterMovement = characterMovement;
+        timeControlSettings.TimeRewinder = timeRewinder;
+        timeControlSettings.Transform = transform;
+        timeControlSettings.Camera = Camera.main;
+        timeControlSettings.Animator = animator;
+        timeControlSettings.InputController = InputController;
+        timeControlSettings.StateObjects = stateObjects;
+        timeControlSettings.CharacterMovement = characterMovement;
+
+        wallRunSettings.Animator = animator;
+        wallRunSettings.Transform = transform;
+        wallRunSettings.CharacterMovement = characterMovement;
+
+        fallSettings.Animator = animator;
+        fallSettings.CharacterMovement = characterMovement;
+        fallSettings.InputController = InputController;
+        fallSettings.MainCamera = Camera.main;
+        fallSettings.Transform = transform;
+
+        landSettings.Animator = animator;
+        landSettings.CharacterMovement = characterMovement;
+        landSettings.InputController = InputController;
+        landSettings.MainCamera = Camera.main;
+        landSettings.Transform = transform;
     }
 
 
-    #region Transitions
+    #region Transition conditions
     private bool IsMoving() {
         return InputController.IsMoving();
     }
 
     private bool IsNotMoving() {
         return !InputController.IsMoving();
+    }
+    private bool JumpAnimationEnded(int stateNameHash) {
+        return Animator.StringToHash("Jump") == stateNameHash;
+    }
+
+    private bool WallRunAnimationEnded(int stateNameHash) {
+        return Animator.StringToHash("WallRunRight") == stateNameHash ||
+               Animator.StringToHash("WallRunLeft") == stateNameHash;
+    }
+
+    private bool LandAnimationEnded(int stateNameHash) {
+        return Animator.StringToHash("Land") == stateNameHash;
+    }
+
+    private bool StateNameHashEquals(int stateNameHash, string stateName) {
+        return Animator.StringToHash(stateName) == stateNameHash;
+    }
+    #endregion
+
+    #region Transition actions
+    private void SetWall() {
+        wallRunSettings.Wall = perceptionSystem.CurrentWall;
+        wallRunSettings.WallSide = perceptionSystem.CurrentWallDirection;
     }
     #endregion
 
@@ -106,13 +172,5 @@ public class PlayerController : MonoBehaviour {
         rootStateMachine.LateUpdate();
     }
 
-    #region Conditions
-    private bool JumpAnimationEnded(int stateNameHash) {
-        return Animator.StringToHash("Jump") == stateNameHash;
-    }
-
-    private bool StateNameHashEquals(int stateNameHash, string stateName) {
-        return Animator.StringToHash(stateName) == stateNameHash;
-    }
-    #endregion
+    
 }

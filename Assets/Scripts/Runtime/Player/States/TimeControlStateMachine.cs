@@ -7,7 +7,7 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class TimeControlStateMachine : StateMachine {
 	[Serializable]
-	public class TimeForwardSettings {
+	public class TimeControlSettings {
 		public TimeRewinder TimeRewinder { get; set; }
 		[field: SerializeField] public CinemachineFreeLook FreeLookCamera { get; set; }
 		public CinemachineVirtualCamera timeRewindCamera;
@@ -16,20 +16,18 @@ public class TimeControlStateMachine : StateMachine {
 		public Transform Transform { get; set; }
 		public CharacterMovement CharacterMovement { get; set; }
 		public Animator Animator { get; set; }
-		public SkinnedMeshRenderer SkinnedMeshRenderer { get; set; }
 		public Dictionary<Type, StateObject> StateObjects { get; set; }
 	}
 
-	private TimeForwardSettings settings;
+	private TimeControlSettings settings;
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
 	private PlayerRecord previousRecord, nextRecord;
 	private float rewindSpeed = 0.1f;
 	private NoneState noneState;
-	private int recordedFrames = 0;
 	private CinemachineBrain cinemachineBrain;
 
-	public TimeControlStateMachine(UpdateMode updateMode, TimeForwardSettings settings, params StateObject[] states) : base(updateMode, states) {
+	public TimeControlStateMachine(UpdateMode updateMode, TimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		this.settings = settings;
 		noneState = new NoneState();
 
@@ -38,7 +36,6 @@ public class TimeControlStateMachine : StateMachine {
 		timeIsRewinding = false;
 		TimeRewindManager.TimeRewindStart += OnTimeRewindStart;
 		TimeRewindManager.TimeRewindStop += OnTimeRewindStop;
-		Debug.Log(nameof(TimeControlStateMachine)+nameof(recordedFrames));
 		
 	}
 
@@ -93,7 +90,7 @@ public class TimeControlStateMachine : StateMachine {
 		settings.FreeLookCamera.gameObject.SetActive(true);
 
 		// State machine
-		RestoreStateMachine(nextRecord.stateMachine);
+		RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
     }
 
     private void SavePlayerRecord() {
@@ -101,23 +98,20 @@ public class TimeControlStateMachine : StateMachine {
 																 settings.Camera,
 																 this,
 																 settings.Animator,
-																 settings.SkinnedMeshRenderer.bones);
+																 settings.CharacterMovement);
 
 		settings.TimeRewinder.records.Push(playerRecord);
 	}
 
 	private void RewindPlayerRecord() {
-		if (settings.TimeRewinder.records.Count != 0) {
-
-			while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && settings.TimeRewinder.records.Count != 0) {
-				elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
-				previousRecord = settings.TimeRewinder.records.Pop();
-				nextRecord = settings.TimeRewinder.records.Peek(); 
-			}
-
-			RestorePlayerRecord(previousRecord, nextRecord);
-			elapsedTimeSinceLastRecord += Time.deltaTime * rewindSpeed;
+		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && !settings.TimeRewinder.records.IsEmpty()) {
+			elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
+			previousRecord = settings.TimeRewinder.records.Pop();
+			nextRecord = settings.TimeRewinder.records.Peek(); 
 		}
+
+		RestorePlayerRecord(previousRecord, nextRecord);
+		elapsedTimeSinceLastRecord += Time.deltaTime * rewindSpeed;
 	}
 
 
@@ -131,7 +125,11 @@ public class TimeControlStateMachine : StateMachine {
 		RestoreAnimationRecord(settings.Animator, previousRecord.animationRecord, nextRecord.animationRecord, 
 							   previousRecord.deltaTime);
 
-		Debug.Log("Rewinding... " + nextRecord.stateMachine.GetCurrentStateName());
+		RestoreCharacterMovementRecord(settings.CharacterMovement, previousRecord.characterMovementRecord,
+									   nextRecord.characterMovementRecord, previousRecord.deltaTime);
+
+
+		Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());
 	}
 
 	private void RestoreTransformRecord(Transform transform, TransformRecord previousTransformRecord,
@@ -190,17 +188,18 @@ public class TimeControlStateMachine : StateMachine {
 										  layer, nextStateFixedTime, transitionNormalizedTime);
 			animator.Update(0.0f);
 			settings.Animator.speed = 0;
-			Debug.Log("Transition previous original normalized time = " + previousTransitionRecord.normalizedTime);
+			/*Debug.Log("Transition previous original normalized time = " + previousTransitionRecord.normalizedTime);
 			Debug.Log("Transition next original normalized time = " + nextTransitionRecord.normalizedTime);
 			Debug.Log("Case0 Current anim short name hash: " + previousAnimationRecord.shortNameHash +
 					  " Next anim short name hash: " + nextTransitionRecord.nextStateNameHash +
 					  " Current anim normalized time: " + currentStateNormalizedTime +
 					  " Next anim normalized time: " + nextStateNormalizedTime +
-					  " TransitionNormalizedTime: " + transitionNormalizedTime);
+					  " TransitionNormalizedTime: " + transitionNormalizedTime);*/
 
 		} else if (previousAnimationRecord.isInTransition &&
 				   nextAnimationRecord.isInTransition &&
 				   previousAnimationRecord.shortNameHash != nextAnimationRecord.shortNameHash) {
+
 
 			/* Here we need to interpolate between frames belonging to different transitions, that is,
 			 interpolating between the first frame of a transition and the last frame of another transition.*/
@@ -218,11 +217,11 @@ public class TimeControlStateMachine : StateMachine {
 			animator.Play(nextAnimationRecord.shortNameHash, layer, normalizedTime);
 			animator.Update(0.0f);
 			settings.Animator.speed = 0;
-			Debug.Log("Case1 Current anim short name hash: " + previousAnimationRecord.shortNameHash +
+			/*Debug.Log("Case1 Current anim short name hash: " + previousAnimationRecord.shortNameHash +
 					  " Next anim short name hash: " + nextTransitionRecord.nextStateNameHash +
 					  " previous anim normalized time: " + previousAnimationRecord.normalizedTime +
 					  " Next anim normalized time: " + nextAnimationRecord.transitionRecord.nextStateNormalizedTime +
-					  " TransitionNormalizedTime: " + transitionNormalizedTime);
+					  " TransitionNormalizedTime: " + transitionNormalizedTime);*/
 
 
 		} else if (!previousAnimationRecord.isInTransition && nextAnimationRecord.isInTransition) {
@@ -246,24 +245,25 @@ public class TimeControlStateMachine : StateMachine {
 				animator.CrossFadeInFixedTime(transitionRecord.nextStateNameHash, transitionRecord.transitionDuration,
 											  layer, nextStateFixedTime, transitionNormalizedTime);
 				animator.Update(0.0f);
-				Debug.Log("Transition original normalized time = " + transitionRecord.normalizedTime +
+				/*Debug.Log("Transition original normalized time = " + transitionRecord.normalizedTime +
 						  " PreviousRecordDeltaTime = " + previousRecord.deltaTime +
 						  " ElapsedTimeSinceLastRecord = " + elapsedTimeSinceLastRecord +
-						  " Transition duration = " + transitionRecord.transitionDuration);
-				Debug.Log("Case2 Ttime<1 Current anim normalized time: " + currentNormalizedTime +
+						  " Transition duration = " + transitionRecord.transitionDuration);*/
+				/*Debug.Log("Case2 Ttime<1 Current anim normalized time: " + currentNormalizedTime +
 						  " current anim duration: " + previousAnimationRecord.duration +
 						  " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash) +
 						  " Next state normalized time: " + nextStateNormalizedTime +
-						  " Transition normalizedTime: " + transitionNormalizedTime);
+						  " Transition normalizedTime: " + transitionNormalizedTime);*/
 			} else {
 				float normalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
 												  nextAnimationRecord.transitionRecord.nextStateNormalizedTime,
 												  lerpAlpha);
 				animator.Play(previousAnimationRecord.shortNameHash, layer, normalizedTime);
 				animator.Update(0.0f);
-				Debug.Log("Case2 Ttime>=1 Current anim normalized time: " + normalizedTime +
+				/*Debug.Log("Case2 Ttime>=1 Current anim normalized time: " + normalizedTime +
 						  " current anim duration: " + previousAnimationRecord.duration +
-						  " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));
+						  " Next and previous record are same state: " + 
+						  (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));*/
 			}
 
 
@@ -276,7 +276,9 @@ public class TimeControlStateMachine : StateMachine {
 			animator.Play(previousAnimationRecord.shortNameHash, layer, normalizedTime);
 			animator.Update(0.0f);
 			settings.Animator.speed = 0;
-			Debug.Log("Case3 Current anim normalized time: " + normalizedTime + " current anim duration: " + previousAnimationRecord.duration + " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));
+			/*Debug.Log("Case3 Current anim normalized time: " + normalizedTime + " current anim duration: " + 
+						previousAnimationRecord.duration + " Next and previous record are same state: " + 
+						(previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));*/
 		
 		} else if (previousAnimationRecord.isInTransition && !nextAnimationRecord.isInTransition) {
 			/* Here we need to interpolate between a frame that does not belong to a transition and
@@ -300,18 +302,20 @@ public class TimeControlStateMachine : StateMachine {
 				animator.CrossFadeInFixedTime(transitionRecord.nextStateNameHash, transitionRecord.transitionDuration,
 											  layer, nextStateFixedTime, transitionNormalizedTime);
 				animator.Update(0.0f);
-				Debug.Log("Case4 Ttime>0 Current anim normalized time: " + currentNormalizedTime +
+				/*Debug.Log("Case4 Ttime>0 Current anim normalized time: " + currentNormalizedTime +
 						  " current anim duration: " + previousAnimationRecord.duration +
 						  " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash) +
 						  " Next state normalized time: " + nextStateNormalizedTime +
-						  " Transition normalizedTime: " + transitionNormalizedTime);
+						  " Transition normalizedTime: " + transitionNormalizedTime);*/
 			} else {
 				float normalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
 												  nextAnimationRecord.normalizedTime,
 												  lerpAlpha);
 				animator.Play(previousAnimationRecord.shortNameHash, layer, normalizedTime);
 				animator.Update(0.0f);
-				Debug.Log("Case4 Ttime<=0 Current anim normalized time: " + normalizedTime + " current anim duration: " + previousAnimationRecord.duration + " Next and previous record are same state: " + (previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));
+				/*Debug.Log("Case4 Ttime<=0 Current anim normalized time: " + normalizedTime + " current anim duration: " +
+							previousAnimationRecord.duration + " Next and previous record are same state: " + 
+							(previousAnimationRecord.shortNameHash == nextAnimationRecord.shortNameHash));*/
 			}
 			settings.Animator.speed = 0;
 		}
@@ -341,11 +345,39 @@ public class TimeControlStateMachine : StateMachine {
 		}
 	}
 
-	private void RestoreStateMachine(StateMachine stateMachine) {
+	private void RestoreStateMachineRecord(Dictionary<Type, StateObject> stateObjects, StateMachineRecord stateMachineRecord) {
+		for(int i=0; i < stateMachineRecord.hierarchy.Length-1; i++) {
+			Type id = stateMachineRecord.hierarchy[i];
+			StateMachine stateMachine = (StateMachine)stateObjects[id];
+			stateMachine.IsActive = true;
+			stateMachine.CurrentStateObject = stateObjects[stateMachineRecord.hierarchy[i + 1]];
+			stateMachine.RestoreFieldsAndProperties(stateMachineRecord.stateObjectRecords[i]);
+		}
+		int leaftStateIndex = stateMachineRecord.hierarchy.Length - 1;
+		Type leaftStateId = stateMachineRecord.hierarchy[leaftStateIndex];
+		StateObject leafState = stateObjects[leaftStateId];
+		leafState.IsActive = true;
+		leafState.RestoreFieldsAndProperties(stateMachineRecord.stateObjectRecords[leaftStateIndex]);
+		CurrentStateObject = stateObjects[stateMachineRecord.hierarchy[0]];
+
+		/*
 		StateObject newCurrentStateObject = settings.StateObjects[stateMachine.CurrentStateObject.GetType()];
 		newCurrentStateObject.RestorePropertiesValues(stateMachine.CurrentStateObject);
-		CurrentStateObject = newCurrentStateObject;
+		CurrentStateObject = newCurrentStateObject;*/
 		//copy stateMachine.CurrentStateObject values to the original stateobject that is referenced by transitions objects and so on
 	}
+
+
+	private void RestoreCharacterMovementRecord(CharacterMovement characterMovement,
+												CharacterMovementRecord previousCharacterMovementRecord,
+												CharacterMovementRecord nextCharacterMovementRecord,
+												float previousRecordDeltaTime) {
+
+		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
+		Vector3 velocity = Vector3.Lerp(previousCharacterMovementRecord.velocity,
+										nextCharacterMovementRecord.velocity,
+										lerpAlpha);
+		characterMovement.Velocity = velocity;
+    }
 
 }
