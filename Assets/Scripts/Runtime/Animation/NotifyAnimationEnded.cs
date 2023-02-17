@@ -13,60 +13,16 @@ public class NotifyAnimationEnded : StateMachineBehaviour {
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         eventFired = false;
-        if (stateInfo.shortNameHash == Animator.StringToHash("Land")) {
-            Debug.Log("Land enter");
-        }else if(stateInfo.shortNameHash == Animator.StringToHash("Fall")){
-            Debug.Log("Fall enter");
-        } else if (stateInfo.shortNameHash == Animator.StringToHash("WallRunRight")) {
-            Debug.Log("WallRunRight enter");
-        } else if (stateInfo.shortNameHash == Animator.StringToHash("WallRunLeft")) {
-            Debug.Log("WallRunLeft enter");
-        } else {
-            Debug.Log("other enter");
-        }
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         if (normalizedTimeFireEvent >= 0 && stateInfo.normalizedTime > normalizedTimeFireEvent && !eventFired ) {
             animator.NotifyAnimationEnded(stateInfo.shortNameHash);
             eventFired = true;
-            if (stateInfo.shortNameHash == Animator.StringToHash("Land")) {
-                Debug.Log("Land fired event");
-            } else if (stateInfo.shortNameHash == Animator.StringToHash("Fall")) {
-                Debug.Log("Fall fired event");
-            } else if (stateInfo.shortNameHash == Animator.StringToHash("WallRunRight")) {
-                Debug.Log("WallRunRight fired event");
-            } else if (stateInfo.shortNameHash == Animator.StringToHash("WallRunLeft")) {
-                Debug.Log("WallRunLeft fired event");
-            } else {
-                Debug.Log("other fired event");
-            }
         }
     }
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (stateInfo.shortNameHash == Animator.StringToHash("Land")) {
-            Debug.Log("Land exit");
-        } else if (stateInfo.shortNameHash == Animator.StringToHash("Fall")) {
-            Debug.Log("Fall exit");
-        } else if (stateInfo.shortNameHash == Animator.StringToHash("WallRunRight")) {
-            Debug.Log("WallRunRight exit");
-        } else if (stateInfo.shortNameHash == Animator.StringToHash("WallRunLeft")) {
-            Debug.Log("WallRunLeft exit");
-        } else {
-            Debug.Log("other exit");
-        }
         if (!eventFired) {
-            if (stateInfo.shortNameHash == Animator.StringToHash("Land")) {
-                Debug.Log("Land fired event");
-            } else if (stateInfo.shortNameHash == Animator.StringToHash("Fall")) {
-                Debug.Log("Fall fired event");
-            } else if (stateInfo.shortNameHash == Animator.StringToHash("WallRunRight")) {
-                Debug.Log("WallRunRight fired event");
-            } else if (stateInfo.shortNameHash == Animator.StringToHash("WallRunLeft")) {
-                Debug.Log("WallRunLeft fired event");
-            } else {
-                Debug.Log("other fired event");
-            }
             animator.NotifyAnimationEnded(stateInfo.shortNameHash);
             eventFired = true;
         }

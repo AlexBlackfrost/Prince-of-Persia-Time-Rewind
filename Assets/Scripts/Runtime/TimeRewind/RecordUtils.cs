@@ -58,6 +58,8 @@ public struct AnimationRecord {
     public AnimationParameter[] parameters;
     public bool isInTransition;
     public TransitionRecord transitionRecord;
+    public TransitionRecord interruptedTransition;
+    public bool IsInterruptingCurrentStateTransition;
 
     public AnimationRecord(bool applyRootMotion, int shortNameHash,
                            float normalizedTime, float duration, AnimationParameter[] parameters) {
@@ -68,6 +70,8 @@ public struct AnimationRecord {
         this.parameters = parameters;
         this.isInTransition = false;
         transitionRecord = default(TransitionRecord);
+        interruptedTransition = default(TransitionRecord);
+        IsInterruptingCurrentStateTransition = false;
     }
 }
 
@@ -159,7 +163,7 @@ public static class RecordUtils {
             
         }
 
-        //Debug.Log(output);
+        Debug.Log(output);
         return animationRecord;
     }
 

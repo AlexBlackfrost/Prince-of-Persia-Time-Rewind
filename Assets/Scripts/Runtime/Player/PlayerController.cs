@@ -50,11 +50,11 @@ public class PlayerController : MonoBehaviour {
         WallRunState wallRunState = new WallRunState(wallRunSettings);
         FallState fallState = new FallState(fallSettings);
         LandState landState = new LandState(landSettings);
-        TimeControlStateMachine timeForwardStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, 
+        TimeControlStateMachine timeControlStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, 
                                                                                       timeControlSettings, 
                                                                                       idleState, moveState, jumpState,
                                                                                       wallRunState, fallState, landState);
-        rootStateMachine = new RootStateMachine(timeForwardStateMachine);
+        rootStateMachine = new RootStateMachine(timeControlStateMachine);
 
         // Create transitions
         // Idle ->
@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour {
         // WallRun ->
         AnimatorUtils.AnimationEnded += wallRunState.AddEventTransition<int>(fallState, WallRunAnimationEnded);
         wallRunState.AddTransition(fallState, InputController.IsWallRunNotPressed);
+        wallRunState.AddTransition(fallState, IsNotDetectingRunnableWall);
 
         // Fall ->
         fallState.AddTransition(landState, perceptionSystem.IsGroundNear);
@@ -86,7 +87,7 @@ public class PlayerController : MonoBehaviour {
         stateObjects[typeof(WallRunState)] = wallRunState;
         stateObjects[typeof(FallState)] = fallState;
         stateObjects[typeof(LandState)] = landState;
-        stateObjects[typeof(TimeControlStateMachine)] = timeForwardStateMachine;
+        stateObjects[typeof(TimeControlStateMachine)] = timeControlStateMachine;
 
     } 
 
@@ -125,7 +126,6 @@ public class PlayerController : MonoBehaviour {
         landSettings.Transform = transform;
     }
 
-
     #region Transition conditions
     private bool IsMoving() {
         return InputController.IsMoving();
@@ -150,6 +150,11 @@ public class PlayerController : MonoBehaviour {
     private bool StateNameHashEquals(int stateNameHash, string stateName) {
         return Animator.StringToHash(stateName) == stateNameHash;
     }
+
+    private bool IsNotDetectingRunnableWall()
+    {
+        return !perceptionSystem.IsRunnableWallNear();
+    }
     #endregion
 
     #region Transition actions
@@ -161,7 +166,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Update() {
         rootStateMachine.Update();
-        Debug.Log("Current state: " + rootStateMachine.GetCurrentStateName() );
+        //Debug.Log("Current state: " + rootStateMachine.GetCurrentStateName() );
     }
 
     private void FixedUpdate() {

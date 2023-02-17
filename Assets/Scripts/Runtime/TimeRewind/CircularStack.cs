@@ -31,17 +31,19 @@ public class CircularStack<T>: ICollection, ICloneable {
     public void Push(T item) {
         index = (index + 1) % array.Length;
         array[index] = item;
-        Count++;
+        Count = Math.Min(Count+1, array.Length);
     }
 
     public T Pop() {
+        T item = default(T);
+
         if (IsEmpty()) {
             throw new InvalidOperationException(this.GetType().Name + " is empty");
         }
-        T item = array[index];
+        item = array[index];
         index = (index - 1) % array.Length;
         Count--;
-        
+
         return item;
     }
 
