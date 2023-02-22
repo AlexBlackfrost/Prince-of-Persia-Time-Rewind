@@ -71,6 +71,15 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Press(behavior=2)"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""28bf60dc-568b-40c9-9545-7749300199f7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -172,6 +181,17 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""action"": ""WallRun"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""994fa202-51d1-4089-818e-84b5c57d64d7"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -185,6 +205,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_ActionMap_RewindTime = m_ActionMap.FindAction("RewindTime", throwIfNotFound: true);
         m_ActionMap_Jump = m_ActionMap.FindAction("Jump", throwIfNotFound: true);
         m_ActionMap_WallRun = m_ActionMap.FindAction("WallRun", throwIfNotFound: true);
+        m_ActionMap_Attack = m_ActionMap.FindAction("Attack", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -249,6 +270,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private readonly InputAction m_ActionMap_RewindTime;
     private readonly InputAction m_ActionMap_Jump;
     private readonly InputAction m_ActionMap_WallRun;
+    private readonly InputAction m_ActionMap_Attack;
     public struct ActionMapActions
     {
         private @PlayerInput m_Wrapper;
@@ -258,6 +280,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         public InputAction @RewindTime => m_Wrapper.m_ActionMap_RewindTime;
         public InputAction @Jump => m_Wrapper.m_ActionMap_Jump;
         public InputAction @WallRun => m_Wrapper.m_ActionMap_WallRun;
+        public InputAction @Attack => m_Wrapper.m_ActionMap_Attack;
         public InputActionMap Get() { return m_Wrapper.m_ActionMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -282,6 +305,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @WallRun.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
                 @WallRun.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
                 @WallRun.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
+                @Attack.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnAttack;
+                @Attack.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnAttack;
+                @Attack.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnAttack;
             }
             m_Wrapper.m_ActionMapActionsCallbackInterface = instance;
             if (instance != null)
@@ -301,6 +327,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @WallRun.started += instance.OnWallRun;
                 @WallRun.performed += instance.OnWallRun;
                 @WallRun.canceled += instance.OnWallRun;
+                @Attack.started += instance.OnAttack;
+                @Attack.performed += instance.OnAttack;
+                @Attack.canceled += instance.OnAttack;
             }
         }
     }
@@ -312,5 +341,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnRewindTime(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnWallRun(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
     }
 }

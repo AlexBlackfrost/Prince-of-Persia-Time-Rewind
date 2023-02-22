@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private WallRunState.WallRunSettings wallRunSettings;
     [field: SerializeField] private FallState.FallSettings fallSettings;
     [field: SerializeField] private LandState.LandSettings landSettings;
+    [field: SerializeField] private GrabSwordState.GrabSwordSettings grabSwordSettings;
 
     public InputController InputController { get; private set; }
     
@@ -50,16 +51,19 @@ public class PlayerController : MonoBehaviour {
         WallRunState wallRunState = new WallRunState(wallRunSettings);
         FallState fallState = new FallState(fallSettings);
         LandState landState = new LandState(landSettings);
+        GrabSwordState grabSwordState = new GrabSwordState(grabSwordSettings);
         TimeControlStateMachine timeControlStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, 
                                                                                       timeControlSettings, 
                                                                                       idleState, moveState, jumpState,
-                                                                                      wallRunState, fallState, landState);
+                                                                                      wallRunState, fallState, landState,
+                                                                                      grabSwordState);
         rootStateMachine = new RootStateMachine(timeControlStateMachine);
 
         // Create transitions
         // Idle ->
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         idleState.AddTransition(moveState, IsMoving);
+        idleState.AddTransition(grabSwordState, InputController.IsAttackPressed);
          
         // Move ->
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
@@ -79,6 +83,9 @@ public class PlayerController : MonoBehaviour {
 
         // Land ->
         AnimatorUtils.AnimationEnded += landState.AddEventTransition<int>(idleState, LandAnimationEnded);
+
+        //GrabSword ->
+        grabSwordState.AddTransition(idleState, () => { return grabSwordState.GrabbedSword; });
 
         // Store them to modify their values after rewinding
         stateObjects[typeof(IdleState)] = idleState;
@@ -124,6 +131,7 @@ public class PlayerController : MonoBehaviour {
         landSettings.InputController = InputController;
         landSettings.MainCamera = Camera.main;
         landSettings.Transform = transform;
+
     }
 
     #region Transition conditions
@@ -151,8 +159,7 @@ public class PlayerController : MonoBehaviour {
         return Animator.StringToHash(stateName) == stateNameHash;
     }
 
-    private bool IsNotDetectingRunnableWall()
-    {
+    private bool IsNotDetectingRunnableWall(){
         return !perceptionSystem.IsRunnableWallNear();
     }
     #endregion
