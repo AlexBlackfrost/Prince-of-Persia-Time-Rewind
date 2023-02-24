@@ -9,6 +9,7 @@ public class WallRunState : State {
 		public GameObject Wall { get; set; }
 		public Transform Transform { get; set; }
 		public CharacterMovement CharacterMovement { get; set; }
+		public Sword Sword { get; set; }
 		public Direction WallSide { get; set; }
 		public float positionOffsetCorrectionDuration = 0.5f;
 		public float rotationOffsetCorrectionDuration = 0.75f;

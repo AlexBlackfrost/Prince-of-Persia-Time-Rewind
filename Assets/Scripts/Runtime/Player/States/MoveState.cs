@@ -7,6 +7,7 @@ public class MoveState : State {
 		public CharacterMovement CharacterMovement { get; set; }
 		public Animator Animator { get; set; }
 		public InputController InputController { get; set; }
+		public Sword Sword { get; set; }
 	}
 
 	private MoveSettings settings;
@@ -29,9 +30,11 @@ public class MoveState : State {
 
 	protected override void OnEnter() {
 		settings.Animator.SetBool(runBoolHash, true);
+		settings.Sword.CanBeUnsheathed = true;
 	}
 
 	protected override void OnExit() {
 		settings.Animator.SetBool(runBoolHash, false);
+		settings.Sword.CanBeUnsheathed = false;
 	}
 }

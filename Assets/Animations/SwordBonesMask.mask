@@ -1,0 +1,199 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SwordBonesMask
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Body.002
+    m_Weight: 0
+  - m_Path: ExportRig
+    m_Weight: 0
+  - m_Path: ExportRig/root.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-pelvis.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-pelvis.R.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.01.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.01.L.001/DEF-f_index.01.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.01.L.001/DEF-f_index.01.L.001/DEF-f_index.02.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.01.L.001/DEF-f_index.01.L.001/DEF-f_index.02.L.001/DEF-f_index.03.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.02.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.02.L.001/DEF-f_middle.01.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.02.L.001/DEF-f_middle.01.L.001/DEF-f_middle.02.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.02.L.001/DEF-f_middle.01.L.001/DEF-f_middle.02.L.001/DEF-f_middle.03.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.03.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.03.L.001/DEF-f_ring.01.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.03.L.001/DEF-f_ring.01.L.001/DEF-f_ring.02.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.03.L.001/DEF-f_ring.01.L.001/DEF-f_ring.02.L.001/DEF-f_ring.03.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.04.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.04.L.001/DEF-f_pinky.01.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.04.L.001/DEF-f_pinky.01.L.001/DEF-f_pinky.02.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-palm.04.L.001/DEF-f_pinky.01.L.001/DEF-f_pinky.02.L.001/DEF-f_pinky.03.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-thumb.01.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-thumb.01.L.001/DEF-thumb.02.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.L.001/DEF-upper_arm.L.002/DEF-upper_arm.L.003/DEF-forearm.L.002/DEF-forearm.L.003/DEF-hand.L.001/DEF-thumb.01.L.001/DEF-thumb.02.L.001/DEF-thumb.03.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.01.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.01.R.001/DEF-palm.01.R.002
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.01.R.001/DEF-palm.01.R.002/DEF-f_index.02.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.01.R.001/DEF-palm.01.R.002/DEF-f_index.02.R.001/DEF-f_index.03.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.02.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.02.R.001/DEF-f_middle.01.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.02.R.001/DEF-f_middle.01.R.001/DEF-f_middle.02.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.02.R.001/DEF-f_middle.01.R.001/DEF-f_middle.02.R.001/DEF-f_middle.03.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.03.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.03.R.001/DEF-f_ring.01.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.03.R.001/DEF-f_ring.01.R.001/DEF-f_ring.02.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.03.R.001/DEF-f_ring.01.R.001/DEF-f_ring.02.R.001/DEF-f_ring.03.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.04.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.04.R.001/DEF-f_pinky.01.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.04.R.001/DEF-f_pinky.01.R.001/DEF-f_pinky.02.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-palm.04.R.001/DEF-f_pinky.01.R.001/DEF-f_pinky.02.R.001/DEF-f_pinky.03.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-thumb.01.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-thumb.01.R.001/DEF-thumb.02.R.001
+    m_Weight: 1
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-shoulder.R.001/DEF-upper_arm.R.002/DEF-upper_arm.R.003/DEF-forearm.R.002/DEF-forearm.R.003/DEF-hand.R.001/DEF-thumb.01.R.001/DEF-thumb.02.R.001/DEF-thumb.03.R.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/DEF-spine.014
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/DEF-spine.014/DEF-spine.015
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/DEF-spine.014/DEF-spine.015/DEF-spine.016
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/Eye.L
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/Eye.R
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/EyeBorder
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/HairBack
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/HairBackSides
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/HairFront
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/HairSide
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/Nose
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/TeethDown
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/TeethUp
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/WingTop.L
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-spine.008/DEF-spine.009/DEF-spine.010/DEF-spine.011/DEF-spine.012/DEF-spine.013/WingTop.R
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.L.002
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.L.002/DEF-thigh.L.003
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.L.002/DEF-thigh.L.003/DEF-shin.L.002
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.L.002/DEF-thigh.L.003/DEF-shin.L.002/DEF-shin.L.003
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.L.002/DEF-thigh.L.003/DEF-shin.L.002/DEF-shin.L.003/DEF-foot.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.L.002/DEF-thigh.L.003/DEF-shin.L.002/DEF-shin.L.003/DEF-foot.L.001/DEF-toe.L.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.L.002/DEF-thigh.L.003/DEF-shin.L.002/DEF-shin.L.003/DEF-foot.L.001/WingLeftFoot.L
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.L.002/DEF-thigh.L.003/DEF-shin.L.002/DEF-shin.L.003/DEF-foot.L.001/WingLeftFoot.R
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.R.002
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.R.002/DEF-thigh.R.003
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.R.002/DEF-thigh.R.003/DEF-shin.R.002
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.R.002/DEF-thigh.R.003/DEF-shin.R.002/DEF-shin.R.003
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.R.002/DEF-thigh.R.003/DEF-shin.R.002/DEF-shin.R.003/DEF-foot.R.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.R.002/DEF-thigh.R.003/DEF-shin.R.002/DEF-shin.R.003/DEF-foot.R.001/DEF-toe.R.001
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.R.002/DEF-thigh.R.003/DEF-shin.R.002/DEF-shin.R.003/DEF-foot.R.001/WingRightFoot.L
+    m_Weight: 0
+  - m_Path: ExportRig/root.001/DEF-spine.007/DEF-thigh.R.002/DEF-thigh.R.003/DEF-shin.R.002/DEF-shin.R.003/DEF-foot.R.001/WingRightFoot.R
+    m_Weight: 0

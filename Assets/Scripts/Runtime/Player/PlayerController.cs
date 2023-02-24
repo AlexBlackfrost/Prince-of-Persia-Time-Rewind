@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private WallRunState.WallRunSettings wallRunSettings;
     [field: SerializeField] private FallState.FallSettings fallSettings;
     [field: SerializeField] private LandState.LandSettings landSettings;
-    [field: SerializeField] private GrabSwordState.GrabSwordSettings grabSwordSettings;
+    [field: SerializeField] private AttackState.AttackSettings attackSettings;
 
     public InputController InputController { get; private set; }
     
@@ -26,8 +26,8 @@ public class PlayerController : MonoBehaviour {
     public RootStateMachine rootStateMachine;
     private TimeRewinder timeRewinder;
     private Dictionary<Type, StateObject> stateObjects;
-    private GameObject wall;
     private PerceptionSystem perceptionSystem;
+    private Sword sword;
 
     private void Awake() {
         characterMovement.Transform = transform;
@@ -36,7 +36,11 @@ public class PlayerController : MonoBehaviour {
         InputController = GetComponent<InputController>();
         perceptionSystem = GetComponent<PerceptionSystem>();
         timeRewinder = GetComponent<TimeRewinder>();
+        sword = GetComponent<Sword>();
         stateObjects = new Dictionary<Type, StateObject>();
+
+        InputController.Attack.performed += (CallbackContext ctx) => { sword.OnUnsheathePressed(); };
+        InputController.Sheathe.performed += (CallbackContext ctx) => { sword.OnSheathePressed(); };
 
         InjectDependencies();
         BuildHFSM();
@@ -51,24 +55,25 @@ public class PlayerController : MonoBehaviour {
         WallRunState wallRunState = new WallRunState(wallRunSettings);
         FallState fallState = new FallState(fallSettings);
         LandState landState = new LandState(landSettings);
-        GrabSwordState grabSwordState = new GrabSwordState(grabSwordSettings);
+        AttackState attackState = new AttackState(attackSettings);
         TimeControlStateMachine timeControlStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, 
                                                                                       timeControlSettings, 
                                                                                       idleState, moveState, jumpState,
                                                                                       wallRunState, fallState, landState,
-                                                                                      grabSwordState);
+                                                                                      attackState);
         rootStateMachine = new RootStateMachine(timeControlStateMachine);
 
         // Create transitions
         // Idle ->
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         idleState.AddTransition(moveState, IsMoving);
-        idleState.AddTransition(grabSwordState, InputController.IsAttackPressed);
          
         // Move ->
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
         moveState.AddTransition(idleState, IsNotMoving);
         moveState.AddTransition(wallRunState, SetWall, InputController.IsWallRunPressed, perceptionSystem.IsRunnableWallNear);
+        InputController.Attack.performed += moveState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
+        InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
 
         // Jump ->
         AnimatorUtils.AnimationEnded += jumpState.AddEventTransition<int>(idleState, JumpAnimationEnded);
@@ -84,8 +89,9 @@ public class PlayerController : MonoBehaviour {
         // Land ->
         AnimatorUtils.AnimationEnded += landState.AddEventTransition<int>(idleState, LandAnimationEnded);
 
-        //GrabSword ->
-        grabSwordState.AddTransition(idleState, () => { return grabSwordState.GrabbedSword; });
+        // Attack ->
+        AnimatorUtils.AnimationEnded += attackState.AddEventTransition<int>(idleState, AttackAnimationEnded, (int stateNameHash)=> { return !IsMoving(); });
+        AnimatorUtils.AnimationEnded += attackState.AddEventTransition<int>(moveState, AttackAnimationEnded, (int stateNameHash)=> { return IsMoving(); });
 
         // Store them to modify their values after rewinding
         stateObjects[typeof(IdleState)] = idleState;
@@ -101,10 +107,12 @@ public class PlayerController : MonoBehaviour {
     private void InjectDependencies() {
         idleSettings.Animator = animator;
         idleSettings.CharacterMovement = characterMovement;
+        idleSettings.Sword = sword;
 
         moveSettings.CharacterMovement = characterMovement;
         moveSettings.Animator = animator;
         moveSettings.InputController = InputController;
+        moveSettings.Sword = sword;
 
         jumpSettings.Animator = animator;
 
@@ -119,6 +127,7 @@ public class PlayerController : MonoBehaviour {
         wallRunSettings.Animator = animator;
         wallRunSettings.Transform = transform;
         wallRunSettings.CharacterMovement = characterMovement;
+        wallRunSettings.Sword = sword;
 
         fallSettings.Animator = animator;
         fallSettings.CharacterMovement = characterMovement;
@@ -131,6 +140,9 @@ public class PlayerController : MonoBehaviour {
         landSettings.InputController = InputController;
         landSettings.MainCamera = Camera.main;
         landSettings.Transform = transform;
+
+        attackSettings.Animator = animator;
+        attackSettings.Sword = sword;
 
     }
 
@@ -161,6 +173,14 @@ public class PlayerController : MonoBehaviour {
 
     private bool IsNotDetectingRunnableWall(){
         return !perceptionSystem.IsRunnableWallNear();
+    }
+
+    private bool SwordIsInHand(CallbackContext ctx) {
+        return sword.IsInHand;
+    }
+
+    private bool AttackAnimationEnded(int stateNameHash) {
+        return Animator.StringToHash("Land") == stateNameHash;
     }
     #endregion
 

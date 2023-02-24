@@ -80,6 +80,15 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Press"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Sheathe"",
+                    ""type"": ""Button"",
+                    ""id"": ""42514c0b-cabc-4b94-9af0-5bd2416fdbb6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -192,6 +201,17 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""action"": ""Attack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""715de614-e5d4-47f3-9124-187a7bbc2a58"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Sheathe"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -206,6 +226,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_ActionMap_Jump = m_ActionMap.FindAction("Jump", throwIfNotFound: true);
         m_ActionMap_WallRun = m_ActionMap.FindAction("WallRun", throwIfNotFound: true);
         m_ActionMap_Attack = m_ActionMap.FindAction("Attack", throwIfNotFound: true);
+        m_ActionMap_Sheathe = m_ActionMap.FindAction("Sheathe", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -271,6 +292,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private readonly InputAction m_ActionMap_Jump;
     private readonly InputAction m_ActionMap_WallRun;
     private readonly InputAction m_ActionMap_Attack;
+    private readonly InputAction m_ActionMap_Sheathe;
     public struct ActionMapActions
     {
         private @PlayerInput m_Wrapper;
@@ -281,6 +303,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_ActionMap_Jump;
         public InputAction @WallRun => m_Wrapper.m_ActionMap_WallRun;
         public InputAction @Attack => m_Wrapper.m_ActionMap_Attack;
+        public InputAction @Sheathe => m_Wrapper.m_ActionMap_Sheathe;
         public InputActionMap Get() { return m_Wrapper.m_ActionMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -308,6 +331,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Attack.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnAttack;
                 @Attack.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnAttack;
                 @Attack.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnAttack;
+                @Sheathe.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnSheathe;
+                @Sheathe.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnSheathe;
+                @Sheathe.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnSheathe;
             }
             m_Wrapper.m_ActionMapActionsCallbackInterface = instance;
             if (instance != null)
@@ -330,6 +356,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Attack.started += instance.OnAttack;
                 @Attack.performed += instance.OnAttack;
                 @Attack.canceled += instance.OnAttack;
+                @Sheathe.started += instance.OnSheathe;
+                @Sheathe.performed += instance.OnSheathe;
+                @Sheathe.canceled += instance.OnSheathe;
             }
         }
     }
@@ -342,5 +371,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnWallRun(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
+        void OnSheathe(InputAction.CallbackContext context);
     }
 }
