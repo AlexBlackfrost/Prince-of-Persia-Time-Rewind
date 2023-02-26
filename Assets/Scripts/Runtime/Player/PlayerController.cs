@@ -67,13 +67,13 @@ public class PlayerController : MonoBehaviour {
         // Idle ->
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         idleState.AddTransition(moveState, IsMoving);
+        //InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
          
         // Move ->
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
         moveState.AddTransition(idleState, IsNotMoving);
         moveState.AddTransition(wallRunState, SetWall, InputController.IsWallRunPressed, perceptionSystem.IsRunnableWallNear);
-        InputController.Attack.performed += moveState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
-        InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
+        //InputController.Attack.performed += moveState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
 
         // Jump ->
         AnimatorUtils.AnimationEnded += jumpState.AddEventTransition<int>(idleState, JumpAnimationEnded);
@@ -176,7 +176,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     private bool SwordIsInHand(CallbackContext ctx) {
-        return sword.IsInHand;
+        return sword.IsInHand();
     }
 
     private bool AttackAnimationEnded(int stateNameHash) {

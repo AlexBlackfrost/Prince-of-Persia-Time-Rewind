@@ -20,11 +20,11 @@ public class IdleState : State {
 	}
 
     protected override void OnEnter() {
-		settings.Sword.CanBeUnsheathed = true;
+		settings.Sword.UnsheathingEnabled = true;
     }
 
 	protected override void OnExit() {
-		settings.Sword.CanBeUnsheathed = false;
+		settings.Sword.UnsheathingEnabled = false;
 	}
 
 

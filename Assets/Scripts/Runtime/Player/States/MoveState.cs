@@ -30,11 +30,11 @@ public class MoveState : State {
 
 	protected override void OnEnter() {
 		settings.Animator.SetBool(runBoolHash, true);
-		settings.Sword.CanBeUnsheathed = true;
+		settings.Sword.UnsheathingEnabled = true;
 	}
 
 	protected override void OnExit() {
 		settings.Animator.SetBool(runBoolHash, false);
-		settings.Sword.CanBeUnsheathed = false;
+		settings.Sword.UnsheathingEnabled = false;
 	}
 }
