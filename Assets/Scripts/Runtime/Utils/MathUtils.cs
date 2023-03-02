@@ -11,4 +11,8 @@ public static class MathUtils {
         value = Mathf.Clamp(value, inMin, inMax);
         return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
     }
+
+    public static int NonNegativeMod(int x, int m) {
+        return (x % m + m) % m;
+    }
 }

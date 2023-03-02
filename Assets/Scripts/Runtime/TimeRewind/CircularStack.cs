@@ -41,7 +41,7 @@ public class CircularStack<T>: ICollection, ICloneable {
             throw new InvalidOperationException(this.GetType().Name + " is empty");
         }
         item = array[index];
-        index = (index - 1) % array.Length;
+        index = MathUtils.NonNegativeMod(index - 1, array.Length); // C#'s % operator is remainder. -1%10 will return -1 and throw IndexOutOfBounds
         Count--;
 
         return item;

@@ -17,6 +17,7 @@ public class TimeControlStateMachine : StateMachine {
 		public CharacterMovement CharacterMovement { get; set; }
 		public Animator Animator { get; set; }
 		public Dictionary<Type, StateObject> StateObjects { get; set; }
+		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
 
 	private TimeControlSettings settings;
@@ -31,6 +32,7 @@ public class TimeControlStateMachine : StateMachine {
 	private TransitionRecord lastInterruptedTransitionRecord;
 
 	public TimeControlStateMachine(UpdateMode updateMode, TimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
+		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
 		noneState = new NoneState();
 
@@ -43,13 +45,18 @@ public class TimeControlStateMachine : StateMachine {
 	}
 
     protected override void OnLateUpdate() {
+		Debug.Log("Record number: " + settings.TimeRewinder.records.Count);
 		bool timeRewindPressed = settings.InputController.IsTimeRewindPressed();
 		if (timeRewindPressed && !timeIsRewinding) {
 			TimeRewindManager.StartTimeRewind();
+			//////// Start custom
+			timeIsRewinding = true;
+			/// End custom
+			
 		} else if (!timeRewindPressed && timeIsRewinding) {
-			TimeRewindManager.StopTimeRewind();
+			//TimeRewindManager.StopTimeRewind();
         }
-		timeIsRewinding = timeRewindPressed;
+		//timeIsRewinding = timeRewindPressed;
 
         if (timeIsRewinding) {
 			RewindPlayerRecord();
@@ -138,7 +145,7 @@ public class TimeControlStateMachine : StateMachine {
 			previousRecord = settings.TimeRewinder.records.Pop();
 			nextRecord = settings.TimeRewinder.records.Peek(); 
 		}
-
+		
 		RestorePlayerRecord(previousRecord, nextRecord);
 		elapsedTimeSinceLastRecord += Time.deltaTime * rewindSpeed;
 	}
@@ -182,11 +189,12 @@ public class TimeControlStateMachine : StateMachine {
 		RestoreTransformRecord(timeRewindCamera.transform, previousTransformRecord, nextTransformRecord, previousRecordDeltaTime);
 	}
 
-	private void RestoreAnimationRecord(Animator animator, AnimationRecord previousAnimationRecord, 
+	private void RestoreAnimationRecord(Animator animator, AnimationRecord previousAnimationRecord,
 										AnimationRecord nextAnimationRecord, float previousRecordDeltaTime) {
 
-		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime; 
+		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
 		int layer = 0;
+
 		if (previousAnimationRecord.isInTransition &&
 			nextAnimationRecord.isInTransition &&
 			!previousAnimationRecord.IsInterruptingCurrentStateTransition &&
@@ -362,7 +370,7 @@ public class TimeControlStateMachine : StateMachine {
 			float transitionNormalizedTime = nextAnimationRecord.transitionRecord.normalizedTime +
 											 (previousRecord.deltaTime - elapsedTimeSinceLastRecord) /
 											 nextAnimationRecord.transitionRecord.transitionDuration;
-			if (transitionNormalizedTime > 1) {
+			//if (transitionNormalizedTime > 1) {
 				float currentStateNormalizedTime = Mathf.Lerp(previousAnimationRecord.normalizedTime,
 															  nextAnimationRecord.transitionRecord.nextStateNormalizedTime,
 															  lerpAlpha);
@@ -370,7 +378,7 @@ public class TimeControlStateMachine : StateMachine {
 				animator.Update(0.0f);
 				Debug.Log("Case3 nTtime>1 Current anim short name hash: " + previousAnimationRecord.shortNameHash +
 						  " current anim normalized time: " + currentStateNormalizedTime);
-			} else {
+			/*} else {
 				animator.Play(nextAnimationRecord.shortNameHash, layer, nextAnimationRecord.normalizedTime);
 				animator.Update(0.0f);
 				float nextInterruptedStateFixedTime = nextAnimationRecord.interruptedTransition.nextStateNormalizedTime *
@@ -394,8 +402,11 @@ public class TimeControlStateMachine : StateMachine {
 						  " Next anim short name hash: " + nextAnimationRecord.transitionRecord.nextStateNameHash +
 						  " current anim normalized time: " + nextAnimationRecord.normalizedTime +
 						  " Next anim normalized time: " + nextStateNormalizedTime +
-						  " TransitionNormalizedTime: " + transitionNormalizedTime);
-			}
+						  " TransitionNormalizedTime: " + transitionNormalizedTime +
+						  " Interrupted Next anim short name hash: " + nextAnimationRecord.interruptedTransition.nextStateNameHash +
+						  " Interrupted Next anim normalized time: " + nextAnimationRecord.interruptedTransition.nextStateNormalizedTime +
+						  " Interrupted TransitionNormalizedTime: " + nextAnimationRecord.interruptedTransition.normalizedTime);
+			}*/
 			animator.speed = 1;
 		
 		} else if (previousAnimationRecord.isInTransition &&
