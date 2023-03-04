@@ -11,17 +11,19 @@ public struct PlayerRecord {
     public AnimationRecord animationRecord;
     public StateMachineRecord stateMachineRecord;
     public CharacterMovementRecord characterMovementRecord;
+    public SwordRecord swordRecord;
     public float deltaTime;
 
     public PlayerRecord(TransformRecord playerTransform, CameraRecord cameraRecord, AnimationRecord animationRecord,
                         StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
-                        float deltaTime) {
+                        SwordRecord swordRecord, float deltaTime) {
 
         this.playerTransform = playerTransform;
         this.cameraRecord = cameraRecord;
         this.animationRecord = animationRecord;
         this.stateMachineRecord = stateMachineRecord;
         this.characterMovementRecord = characterMovementRecord;
+        this.swordRecord = swordRecord;
         this.deltaTime = deltaTime;
     }
 }
@@ -52,22 +54,32 @@ public struct CameraRecord {
 
 public struct AnimationRecord {
     public bool applyRootMotion;
+    public AnimationParameter[] parameters;
+    public AnimationLayerRecord[] animationLayerRecords;
+    public AnimationRecord(AnimationParameter[] parameters, AnimationLayerRecord[] animationLayerRecords, bool applyRootMotion) {
+        this.parameters = parameters;
+        this.animationLayerRecords = animationLayerRecords;
+        this.applyRootMotion = applyRootMotion;
+
+    }
+}
+public struct AnimationLayerRecord {
+    public int layer;
+    public float layerWeight;
     public int shortNameHash;
     public float duration;
     public float normalizedTime;
-    public AnimationParameter[] parameters;
     public bool isInTransition;
     public TransitionRecord transitionRecord;
     public TransitionRecord interruptedTransition;
     public bool IsInterruptingCurrentStateTransition;
 
-    public AnimationRecord(bool applyRootMotion, int shortNameHash,
-                           float normalizedTime, float duration, AnimationParameter[] parameters) {
-        this.applyRootMotion = applyRootMotion;
+    public AnimationLayerRecord(int layer, float layerWeight, int shortNameHash,  float normalizedTime, float duration ) {
+        this.layer = layer;
+        this.layerWeight = layerWeight;
         this.shortNameHash = shortNameHash;
         this.normalizedTime = normalizedTime;
         this.duration = duration;
-        this.parameters = parameters;
         this.isInTransition = false;
         transitionRecord = default(TransitionRecord);
         interruptedTransition = default(TransitionRecord);
@@ -121,6 +133,25 @@ public struct CharacterMovementRecord {
     }
 }
 
+public struct SwordRecord {
+    public bool sheathingEnabled;
+    public bool unsheathingEnabled;
+    public float unsheatheMotionTime;
+    public float animatorSwordLayerWeight;
+    public SwordState swordState;
+    public Transform swordSocket;
+
+    public SwordRecord(bool sheathingEnabled, bool unsheathingEnabled, float unsheatheMotionTime, float animatorSwordLayerWeight, SwordState swordState, Transform swordSocket) {
+        this.sheathingEnabled = sheathingEnabled;
+        this.unsheathingEnabled = unsheathingEnabled;
+        this.unsheatheMotionTime = unsheatheMotionTime;
+        this.animatorSwordLayerWeight = animatorSwordLayerWeight;
+        this.swordState = swordState;
+        this.swordSocket = swordSocket;
+    }
+
+}
+
 public static class RecordUtils {
     public static TransformRecord RecordTransformData(Transform transform) {
         return new TransformRecord(transform.position,
@@ -135,40 +166,42 @@ public static class RecordUtils {
 
     public static AnimationRecord RecordAnimationData(Animator animator) {
         AnimationParameter[] parameters = RecordAnimatorParameters(animator);
-        int layer = 0;
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(layer);
-        AnimationRecord animationRecord = new AnimationRecord(animator.applyRootMotion, stateInfo.shortNameHash, 
-                                   stateInfo.normalizedTime, stateInfo.length ,parameters);
+        AnimationLayerRecord[] animationLayerRecords = new AnimationLayerRecord[animator.layerCount];
 
-        string output = "ShortNameHash: " + stateInfo.shortNameHash +
-                        " NormalizedTime: " + stateInfo.normalizedTime;
+        for(int layer = 0; layer < animator.layerCount; layer++) {
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(layer);
+            AnimationLayerRecord animationLayerRecord = new AnimationLayerRecord(layer, animator.GetLayerWeight(layer), stateInfo.shortNameHash, 
+                                                                                 stateInfo.normalizedTime, stateInfo.length);
 
-        if (animator.IsInTransition(layer)) {
-            AnimatorTransitionInfo transitionInfo = animator.GetAnimatorTransitionInfo(layer);
-            AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
-            TransitionRecord transitionRecord = new TransitionRecord(nextStateInfo.shortNameHash,
-                                                                     transitionInfo.normalizedTime,
-                                                                     transitionInfo.duration,
-                                                                     nextStateInfo.normalizedTime,
-                                                                     nextStateInfo.length);
+            string output = "ShortNameHash: " + stateInfo.shortNameHash +
+                            " NormalizedTime: " + stateInfo.normalizedTime;
+
+            if (animator.IsInTransition(layer)) {
+                AnimatorTransitionInfo transitionInfo = animator.GetAnimatorTransitionInfo(layer);
+                AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
+                TransitionRecord transitionRecord = new TransitionRecord(nextStateInfo.shortNameHash,
+                                                                         transitionInfo.normalizedTime,
+                                                                         transitionInfo.duration,
+                                                                         nextStateInfo.normalizedTime,
+                                                                         nextStateInfo.length);
             
-            animationRecord.isInTransition = true;
-            animationRecord.transitionRecord = transitionRecord;
+                animationLayerRecord.isInTransition = true;
+                animationLayerRecord.transitionRecord = transitionRecord;
 
+                output += " NextNameHash: " + nextStateInfo.shortNameHash +
+                            " NextStateNormalizedTime: " + nextStateInfo.normalizedTime +
+                            " TransitionDuration: " + transitionInfo.duration +
+                            " TransitionNormalizedTime: " + transitionInfo.normalizedTime;
+            }
 
-            output += " NextNameHash: " + nextStateInfo.shortNameHash +
-                        " NextStateNormalizedTime: " + nextStateInfo.normalizedTime +
-                        " TransitionDuration: " + transitionInfo.duration +
-                        " TransitionNormalizedTime: " + transitionInfo.normalizedTime;
-            
+            animationLayerRecords[layer] = animationLayerRecord;
+            Debug.Log(output);
         }
-
-        Debug.Log(output);
-        return animationRecord;
+        return new AnimationRecord(parameters, animationLayerRecords, animator.applyRootMotion);
     }
 
     public static PlayerRecord RecordPlayerData(Transform transform, Camera camera, StateMachine stateMachine, 
-                                                Animator animator, CharacterMovement characterMovement) {
+                                                Animator animator, CharacterMovement characterMovement, SwordRecord swordRecord) {
 
         TransformRecord transformRecord = RecordTransformData(transform);
         CameraRecord cameraRecord = RecordCameraData(camera);
@@ -178,7 +211,7 @@ public static class RecordUtils {
         StateMachine stateMachineCopy = (StateMachine) stateMachine.Copy();
         //Debug.Log("Saving... " + stateMachineCopy.GetCurrentStateName());
         return new PlayerRecord(transformRecord, cameraRecord, animationRecord, stateMachineRecord,
-                                characterMovementRecord, Time.deltaTime);
+                                characterMovementRecord, swordRecord, Time.deltaTime);
     }
 
     private static TransformRecord[] RecordPose(Transform[] bones) {

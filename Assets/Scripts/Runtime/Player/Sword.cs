@@ -16,22 +16,23 @@ public class Sword : MonoBehaviour {
     private int unsheatheHash;
     private int unsheatheSpeedMultiplierHash;
     private int unsheatheMotionTimeHash;
+    private const float sheatheAnimationSpeed = 1.5f;
+    private const float unsheatheAnimationSpeed = 1.5f;
+    private const int swordAnimatorLayer = 1;
+    private const float transitionSpeedIntoSwordLayer = 10f;
+    private const float transitionSpeedOutOfSwordLayer = 2.5f;
     private float unsheatheMotionTime;
-    private float sheatheAnimationSpeed = 1.5f;
-    private float unsheatheAnimationSpeed = 1.5f;
-    private int swordAnimatorLayer = 1;
     private float animatorSwordLayerWeight = 0.0f;
-    private float transitionSpeedIntoSwordLayer = 10f;
-    private float transitionSpeedOutOfSwordLayer = 2.5f;
+    private SwordState swordState;
     private Coroutine animationCoroutine;
     private Coroutine layerTransitionCoroutine;
-    private SwordState swordState = SwordState.InBack;
 
     private void Awake() {
         animator = GetComponent<Animator>();
         unsheatheHash = Animator.StringToHash("Unsheathe");
         unsheatheSpeedMultiplierHash = Animator.StringToHash("UnsheatheSpeedMultiplier");
         unsheatheMotionTimeHash = Animator.StringToHash("UnsheatheMotionTime");
+        swordState = SwordState.InBack;
     }
 
     public void SheatheIfPossible() {
@@ -44,7 +45,9 @@ public class Sword : MonoBehaviour {
 
             } else if(swordState == SwordState.Unsheathing) {
                 animator.SetFloat(unsheatheSpeedMultiplierHash, 0);
-                StopCoroutine(animationCoroutine);
+                if(animationCoroutine != null) {
+                    StopCoroutine(animationCoroutine);
+                }
                 animationCoroutine = StartCoroutine(UpdateSheatheAnimation());
                 swordState = SwordState.Sheathing;
             }
@@ -65,7 +68,9 @@ public class Sword : MonoBehaviour {
 
             } else if (swordState == SwordState.Sheathing) {
                 animator.SetFloat(unsheatheSpeedMultiplierHash, 0);
-                StopCoroutine(animationCoroutine);
+                if (animationCoroutine != null) {
+                    StopCoroutine(animationCoroutine);
+                }
                 animationCoroutine = StartCoroutine(UpdateUnsheatheAnimation());
                 swordState = SwordState.Unsheathing;
             }
@@ -93,7 +98,9 @@ public class Sword : MonoBehaviour {
     private void OnSheatheAnimationEnded() {
         swordState = SwordState.InBack;
         unsheatheMotionTime = 0;
-        StopCoroutine(layerTransitionCoroutine);
+        if (layerTransitionCoroutine != null) {
+            StopCoroutine(layerTransitionCoroutine);
+        }
         layerTransitionCoroutine = StartCoroutine(UpdateSwordLayerWeightOverTime(0, transitionSpeedOutOfSwordLayer));
     }
 
@@ -104,8 +111,9 @@ public class Sword : MonoBehaviour {
             if (unsheatheMotionTime == 1.0f) {
                 OnUnsheatheAnimationEnded();
             }
-            yield return null;
+            yield return unsheatheMotionTime;
         }
+        yield return null;// animationCoroutine = null;
     }
 
     private IEnumerator UpdateSheatheAnimation() {
@@ -115,8 +123,9 @@ public class Sword : MonoBehaviour {
             if (unsheatheMotionTime == 0.0f) {
                 OnSheatheAnimationEnded();
             }
-            yield return null;
+            yield return unsheatheMotionTime;
         }
+        yield return null;// animationCoroutine = null;
     }
 
     private IEnumerator UpdateSwordLayerWeightOverTime(float targetWeight, float speed) {
@@ -127,8 +136,9 @@ public class Sword : MonoBehaviour {
                 animatorSwordLayerWeight = Mathf.Max(animatorSwordLayerWeight - speed * Time.deltaTime, 0);
             }
             animator.SetLayerWeight(swordAnimatorLayer, animatorSwordLayerWeight);
-            yield return null;
+            yield return animatorSwordLayerWeight;
         }
+        yield return null; layerTransitionCoroutine = null;
     }
     #endregion
 
@@ -140,5 +150,59 @@ public class Sword : MonoBehaviour {
     public void OnUnsheathePressed() {
         UnsheatheIfPossible();
     }
+    #endregion
+
+    #region TimeRewind
+    public void OnTimeRewindStart() {
+        UnsheathingEnabled = false;
+        SheathingEnabled = false;
+        if(animationCoroutine != null) {
+            StopCoroutine(animationCoroutine);
+        }
+
+        if (layerTransitionCoroutine != null) {
+            StopCoroutine(layerTransitionCoroutine);
+        }
+    }
+
+    public void OnTimeRewindStop(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord, float elapsedTimeSinceLastRecord, float previousRecordDeltaTime) {
+        RestoreSwordRecord(previousSwordRecord,nextSwordRecord, elapsedTimeSinceLastRecord, previousRecordDeltaTime);
+        swordState = previousSwordRecord.swordState;
+        SheathingEnabled = previousSwordRecord.sheathingEnabled;
+        UnsheathingEnabled = previousSwordRecord.unsheathingEnabled;
+
+        if (animationCoroutine != null) {//coroutine hadn't ended when time rewind started
+            if (previousSwordRecord.swordState == SwordState.Unsheathing) {
+                animationCoroutine = StartCoroutine(UpdateUnsheatheAnimation());
+            } else if (previousSwordRecord.swordState == SwordState.Sheathing) {
+                animationCoroutine = StartCoroutine(UpdateSheatheAnimation());
+            }
+        }
+
+        if (layerTransitionCoroutine != null) {
+            if(previousSwordRecord.swordState == SwordState.Unsheathing) {
+                layerTransitionCoroutine = StartCoroutine(UpdateSwordLayerWeightOverTime(1, transitionSpeedIntoSwordLayer));
+            }else if(previousSwordRecord.swordState == SwordState.InBack) {
+                layerTransitionCoroutine = StartCoroutine(UpdateSwordLayerWeightOverTime(0, transitionSpeedOutOfSwordLayer));
+            }
+        }
+    }
+
+    public SwordRecord SaveSwordRecord() {
+        return new SwordRecord(SheathingEnabled, UnsheathingEnabled, unsheatheMotionTime, animatorSwordLayerWeight, swordState, sword.parent);
+    }
+
+    public void RestoreSwordRecord(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord, float elapsedTimeSinceLastRecord, float previousRecordDeltaTime) {
+        float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
+
+        unsheatheMotionTime = Mathf.Lerp(previousSwordRecord.unsheatheMotionTime, nextSwordRecord.unsheatheMotionTime, lerpAlpha);
+        animator.SetFloat(unsheatheMotionTimeHash, unsheatheMotionTime);
+
+        animatorSwordLayerWeight = Mathf.Lerp(previousSwordRecord.animatorSwordLayerWeight, nextSwordRecord.animatorSwordLayerWeight, lerpAlpha);
+        animator.SetLayerWeight(swordAnimatorLayer, animatorSwordLayerWeight);
+
+        sword.SetParent(previousSwordRecord.swordSocket, false);
+    }
+
     #endregion
 }

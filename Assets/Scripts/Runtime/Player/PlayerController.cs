@@ -123,6 +123,7 @@ public class PlayerController : MonoBehaviour {
         timeControlSettings.InputController = InputController;
         timeControlSettings.StateObjects = stateObjects;
         timeControlSettings.CharacterMovement = characterMovement;
+        timeControlSettings.Sword = sword;
 
         wallRunSettings.Animator = animator;
         wallRunSettings.Transform = transform;
