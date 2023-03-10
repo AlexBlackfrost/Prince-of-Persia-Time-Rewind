@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CircularStack<T>: ICollection, ICloneable {
-    private T[] array;
-    private int index;
-    private int count; 
+    protected T[] array;
+    protected int index;
+    protected int count; 
     public int Count {
         get {
             return count;
         }
-        private set {
+        protected set {
             count = value;
         }
     }
@@ -56,6 +56,13 @@ public class CircularStack<T>: ICollection, ICloneable {
 
     public void CopyTo(Array array, int index) {
         this.array.CopyTo(array, index);
+    }
+
+    public void Clear() {
+        int size = array.Length;
+        array = new T[size];
+        index = 0;
+        count = 0;
     }
 
     public IEnumerator GetEnumerator() {

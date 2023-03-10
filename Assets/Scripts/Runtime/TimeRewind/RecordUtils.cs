@@ -138,14 +138,17 @@ public struct SwordRecord {
     public bool unsheathingEnabled;
     public float unsheatheMotionTime;
     public float animatorSwordLayerWeight;
+    public float animatorSwordLayerTargetWeight;
     public SwordState swordState;
     public Transform swordSocket;
 
-    public SwordRecord(bool sheathingEnabled, bool unsheathingEnabled, float unsheatheMotionTime, float animatorSwordLayerWeight, SwordState swordState, Transform swordSocket) {
+    public SwordRecord(bool sheathingEnabled, bool unsheathingEnabled, float unsheatheMotionTime, float animatorSwordLayerWeight,
+                       float animatorSwordLayerTargetWeight, SwordState swordState, Transform swordSocket) {
         this.sheathingEnabled = sheathingEnabled;
         this.unsheathingEnabled = unsheathingEnabled;
         this.unsheatheMotionTime = unsheatheMotionTime;
         this.animatorSwordLayerWeight = animatorSwordLayerWeight;
+        this.animatorSwordLayerTargetWeight = animatorSwordLayerTargetWeight;
         this.swordState = swordState;
         this.swordSocket = swordSocket;
     }
