@@ -52,6 +52,8 @@ public class WallRunState : State {
 
 
 	protected override void OnEnter() {
+		settings.Sword.SheatheIfPossible();
+		settings.Sword.UnsheathingEnabled = false;
 		settings.Animator.SetInteger(wallRunDirectionHash, (int)settings.WallSide);
 		settings.Animator.SetBool(wallRunHash, true);
 		settings.Animator.applyRootMotion = true;
@@ -72,6 +74,7 @@ public class WallRunState : State {
 	}
 
 	protected override void OnExit() {
+		settings.Sword.UnsheathingEnabled = true;
 		settings.Animator.SetBool(wallRunHash, false);
 		settings.Animator.applyRootMotion = false;
 

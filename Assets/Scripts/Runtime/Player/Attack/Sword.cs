@@ -14,6 +14,8 @@ public class Sword : MonoBehaviour {
     public bool UnsheathingEnabled { get; set; } = true;
 
     public Action<bool> OnSetComboEnabled;
+    public Action<bool> OnSetRotationEnabled;
+    public Action OnAttackEnded;
 
     private Animator animator;
     private int unsheatheHash;
@@ -148,6 +150,14 @@ public class Sword : MonoBehaviour {
 
     public void SetComboEnabled(Bool enabled) {
         OnSetComboEnabled.Invoke(Convert.ToBoolean((int) enabled));
+    }
+
+    public void SetRotationEnabled(Bool enabled) {
+        OnSetRotationEnabled.Invoke(Convert.ToBoolean((int)enabled));
+    }
+
+    public void EndAttack() {
+        OnAttackEnded.Invoke();
     }
     #endregion
 

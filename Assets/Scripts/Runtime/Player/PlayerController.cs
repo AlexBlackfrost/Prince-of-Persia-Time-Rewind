@@ -90,8 +90,8 @@ public class PlayerController : MonoBehaviour {
         AnimatorUtils.AnimationEnded += landState.AddEventTransition<int>(idleState, LandAnimationEnded);
 
         // Attack ->
-        AnimatorUtils.AnimationEnded += attackState.AddEventTransition<int>(idleState, AttackAnimationEnded, (int stateNameHash)=> { return !IsMoving(); });
-        AnimatorUtils.AnimationEnded += attackState.AddEventTransition<int>(moveState, AttackAnimationEnded, (int stateNameHash)=> { return IsMoving(); });
+        attackState.AttackEnded += attackState.AddEventTransition(idleState, IsNotMoving);
+        attackState.AttackEnded += attackState.AddEventTransition(moveState, IsMoving);
 
         // Store them to modify their values after rewinding
         stateObjects[typeof(IdleState)] = idleState;
@@ -115,6 +115,7 @@ public class PlayerController : MonoBehaviour {
         moveSettings.Sword = sword;
 
         jumpSettings.Animator = animator;
+        jumpSettings.Sword = sword;
 
         timeControlSettings.TimeRewinder = timeRewinder;
         timeControlSettings.Transform = transform;
@@ -145,6 +146,8 @@ public class PlayerController : MonoBehaviour {
         attackSettings.Animator = animator;
         attackSettings.Sword = sword;
         attackSettings.InputController = InputController;
+        attackSettings.CharacterMovement = characterMovement;
+        attackSettings.Transform = transform;
 
     }
 
@@ -179,10 +182,6 @@ public class PlayerController : MonoBehaviour {
 
     private bool SwordIsInHand(CallbackContext ctx) {
         return sword.IsInHand();
-    }
-
-    private bool AttackAnimationEnded(int stateNameHash) {
-        return Animator.StringToHash("Attack1") == stateNameHash;
     }
     #endregion
 

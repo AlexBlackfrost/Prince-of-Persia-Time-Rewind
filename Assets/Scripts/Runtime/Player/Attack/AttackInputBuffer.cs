@@ -18,13 +18,13 @@ public class AttackInputBuffer : CircularStack<AttackInput>{
 
     public bool WasAttackPressedInLastSeconds(float seconds) {
         bool wasAttackPressed = false;
-        for(int i = index; i != index; i %= ++i) {
+        for(int i = index; i != (index+1) % array.Length; i = MathUtils.NonNegativeMod(i - 1, array.Length) ) {
             if (array[i].pressed) {
                 wasAttackPressed = true;
                 break;
             }
 
-            if(array[i].time < seconds) {
+            if(Time.time - array[i].time > seconds) {
                 break;
             }
         }

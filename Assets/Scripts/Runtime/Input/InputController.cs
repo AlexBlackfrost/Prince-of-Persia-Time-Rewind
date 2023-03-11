@@ -53,5 +53,9 @@ public class InputController : MonoBehaviour {
     public bool IsAttackPressed() {
         return Attack.ReadValue<float>() > 0;
     }
+
+    public bool WasAttackPressedThisFrame() {
+        return Attack.WasPressedThisFrame();
+    }
 }
 
