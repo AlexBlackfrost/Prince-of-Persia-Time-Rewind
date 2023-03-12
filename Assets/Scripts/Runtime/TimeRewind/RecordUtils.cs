@@ -126,6 +126,20 @@ public struct StateMachineRecord {
     }
 }
 
+public struct AttackStateRecord {
+    public int attackIndex;
+    public bool comboEnabled;
+    public bool rotationEnabled;
+    public bool followedCombo;
+
+    public AttackStateRecord(int attackIndex, bool comboEnabled, bool rotationEnabled, bool followedCombo) {
+        this.attackIndex = attackIndex;
+        this.comboEnabled = comboEnabled;
+        this.rotationEnabled = rotationEnabled;
+        this.followedCombo = followedCombo;
+    }
+}
+
 public struct CharacterMovementRecord {
     public Vector3 velocity;
     public CharacterMovementRecord(Vector3 velocity) {
@@ -152,7 +166,6 @@ public struct SwordRecord {
         this.swordState = swordState;
         this.swordSocket = swordSocket;
     }
-
 }
 
 public static class RecordUtils {

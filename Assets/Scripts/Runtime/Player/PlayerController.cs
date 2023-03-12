@@ -100,6 +100,7 @@ public class PlayerController : MonoBehaviour {
         stateObjects[typeof(WallRunState)] = wallRunState;
         stateObjects[typeof(FallState)] = fallState;
         stateObjects[typeof(LandState)] = landState;
+        stateObjects[typeof(AttackState)] = attackState;
         stateObjects[typeof(TimeControlStateMachine)] = timeControlStateMachine;
 
     } 

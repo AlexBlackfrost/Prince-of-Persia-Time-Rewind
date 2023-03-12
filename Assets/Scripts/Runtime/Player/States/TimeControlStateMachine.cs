@@ -91,10 +91,12 @@ public class TimeControlStateMachine : StateMachine {
 
 	private void OnTimeRewindStop() {
 		// Animation
+		RestoreAnimatorParameters(); //Restore parameters before restoring animation record or it won't work.
+		RestoreAnimationRecord(settings.Animator, previousRecord.animationRecord, nextRecord.animationRecord,
+							   previousRecord.deltaTime);
 		settings.Animator.enabled = true;
 		settings.Animator.speed = 1;
 		settings.Animator.applyRootMotion = previousRecord.animationRecord.applyRootMotion;
-		RestoreAnimatorParameters();
 
 		// Camera
 		settings.timeRewindCamera.gameObject.SetActive(false);
@@ -105,6 +107,7 @@ public class TimeControlStateMachine : StateMachine {
 
 		// Sword
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		
 	}
 
     private void SavePlayerRecord() {
@@ -209,7 +212,7 @@ public class TimeControlStateMachine : StateMachine {
 	}
 
 	private void RestoreAnimationRecord(Animator animator, AnimationRecord previousAnimationRecord, AnimationRecord nextAnimationRecord, float previousRecordDeltaTime) {
-		for(int layer = 0; layer< animator.layerCount; layer++) {
+		for (int layer = 0; layer< animator.layerCount; layer++) {
 			RestoreAnimationLayerRecord(animator, previousAnimationRecord.animationLayerRecords[layer], nextAnimationRecord.animationLayerRecords[layer],
 										layer, previousRecordDeltaTime);
         }
@@ -296,7 +299,7 @@ public class TimeControlStateMachine : StateMachine {
 					  " Next anim normalized time: " + nextStateNormalizedTime +
 					  " TransitionNormalizedTime: " + normalizedTransitionTime +
 					  " Interrupted Next anim short name hash: " + interruptedTransition.nextStateNameHash +
-					  " Interrupted Next anim normalized time: " + interruptedTransition.nextStateNormalizedTime+
+					  " Interrupted Next anim normalized time: " + interruptedTransition.nextStateNormalizedTime +
 					  " Interrupted TransitionNormalizedTime: " + interruptedTransition.normalizedTime);
 
 		} else if (previousAnimationLayerRecord.isInTransition && nextAnimationLayerRecord.isInTransition &&
@@ -397,13 +400,13 @@ public class TimeControlStateMachine : StateMachine {
 											 (previousRecord.deltaTime - elapsedTimeSinceLastRecord) /
 											 nextAnimationLayerRecord.transitionRecord.transitionDuration;
 			//if (transitionNormalizedTime > 1) {
-				float currentStateNormalizedTime = Mathf.Lerp(previousAnimationLayerRecord.normalizedTime,
-															  nextAnimationLayerRecord.transitionRecord.nextStateNormalizedTime,
-															  lerpAlpha);
-				animator.Play(previousAnimationLayerRecord.shortNameHash, layer, currentStateNormalizedTime);
-				animator.Update(0.0f);
-				Debug.Log("Case3 nTtime>1 Current anim short name hash: " + previousAnimationLayerRecord.shortNameHash +
-						  " current anim normalized time: " + currentStateNormalizedTime);
+			float currentStateNormalizedTime = Mathf.Lerp(previousAnimationLayerRecord.normalizedTime,
+														  nextAnimationLayerRecord.transitionRecord.nextStateNormalizedTime,
+														  lerpAlpha);
+			animator.Play(previousAnimationLayerRecord.shortNameHash, layer, currentStateNormalizedTime);
+			animator.Update(0.0f);
+			Debug.Log("Case3 nTtime>1 Current anim short name hash: " + previousAnimationLayerRecord.shortNameHash +
+					  " current anim normalized time: " + currentStateNormalizedTime);
 			/*} else {
 				animator.Play(nextAnimationRecord.shortNameHash, layer, nextAnimationRecord.normalizedTime);
 				animator.Update(0.0f);
@@ -434,7 +437,7 @@ public class TimeControlStateMachine : StateMachine {
 						  " Interrupted TransitionNormalizedTime: " + nextAnimationRecord.interruptedTransition.normalizedTime);
 			}*/
 			animator.speed = 1;
-		
+
 		} else if (previousAnimationLayerRecord.isInTransition &&
 				   nextAnimationLayerRecord.isInTransition &&
 				   !previousAnimationLayerRecord.IsInterruptingCurrentStateTransition &&
@@ -486,13 +489,14 @@ public class TimeControlStateMachine : StateMachine {
 				animator.Update(0.0f);
 				Debug.Log("Case4 Ttime>=1 Current anim normalized time: " + normalizedTime +
 						  " current anim duration: " + previousAnimationLayerRecord.duration +
-						  " Next and previous record are same state: " + 
+						  " Next and previous record are same state: " +
 						  (previousAnimationLayerRecord.shortNameHash == nextAnimationLayerRecord.shortNameHash));
 			}
 
 
-		} else if (!previousAnimationLayerRecord.isInTransition && !nextAnimationLayerRecord.isInTransition) {
-			// Here we need to interpolate between frames that do not belong to a transition
+		} else if (!previousAnimationLayerRecord.isInTransition && !nextAnimationLayerRecord.isInTransition &&
+					previousAnimationLayerRecord.shortNameHash == nextAnimationLayerRecord.shortNameHash) {
+			// Here we need to interpolate between frames of the same animation that do not belong to a transition
 			settings.Animator.speed = 1;
 			float normalizedTime = Mathf.Lerp(previousAnimationLayerRecord.normalizedTime,
 											  nextAnimationLayerRecord.normalizedTime,
@@ -501,12 +505,34 @@ public class TimeControlStateMachine : StateMachine {
 			animator.Update(0.0f);
 			settings.Animator.speed = 0;
 			Debug.Log("Case5 Current anim hash: " + previousAnimationLayerRecord.shortNameHash +
-					  "Current anim normalized time: " + normalizedTime + " Next and previous record are same state: " + 
+					  "Current anim normalized time: " + normalizedTime + " Next and previous record are same state: " +
 					  (previousAnimationLayerRecord.shortNameHash == nextAnimationLayerRecord.shortNameHash));
-		
+
+		} else if (!previousAnimationLayerRecord.isInTransition && !nextAnimationLayerRecord.isInTransition &&
+					previousAnimationLayerRecord.shortNameHash != nextAnimationLayerRecord.shortNameHash) {
+			/* Here we need to interpolate between frames of the different animations that do not belong to a transition.
+			 * This is a weird scenario that only occurs when a transition is so short (like 0 seconds) that it doesn't 
+			 * get registered as such.*/
+
+			settings.Animator.speed = 1;
+			animator.Play(nextAnimationLayerRecord.shortNameHash, layer, nextAnimationLayerRecord.normalizedTime);
+			animator.Update(0.0f);
+
+			float transitionNormalizedTime = (previousRecordDeltaTime - elapsedTimeSinceLastRecord) / previousRecordDeltaTime;
+			animator.CrossFadeInFixedTime(previousAnimationLayerRecord.shortNameHash, previousRecordDeltaTime,
+										  layer, previousAnimationLayerRecord.normalizedTime, transitionNormalizedTime);
+			animator.Update(0.0f);
+			settings.Animator.speed = 0;
+			Debug.Log("Case6 Current anim hash: " + previousAnimationLayerRecord.shortNameHash +
+					  " Current anim normalized time: " + previousAnimationLayerRecord.normalizedTime + 
+					  " Next anim hash: " + nextAnimationLayerRecord.shortNameHash +
+					  " Transiton normalizedTime: " + transitionNormalizedTime +
+					  " Next anim normalized time: " + nextAnimationLayerRecord.normalizedTime +
+					  " Next and previous record are same state: " + (previousAnimationLayerRecord.shortNameHash == nextAnimationLayerRecord.shortNameHash));
+
 		} else if (previousAnimationLayerRecord.isInTransition && !nextAnimationLayerRecord.isInTransition) {
 			/* Here we need to interpolate between a frame that does not belong to a transition and
-			the first frame of a transition */ 
+			the first frame of a transition */
 			settings.Animator.speed = 1;
 			TransitionRecord transitionRecord = previousAnimationLayerRecord.transitionRecord;
 			float transitionNormalizedTime = transitionRecord.normalizedTime -
@@ -526,7 +552,7 @@ public class TimeControlStateMachine : StateMachine {
 				animator.CrossFadeInFixedTime(transitionRecord.nextStateNameHash, transitionRecord.transitionDuration,
 											  layer, nextStateFixedTime, transitionNormalizedTime);
 				animator.Update(0.0f);
-				Debug.Log("Case6 Ttime>0 Current anim normalized time: " + currentNormalizedTime +
+				Debug.Log("Case7 Ttime>0 Current anim normalized time: " + currentNormalizedTime +
 						  " current anim duration: " + previousAnimationLayerRecord.duration +
 						  " Next and previous record are same state: " + (previousAnimationLayerRecord.shortNameHash == nextAnimationLayerRecord.shortNameHash) +
 						  " Next state normalized time: " + nextStateNormalizedTime +
@@ -537,8 +563,8 @@ public class TimeControlStateMachine : StateMachine {
 												  lerpAlpha);
 				animator.Play(previousAnimationLayerRecord.shortNameHash, layer, normalizedTime);
 				animator.Update(0.0f);
-				Debug.Log("Case6 Ttime<=0 Current anim normalized time: " + normalizedTime + " current anim duration: " +
-							previousAnimationLayerRecord.duration + " Next and previous record are same state: " + 
+				Debug.Log("Case7 Ttime<=0 Current anim normalized time: " + normalizedTime + " current anim duration: " +
+							previousAnimationLayerRecord.duration + " Next and previous record are same state: " +
 							(previousAnimationLayerRecord.shortNameHash == nextAnimationLayerRecord.shortNameHash));
 			}
 			settings.Animator.speed = 0;

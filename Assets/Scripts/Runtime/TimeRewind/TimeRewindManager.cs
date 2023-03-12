@@ -8,6 +8,7 @@ public class TimeRewindManager : MonoBehaviour {
     private static TimeRewindManager instance;
     public static event Action TimeRewindStart;
     public static event Action TimeRewindStop;
+    public static bool IsRewinding;
 
     public static TimeRewindManager Instance {
         get {
@@ -25,11 +26,13 @@ public class TimeRewindManager : MonoBehaviour {
 
     public static void StartTimeRewind() {
         TimeRewindStart.Invoke();
+        IsRewinding = true;
         Debug.Log("Start rewind");
     }
 
     public static void StopTimeRewind() {
         TimeRewindStop.Invoke();
+        IsRewinding = false;
         Debug.Log("Stop rewind");
     }
 }

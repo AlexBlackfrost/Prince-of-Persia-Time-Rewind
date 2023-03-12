@@ -3733,7 +3733,7 @@ MonoBehaviour:
     downwardSpeedAtEnd: 2
   attackSettings:
     <AttackPressedBufferTime>k__BackingField: 0.3
-    <RotationSpeed>k__BackingField: 12
+    <RotationSpeed>k__BackingField: 18
 --- !u!114 &1920022716
 MonoBehaviour:
   m_ObjectHideFlags: 0

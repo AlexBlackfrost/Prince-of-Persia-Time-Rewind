@@ -120,13 +120,12 @@ public class AttackState : State {
     }
 
     public void SetRotationEnabled(bool enabled) {
-        rotationEnabled = enabled;
+        rotationEnabled = enabled; 
     }
 
     private void OnAnimationEnded(int shortNameHash) {
         if(shortNameHash == comboAttackNameHashes[MAX_ATTACK_COMBO - 1]) { // Last combo attack finished
             AttackEnded.Invoke();
-
         } else if (!followedCombo){ // Other combo attacks finished but player didn't keep pressing attack
             foreach(int comboAttackNameHash in comboAttackNameHashes) {
                 if (comboAttackNameHash == shortNameHash) {
@@ -135,5 +134,19 @@ public class AttackState : State {
                 }
             }
         }
+    }
+
+    public override void RestoreFieldsAndProperties(object stateObjectRecord) {
+        attackInputBuffer.Clear();
+
+        AttackStateRecord record = (AttackStateRecord)stateObjectRecord;
+        attackIndex = record.attackIndex;
+        comboEnabled = record.comboEnabled;
+        rotationEnabled = record.rotationEnabled;
+        followedCombo = record.followedCombo;
+    }
+
+    public override object RecordFieldsAndProperties() {
+        return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo);
     }
 }

@@ -19,13 +19,13 @@ public class NotifyAnimationStarted : StateMachineBehaviour {
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (normalizedTimeFireEvent > 0 && stateInfo.normalizedTime > normalizedTimeFireEvent && !eventFired) {
+        if (normalizedTimeFireEvent > 0 && stateInfo.normalizedTime >= normalizedTimeFireEvent && !eventFired && !TimeRewindManager.IsRewinding) {
             animator.NotifyAnimationStarted(stateInfo.shortNameHash);
             eventFired = true;
         }
     }
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (!eventFired) {
+        if (!eventFired && !TimeRewindManager.IsRewinding) {
             animator.NotifyAnimationStarted(stateInfo.shortNameHash);
             eventFired = true;
         }
