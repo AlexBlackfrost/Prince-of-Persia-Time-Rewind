@@ -16,7 +16,7 @@ public class NotifyAnimationEnded : StateMachineBehaviour {
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (normalizedTimeFireEvent >= 0 && stateInfo.normalizedTime > normalizedTimeFireEvent && !eventFired ) {
+        if (normalizedTimeFireEvent >= 0 && stateInfo.normalizedTime >= normalizedTimeFireEvent && !eventFired ) {
             animator.NotifyAnimationEnded(stateInfo.shortNameHash);
             eventFired = true;
         }

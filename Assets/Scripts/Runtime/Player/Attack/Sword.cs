@@ -15,7 +15,6 @@ public class Sword : MonoBehaviour {
 
     public Action<bool> OnSetComboEnabled;
     public Action<bool> OnSetRotationEnabled;
-    public Action OnAttackEnded;
 
     private Animator animator;
     private int unsheatheHash;
@@ -156,9 +155,6 @@ public class Sword : MonoBehaviour {
         OnSetRotationEnabled.Invoke(Convert.ToBoolean((int)enabled));
     }
 
-    public void EndAttack() {
-        OnAttackEnded.Invoke();
-    }
     #endregion
 
     #region Input

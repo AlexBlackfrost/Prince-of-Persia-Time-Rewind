@@ -37,7 +37,6 @@ public class AttackState : State {
         mainCamera = Camera.main;
         settings.Sword.OnSetComboEnabled = SetComboEnabled;
         settings.Sword.OnSetRotationEnabled = SetRotationEnabled;
-        settings.Sword.OnAttackEnded = EndAttack;
         comboEnabled = false;
         attackInputBuffer = new AttackInputBuffer(ATTACK_PRESSED_BUFFER_SIZE);
 
@@ -124,13 +123,17 @@ public class AttackState : State {
         rotationEnabled = enabled;
     }
 
-    public void EndAttack() {
-        AttackEnded.Invoke();
-    }
-
     private void OnAnimationEnded(int shortNameHash) {
-        if (!followedCombo) {
+        if(shortNameHash == comboAttackNameHashes[MAX_ATTACK_COMBO - 1]) { // Last combo attack finished
             AttackEnded.Invoke();
+
+        } else if (!followedCombo){ // Other combo attacks finished but player didn't keep pressing attack
+            foreach(int comboAttackNameHash in comboAttackNameHashes) {
+                if (comboAttackNameHash == shortNameHash) {
+                    AttackEnded.Invoke();
+                    break;
+                }
+            }
         }
     }
 }
