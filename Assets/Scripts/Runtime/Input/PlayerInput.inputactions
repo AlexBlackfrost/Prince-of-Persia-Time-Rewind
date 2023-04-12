@@ -42,6 +42,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Roll",
+                    "type": "Button",
+                    "id": "ef07f34c-3af3-4ba3-984d-cbc9af23f83c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "WallRun",
                     "type": "Button",
                     "id": "0bc605db-c802-4393-a0f3-cbb4a4b0f00f",
@@ -188,6 +197,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Sheathe",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6cfdd61d-bea3-4682-aa43-55fc9507a62b",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Roll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

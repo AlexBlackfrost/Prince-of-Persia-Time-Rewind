@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private FallState.FallSettings fallSettings;
     [field: SerializeField] private LandState.LandSettings landSettings;
     [field: SerializeField] private AttackState.AttackSettings attackSettings;
+    [field: SerializeField] private RollState.RollSettings rollSettings;
 
     public InputController InputController { get; private set; }
     
@@ -56,20 +57,23 @@ public class PlayerController : MonoBehaviour {
         FallState fallState = new FallState(fallSettings);
         LandState landState = new LandState(landSettings);
         AttackState attackState = new AttackState(attackSettings);
+        RollState rollState = new RollState(rollSettings);
         TimeControlStateMachine timeControlStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, 
                                                                                       timeControlSettings, 
                                                                                       idleState, moveState, jumpState,
                                                                                       wallRunState, fallState, landState,
-                                                                                      attackState);
+                                                                                      attackState, rollState);
         rootStateMachine = new RootStateMachine(timeControlStateMachine);
 
         // Create transitions
         // Idle ->
+        InputController.Roll.performed += idleState.AddEventTransition<CallbackContext>(rollState);
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         idleState.AddTransition(moveState, IsMoving);
         InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
          
         // Move ->
+        InputController.Roll.performed += moveState.AddEventTransition<CallbackContext>(rollState);
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
         moveState.AddTransition(idleState, IsNotMoving);
         moveState.AddTransition(wallRunState, SetWall, InputController.IsWallRunPressed, perceptionSystem.IsRunnableWallNear);
@@ -93,6 +97,10 @@ public class PlayerController : MonoBehaviour {
         attackState.AttackEnded += attackState.AddEventTransition(idleState, IsNotMoving);
         attackState.AttackEnded += attackState.AddEventTransition(moveState, IsMoving);
 
+        // Roll ->
+        AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(idleState, RollAnimationEnded, (int shortNameHash) => { return IsNotMoving(); });
+        AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(moveState, RollAnimationEnded, (int shortNameHash) => { return IsMoving(); });
+
         // Store them to modify their values after rewinding
         stateObjects[typeof(IdleState)] = idleState;
         stateObjects[typeof(MoveState)] = moveState;
@@ -101,6 +109,7 @@ public class PlayerController : MonoBehaviour {
         stateObjects[typeof(FallState)] = fallState;
         stateObjects[typeof(LandState)] = landState;
         stateObjects[typeof(AttackState)] = attackState;
+        stateObjects[typeof(RollState)] = rollState;
         stateObjects[typeof(TimeControlStateMachine)] = timeControlStateMachine;
 
     } 
@@ -150,6 +159,8 @@ public class PlayerController : MonoBehaviour {
         attackSettings.CharacterMovement = characterMovement;
         attackSettings.Transform = transform;
 
+        rollSettings.Animator = animator;
+
     }
 
     #region Transition conditions
@@ -171,6 +182,10 @@ public class PlayerController : MonoBehaviour {
 
     private bool LandAnimationEnded(int stateNameHash) {
         return Animator.StringToHash("Land") == stateNameHash;
+    }
+
+    private bool RollAnimationEnded(int stateNameHash) {
+        return Animator.StringToHash("Roll") == stateNameHash;
     }
 
     private bool StateNameHashEquals(int stateNameHash, string stateName) {

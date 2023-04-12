@@ -64,6 +64,15 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Roll"",
+                    ""type"": ""Button"",
+                    ""id"": ""ef07f34c-3af3-4ba3-984d-cbc9af23f83c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""WallRun"",
                     ""type"": ""Button"",
                     ""id"": ""0bc605db-c802-4393-a0f3-cbb4a4b0f00f"",
@@ -212,6 +221,17 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""action"": ""Sheathe"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6cfdd61d-bea3-4682-aa43-55fc9507a62b"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Roll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -224,6 +244,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_ActionMap_Move = m_ActionMap.FindAction("Move", throwIfNotFound: true);
         m_ActionMap_RewindTime = m_ActionMap.FindAction("RewindTime", throwIfNotFound: true);
         m_ActionMap_Jump = m_ActionMap.FindAction("Jump", throwIfNotFound: true);
+        m_ActionMap_Roll = m_ActionMap.FindAction("Roll", throwIfNotFound: true);
         m_ActionMap_WallRun = m_ActionMap.FindAction("WallRun", throwIfNotFound: true);
         m_ActionMap_Attack = m_ActionMap.FindAction("Attack", throwIfNotFound: true);
         m_ActionMap_Sheathe = m_ActionMap.FindAction("Sheathe", throwIfNotFound: true);
@@ -290,6 +311,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private readonly InputAction m_ActionMap_Move;
     private readonly InputAction m_ActionMap_RewindTime;
     private readonly InputAction m_ActionMap_Jump;
+    private readonly InputAction m_ActionMap_Roll;
     private readonly InputAction m_ActionMap_WallRun;
     private readonly InputAction m_ActionMap_Attack;
     private readonly InputAction m_ActionMap_Sheathe;
@@ -301,6 +323,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_ActionMap_Move;
         public InputAction @RewindTime => m_Wrapper.m_ActionMap_RewindTime;
         public InputAction @Jump => m_Wrapper.m_ActionMap_Jump;
+        public InputAction @Roll => m_Wrapper.m_ActionMap_Roll;
         public InputAction @WallRun => m_Wrapper.m_ActionMap_WallRun;
         public InputAction @Attack => m_Wrapper.m_ActionMap_Attack;
         public InputAction @Sheathe => m_Wrapper.m_ActionMap_Sheathe;
@@ -325,6 +348,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Jump.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
                 @Jump.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
                 @Jump.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnJump;
+                @Roll.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnRoll;
+                @Roll.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnRoll;
+                @Roll.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnRoll;
                 @WallRun.started -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
                 @WallRun.performed -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
                 @WallRun.canceled -= m_Wrapper.m_ActionMapActionsCallbackInterface.OnWallRun;
@@ -350,6 +376,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
+                @Roll.started += instance.OnRoll;
+                @Roll.performed += instance.OnRoll;
+                @Roll.canceled += instance.OnRoll;
                 @WallRun.started += instance.OnWallRun;
                 @WallRun.performed += instance.OnWallRun;
                 @WallRun.canceled += instance.OnWallRun;
@@ -369,6 +398,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnRewindTime(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnRoll(InputAction.CallbackContext context);
         void OnWallRun(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnSheathe(InputAction.CallbackContext context);
