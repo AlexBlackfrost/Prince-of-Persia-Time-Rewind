@@ -160,7 +160,10 @@ public class PlayerController : MonoBehaviour {
         attackSettings.Transform = transform;
 
         rollSettings.Animator = animator;
-
+        rollSettings.CharacterMovement = characterMovement;
+        rollSettings.InputController = InputController;
+        rollSettings.Transform = transform;
+        rollSettings.MainCamera = Camera.main;
     }
 
     #region Transition conditions
