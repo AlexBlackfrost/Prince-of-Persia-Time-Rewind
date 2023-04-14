@@ -67,13 +67,13 @@ public class PlayerController : MonoBehaviour {
 
         // Create transitions
         // Idle ->
-        InputController.Roll.performed += idleState.AddEventTransition<CallbackContext>(rollState);
+        InputController.Roll.performed += idleState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         idleState.AddTransition(moveState, IsMoving);
         InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
          
         // Move ->
-        InputController.Roll.performed += moveState.AddEventTransition<CallbackContext>(rollState);
+        InputController.Roll.performed += moveState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
         moveState.AddTransition(idleState, IsNotMoving);
         moveState.AddTransition(wallRunState, SetWall, InputController.IsWallRunPressed, perceptionSystem.IsRunnableWallNear);
@@ -201,6 +201,10 @@ public class PlayerController : MonoBehaviour {
 
     private bool SwordIsInHand(CallbackContext ctx) {
         return sword.IsInHand();
+    }
+
+    private bool IsGroundAhead(CallbackContext ctx) {
+        return perceptionSystem.IsGroundAhead();
     }
     #endregion
 

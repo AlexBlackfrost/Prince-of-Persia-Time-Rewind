@@ -140,6 +140,13 @@ public struct AttackStateRecord {
     }
 }
 
+public struct RollStateRecord {
+    public float rollElapsedTime;
+    public RollStateRecord(float rollElapsedTime) {
+        this.rollElapsedTime = rollElapsedTime;
+    }
+}
+
 public struct CharacterMovementRecord {
     public Vector3 velocity;
     public CharacterMovementRecord(Vector3 velocity) {

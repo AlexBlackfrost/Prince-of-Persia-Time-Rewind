@@ -1,3 +1,4 @@
+using Cinemachine;
 using HFSM;
 using System;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class RollState : State {
 		public Animator Animator { get; set; }
 		public CharacterMovement CharacterMovement { get; set; }
 		public Camera MainCamera { get; set; }
+		[field:SerializeField]public CinemachineFreeLook FreeLookCamera { get; set; }
 		public InputController InputController { get; set; }
 		public Transform Transform { get; set; }
 		public AnimationCurve rollSpeed;
@@ -19,6 +21,7 @@ public class RollState : State {
 	private RollSettings settings;
 	private int rollHash;
 	private float rollElapsedTime;
+
 	public RollState(RollSettings settings) : base() {
 		this.settings = settings;
 		rollHash = Animator.StringToHash("Roll");
@@ -39,8 +42,7 @@ public class RollState : State {
 			settings.CharacterMovement.SetRotation(rollRotation);
 
 		}
-		
-		
+
 		rollElapsedTime += Time.deltaTime;
 	}
 
@@ -55,9 +57,18 @@ public class RollState : State {
 		if (cameraRelativeInputDirection.magnitude > 0) {
 			settings.CharacterMovement.SetRotation(Quaternion.LookRotation(cameraRelativeInputDirection));
 		}
+
 	}
 
-	protected override void OnExit() {
-	
+	protected override void OnExit() { }
+
+	public override void RestoreFieldsAndProperties(object stateObjectRecord) {
+		RollStateRecord record = (RollStateRecord)stateObjectRecord;
+		rollElapsedTime = record.rollElapsedTime;
 	}
+
+	public override object RecordFieldsAndProperties() {
+		return new RollStateRecord(rollElapsedTime);
+	}
+
 }

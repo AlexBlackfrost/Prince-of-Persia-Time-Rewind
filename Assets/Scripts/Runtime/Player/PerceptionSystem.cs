@@ -16,6 +16,12 @@ public class PerceptionSystem : MonoBehaviour {
     public float startLandGroundDistance = 1.25f;
     public LayerMask groundMask;
 
+    [Header("Jump")]
+    public GameObject jumpGroundCheckOrigin;
+    public float groundAheadDistanceCheck = 4f;
+    public LayerMask jumpGroundMask;
+    public float groundHeight = 2f;
+
 
     private int AheadDistanceSteps = 5;
 
@@ -82,6 +88,25 @@ public class PerceptionSystem : MonoBehaviour {
 
     public bool IsGroundNear() {
         return Physics.Raycast(groundCheckOrigin.transform.position, -groundCheckOrigin.transform.up, startLandGroundDistance, groundMask);
+    }
+
+    public bool IsGroundAhead() {
+        bool groundAhead = true;
+        int sweepIterations = 10;
+        float delta = groundAheadDistanceCheck / sweepIterations;
+        for(int i = 0; i < sweepIterations; i++) {
+            if (!Physics.Raycast(jumpGroundCheckOrigin.transform.position + transform.forward * delta * i,
+                                 -jumpGroundCheckOrigin.transform.up,
+                                 groundHeight, 
+                                 jumpGroundMask)) {
+
+                groundAhead = false;
+                break;
+            }
+            Debug.DrawRay(jumpGroundCheckOrigin.transform.position + transform.forward * delta * i, -jumpGroundCheckOrigin.transform.up * groundHeight, Color.red,10);
+        }
+
+        return groundAhead;
     }
 }
 
