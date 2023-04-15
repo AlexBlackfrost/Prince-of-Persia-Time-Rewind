@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private IdleState.IdleSettings idleSettings;
     [field: SerializeField] private MoveState.MoveSettings moveSettings;
     [field: SerializeField] private JumpState.JumpSettings jumpSettings;
-    [field: SerializeField] private TimeControlStateMachine.TimeControlSettings timeControlSettings;
+    [field: SerializeField] private PlayerTimeControlStateMachine.PlayerTimeControlSettings timeControlSettings;
     [field: SerializeField] private WallRunState.WallRunSettings wallRunSettings;
     [field: SerializeField] private FallState.FallSettings fallSettings;
     [field: SerializeField] private LandState.LandSettings landSettings;
@@ -22,21 +22,21 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private RollState.RollSettings rollSettings;
 
     public InputController InputController { get; private set; }
-    
-    private Animator animator;
     public RootStateMachine rootStateMachine;
-    private TimeRewinder timeRewinder;
+
+    private Animator animator;
     private Dictionary<Type, StateObject> stateObjects;
-    private PerceptionSystem perceptionSystem;
+    private PlayerPerceptionSystem perceptionSystem;
     private Sword sword;
+
+
 
     private void Awake() {
         characterMovement.Transform = transform;
         characterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         InputController = GetComponent<InputController>();
-        perceptionSystem = GetComponent<PerceptionSystem>();
-        timeRewinder = GetComponent<TimeRewinder>();
+        perceptionSystem = GetComponent<PlayerPerceptionSystem>();
         sword = GetComponent<Sword>();
         stateObjects = new Dictionary<Type, StateObject>();
 
@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour {
         LandState landState = new LandState(landSettings);
         AttackState attackState = new AttackState(attackSettings);
         RollState rollState = new RollState(rollSettings);
-        TimeControlStateMachine timeControlStateMachine = new TimeControlStateMachine(UpdateMode.UpdateAfterChild, 
+        PlayerTimeControlStateMachine timeControlStateMachine = new PlayerTimeControlStateMachine(UpdateMode.UpdateAfterChild, 
                                                                                       timeControlSettings, 
                                                                                       idleState, moveState, jumpState,
                                                                                       wallRunState, fallState, landState,
@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour {
         stateObjects[typeof(LandState)] = landState;
         stateObjects[typeof(AttackState)] = attackState;
         stateObjects[typeof(RollState)] = rollState;
-        stateObjects[typeof(TimeControlStateMachine)] = timeControlStateMachine;
+        stateObjects[typeof(PlayerTimeControlStateMachine)] = timeControlStateMachine;
 
     } 
 
@@ -127,7 +127,6 @@ public class PlayerController : MonoBehaviour {
         jumpSettings.Animator = animator;
         jumpSettings.Sword = sword;
 
-        timeControlSettings.TimeRewinder = timeRewinder;
         timeControlSettings.Transform = transform;
         timeControlSettings.Camera = Camera.main;
         timeControlSettings.Animator = animator;

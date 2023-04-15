@@ -28,6 +28,28 @@ public struct PlayerRecord {
     }
 }
 
+public struct EnemyRecord {
+    public TransformRecord enemyTransform;
+    public AnimationRecord animationRecord;
+
+    public StateMachineRecord stateMachineRecord;
+    public CharacterMovementRecord characterMovementRecord;
+    public SwordRecord swordRecord;
+    public float deltaTime;
+
+    public EnemyRecord(TransformRecord enemyTransform, AnimationRecord animationRecord,
+                        StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
+                        SwordRecord swordRecord, float deltaTime) {
+
+        this.enemyTransform = enemyTransform;
+        this.animationRecord = animationRecord;
+        this.stateMachineRecord = stateMachineRecord;
+        this.characterMovementRecord = characterMovementRecord;
+        this.swordRecord = swordRecord;
+        this.deltaTime = deltaTime;
+    }
+}
+
 public struct TransformRecord {
     public Vector3 position;
     public Quaternion rotation;

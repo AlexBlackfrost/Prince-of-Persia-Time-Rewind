@@ -5,10 +5,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
 
-public class TimeControlStateMachine : StateMachine {
+public class PlayerTimeControlStateMachine : StateMachine {
 	[Serializable]
-	public class TimeControlSettings {
-		public TimeRewinder TimeRewinder { get; set; }
+	public class PlayerTimeControlSettings {
 		[field: SerializeField] public CinemachineFreeLook FreeLookCamera { get; set; }
 		public CinemachineVirtualCamera timeRewindCamera;
 		public Camera Camera { get; set; }
@@ -21,10 +20,13 @@ public class TimeControlStateMachine : StateMachine {
 		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
 
-	private TimeControlSettings settings;
+	private PlayerTimeControlSettings settings;
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
 	private PlayerRecord previousRecord, nextRecord;
+	private  CircularStack<PlayerRecord> records;
+	private int recordFPS = 60;
+	private int recordMaxseconds = 20;
 	private float rewindSpeed = 0.1f;
 	private NoneState noneState;
 	private CinemachineBrain cinemachineBrain;
@@ -32,7 +34,7 @@ public class TimeControlStateMachine : StateMachine {
 	private AnimationRecord lastAnimationRecord;
 	private TransitionRecord[] lastInterruptedTransitionRecordInLayer;
 
-	public TimeControlStateMachine(UpdateMode updateMode, TimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
+	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
 		noneState = new NoneState();
@@ -42,6 +44,8 @@ public class TimeControlStateMachine : StateMachine {
 
 		cinemachineBrain = settings.Camera.GetComponent<CinemachineBrain>();
 
+
+		records = new CircularStack<PlayerRecord>(recordFPS * recordMaxseconds);
 		timeIsRewinding = false;
 		TimeRewindManager.TimeRewindStart += OnTimeRewindStart;
 		TimeRewindManager.TimeRewindStop += OnTimeRewindStop;
@@ -67,8 +71,8 @@ public class TimeControlStateMachine : StateMachine {
 
 	private void OnTimeRewindStart() {
 		elapsedTimeSinceLastRecord = 0;
-		previousRecord = settings.TimeRewinder.records.Pop();
-		nextRecord = settings.TimeRewinder.records.Peek();
+		previousRecord = records.Pop();
+		nextRecord = records.Peek();
 
 		// Animation
 		settings.Animator.speed = 0;
@@ -155,15 +159,15 @@ public class TimeControlStateMachine : StateMachine {
 		}
 
 		lastAnimationRecord = playerRecord.animationRecord;
-		settings.TimeRewinder.records.Push(playerRecord);
+		records.Push(playerRecord);
 	}
 
 
 	private void RewindPlayerRecord() {
-		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && settings.TimeRewinder.records.Count > 2) {
+		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && records.Count > 2) {
 			elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
-			previousRecord = settings.TimeRewinder.records.Pop();
-			nextRecord = settings.TimeRewinder.records.Peek(); 
+			previousRecord = records.Pop();
+			nextRecord = records.Peek(); 
 		}
 		
 		RestorePlayerRecord(previousRecord, nextRecord);

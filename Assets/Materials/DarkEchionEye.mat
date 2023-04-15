@@ -120,7 +120,7 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Color_678aa568ea30423e8c306f5a552bb6dd: {r: 0, g: 0, b: 0, a: 0}
+    - Color_678aa568ea30423e8c306f5a552bb6dd: {r: 8.47419, g: 0, b: 0, a: 1}
     - Vector4_b24792cb428c479bb3af698d5be60c7e: {r: 1.25, g: 1.25, b: -0.125, a: 0}
     - Vector4_b24792cb428c479bb3af698d5be60c7e_1: {r: 1, g: 1, b: 0, a: 0}
     - Vector4_b24792cb428c479bb3af698d5be60c7e_2: {r: 1, g: 1, b: 0, a: 0}

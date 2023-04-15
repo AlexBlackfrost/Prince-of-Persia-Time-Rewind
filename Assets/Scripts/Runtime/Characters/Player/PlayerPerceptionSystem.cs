@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PerceptionSystem : MonoBehaviour {
+public class PlayerPerceptionSystem : MonoBehaviour {
     [Header("Wall run")]
     public GameObject wallRunCheckOrigin;
     public float wallMaxDistance = 1.5f;
