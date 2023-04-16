@@ -329,6 +329,18 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1.17, z: 0}
+--- !u!114 &58233413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58233409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75b0d01a8a9ecc847af6cceeb9883cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &58233414 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
@@ -348,18 +360,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionAngle: 100
   player: {fileID: 1920022710}
---- !u!114 &58233416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 58233409}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 706907214c12ba0479496adab2c18031, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &63089522 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 65c8cb8213edb0445a762d1ce6194975, type: 3}
@@ -1088,7 +1088,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_TagString
@@ -2135,7 +2135,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.02
+      value: 12.21
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2143,7 +2143,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 17.32
+      value: 6.53
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3583,7 +3583,7 @@ MonoBehaviour:
   m_SoftZoneHeight: 0.8
   m_BiasX: 0
   m_BiasY: 0
-  m_CenterOnActivate: 1
+  m_CenterOnActivate: 0
 --- !u!114 &562832943
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3599,8 +3599,8 @@ MonoBehaviour:
   m_BindingMode: 5
   m_FollowOffset: {x: 0, y: 2.5, z: -7}
   m_XDamping: 1
-  m_YDamping: 0.75
-  m_ZDamping: 0.75
+  m_YDamping: 0
+  m_ZDamping: 10
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
@@ -4124,7 +4124,7 @@ MonoBehaviour:
   m_SoftZoneHeight: 0.8
   m_BiasX: 0
   m_BiasY: 0
-  m_CenterOnActivate: 1
+  m_CenterOnActivate: 0
 --- !u!114 &1097373748
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -4140,8 +4140,8 @@ MonoBehaviour:
   m_BindingMode: 5
   m_FollowOffset: {x: 0, y: 2.5, z: -7}
   m_XDamping: 1
-  m_YDamping: 0.75
-  m_ZDamping: 0.75
+  m_YDamping: 0
+  m_ZDamping: 0
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
@@ -4328,8 +4328,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1140635135}
-  m_LocalRotation: {x: 0.011503179, y: 0.9852485, z: -0.0735518, w: 0.15408857}
-  m_LocalPosition: {x: -16.195827, y: 0, z: 21.183517}
+  m_LocalRotation: {x: 0.031905048, y: 0.9010029, z: -0.0672626, w: 0.42737773}
+  m_LocalPosition: {x: -0.24956894, y: 0, z: 8.156402}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 562832941}
@@ -4688,7 +4688,7 @@ MonoBehaviour:
   m_SoftZoneHeight: 0.8
   m_BiasX: 0
   m_BiasY: 0
-  m_CenterOnActivate: 1
+  m_CenterOnActivate: 0
 --- !u!114 &1401097977
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -4704,8 +4704,8 @@ MonoBehaviour:
   m_BindingMode: 5
   m_FollowOffset: {x: 0, y: 2.5, z: -7}
   m_XDamping: 1
-  m_YDamping: 0.75
-  m_ZDamping: 0.75
+  m_YDamping: 0
+  m_ZDamping: 0
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0

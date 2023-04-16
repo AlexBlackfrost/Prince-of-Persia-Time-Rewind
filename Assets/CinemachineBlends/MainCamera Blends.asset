@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_CustomBlends:
   - m_From: TimeRewindCamera
-    m_To: FreelookCamera
+    m_To: FreeLookCamera
     m_Blend:
-      m_Style: 1
+      m_Style: 6
       m_Time: 0.25
       m_CustomCurve:
         serializedVersion: 2

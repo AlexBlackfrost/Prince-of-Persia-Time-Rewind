@@ -12,7 +12,6 @@ public class EnemyController : MonoBehaviour{
     [field: SerializeField] private ApproachPlayerState.ApproachPlayerSettings approachPlayerSettings;
 
     private Animator animator;
-    private TimeRewinder timeRewinder;
     private Sword sword;
     private Dictionary<Type, StateObject> stateObjects;
     private EnemyPerceptionSystem perceptionSystem;
@@ -22,7 +21,6 @@ public class EnemyController : MonoBehaviour{
         characterMovement.Transform = transform;
         characterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
-        timeRewinder = GetComponent<TimeRewinder>();
         sword = GetComponent<Sword>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
         stateObjects = new Dictionary<Type, StateObject>();
