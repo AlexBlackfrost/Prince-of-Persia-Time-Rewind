@@ -27,6 +27,67 @@ public class AnimationTimeControl {
         animator.applyRootMotion = previousRecord.applyRootMotion;
     }
 
+	public AnimationRecord RecordAnimationData() {
+		AnimationParameter[] parameters = RecordAnimatorParameters(animator);
+		AnimationLayerRecord[] animationLayerRecords = new AnimationLayerRecord[animator.layerCount];
+
+		for (int layer = 0; layer < animator.layerCount; layer++) {
+			AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(layer);
+			AnimationLayerRecord animationLayerRecord = new AnimationLayerRecord(layer, animator.GetLayerWeight(layer), stateInfo.shortNameHash,
+																				 stateInfo.normalizedTime, stateInfo.length);
+
+			string output = "ShortNameHash: " + stateInfo.shortNameHash +
+							" NormalizedTime: " + stateInfo.normalizedTime;
+
+			if (animator.IsInTransition(layer)) {
+				AnimatorTransitionInfo transitionInfo = animator.GetAnimatorTransitionInfo(layer);
+				AnimatorStateInfo nextStateInfo = animator.GetNextAnimatorStateInfo(layer);
+				TransitionRecord transitionRecord = new TransitionRecord(nextStateInfo.shortNameHash,
+																		 transitionInfo.normalizedTime,
+																		 transitionInfo.duration,
+																		 nextStateInfo.normalizedTime,
+																		 nextStateInfo.length);
+
+				animationLayerRecord.isInTransition = true;
+				animationLayerRecord.transitionRecord = transitionRecord;
+
+				output += " NextNameHash: " + nextStateInfo.shortNameHash +
+							" NextStateNormalizedTime: " + nextStateInfo.normalizedTime +
+							" TransitionDuration: " + transitionInfo.duration +
+							" TransitionNormalizedTime: " + transitionInfo.normalizedTime;
+			}
+
+			animationLayerRecords[layer] = animationLayerRecord;
+			Debug.Log(output);
+		}
+		return new AnimationRecord(parameters, animationLayerRecords, animator.applyRootMotion);
+	}
+
+	private static AnimationParameter[] RecordAnimatorParameters(Animator animator) {
+		AnimationParameter[] parameters = new AnimationParameter[animator.parameterCount];
+		int i = 0;
+		foreach (AnimatorControllerParameter parameter in animator.parameters) {
+			object value = null;
+			switch (parameter.type) {
+				case AnimatorControllerParameterType.Float:
+					value = animator.GetFloat(parameter.nameHash);
+					break;
+
+				case AnimatorControllerParameterType.Int:
+					value = animator.GetInteger(parameter.nameHash);
+					break;
+
+				case AnimatorControllerParameterType.Bool:
+				case AnimatorControllerParameterType.Trigger:
+					value = animator.GetBool(parameter.nameHash);
+					break;
+			}
+			parameters[i++] = new AnimationParameter(parameter.type, parameter.nameHash, value);
+
+		}
+		return parameters;
+	}
+
 	public void RestoreAnimatorParameters(AnimationRecord previousRecord) {
 		foreach (AnimationParameter parameter in previousRecord.parameters) {
 			switch (parameter.type) {

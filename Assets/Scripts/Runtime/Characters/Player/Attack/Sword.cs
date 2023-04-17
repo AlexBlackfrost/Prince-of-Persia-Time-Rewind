@@ -181,7 +181,7 @@ public class Sword : MonoBehaviour {
     }
 
     public void OnTimeRewindStop(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord, float elapsedTimeSinceLastRecord, float previousRecordDeltaTime) {
-        RestoreSwordRecord(previousSwordRecord,nextSwordRecord, elapsedTimeSinceLastRecord, previousRecordDeltaTime);
+        RestoreSwordRecord(previousSwordRecord,nextSwordRecord,  previousRecordDeltaTime, elapsedTimeSinceLastRecord);
         swordState = previousSwordRecord.swordState;
         SheathingEnabled = previousSwordRecord.sheathingEnabled;
         UnsheathingEnabled = previousSwordRecord.unsheathingEnabled;
@@ -211,11 +211,11 @@ public class Sword : MonoBehaviour {
         }
     }
 
-    public SwordRecord SaveSwordRecord() {
+    public SwordRecord RecordSwordData() {
         return new SwordRecord(SheathingEnabled, UnsheathingEnabled, unsheatheMotionTime, animatorSwordLayerWeight, animatorSwordLayerTargetWeight, swordState, sword.parent);
     }
 
-    public void RestoreSwordRecord(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord, float elapsedTimeSinceLastRecord, float previousRecordDeltaTime) {
+    public void RestoreSwordRecord(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord,float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
         float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
 
         unsheatheMotionTime = Mathf.Lerp(previousSwordRecord.unsheatheMotionTime, nextSwordRecord.unsheatheMotionTime, lerpAlpha);

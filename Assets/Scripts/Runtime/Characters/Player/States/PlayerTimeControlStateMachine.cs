@@ -22,6 +22,10 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 	private PlayerTimeControlSettings settings;
 	private AnimationTimeControl animationTimeControl;
+	private StateMachineTimeControl stateMachineTimeControl;
+	private TransformTimeControl transformTimeControl;
+	private CameraTimeControl cameraTimeControl;
+	private CharacterMovementTimeControl characterMovementTimeControl;
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
 	private PlayerRecord previousRecord, nextRecord;
@@ -38,6 +42,10 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		noneState = new NoneState();
 
 		animationTimeControl = new AnimationTimeControl(settings.Animator);
+		transformTimeControl = new TransformTimeControl(settings.Transform);
+		cameraTimeControl = new CameraTimeControl(settings.Camera, settings.timeRewindCamera);
+		stateMachineTimeControl = new StateMachineTimeControl(this);
+		characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
 
 		cinemachineBrain = settings.Camera.GetComponent<CinemachineBrain>();
 
@@ -78,8 +86,6 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		settings.timeRewindCamera.transform.rotation = settings.Camera.transform.rotation;
 		settings.timeRewindCamera.gameObject.SetActive(true);
 		settings.FreeLookCamera.gameObject.SetActive(false);
-		settings.timeRewindCamera.Priority++;
-		settings.FreeLookCamera.Priority--;
 
 		// State machine
 		CurrentStateObject.Exit();
@@ -99,7 +105,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		settings.FreeLookCamera.gameObject.SetActive(true);
 
 		// State machine
-		RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
+		// RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
+		stateMachineTimeControl.RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
 
 		// Sword
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
@@ -107,12 +114,20 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	}
 
     private void SavePlayerRecord() {
-		PlayerRecord playerRecord = RecordUtils.RecordPlayerData(settings.Transform,
+		PlayerRecord playerRecord = new PlayerRecord(transformTimeControl.RecordTransformData(),
+													 cameraTimeControl.RecordCameraData(),
+													 animationTimeControl.RecordAnimationData(),
+													 stateMachineTimeControl.RecordStateMachineData(),
+													 characterMovementTimeControl.RecordCharacterMovementData(),
+													 settings.Sword.RecordSwordData(),
+													 Time.deltaTime);
+
+		/*PlayerRecord playerRecord = RecordUtils.RecordPlayerData(settings.Transform,
 																 settings.Camera,
 																 this,
 																 settings.Animator,
 																 settings.CharacterMovement,
-																 settings.Sword.SaveSwordRecord());
+																 settings.Sword.SaveSwordRecord());*/
 
 		// Check for interrupted transitions
 		animationTimeControl.TrackInterruptedTransitions(ref playerRecord.animationRecord, playerRecord.deltaTime);
@@ -134,19 +149,19 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 
 	private void RestorePlayerRecord(PlayerRecord previousRecord, PlayerRecord nextRecord) {
-		RestoreTransformRecord(settings.Transform, previousRecord.playerTransform, nextRecord.playerTransform, 
-							   previousRecord.deltaTime);
+		transformTimeControl.RestoreTransformRecord(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, 
+													elapsedTimeSinceLastRecord);
 
-		RestoreCameraRecord(settings.timeRewindCamera, previousRecord.cameraRecord, nextRecord.cameraRecord, 
-							previousRecord.deltaTime);
+		cameraTimeControl.RestoreCameraRecord(previousRecord.cameraRecord, nextRecord.cameraRecord, previousRecord.deltaTime, 
+											  elapsedTimeSinceLastRecord);
 
-		animationTimeControl.RestoreAnimationRecord(previousRecord.animationRecord, nextRecord.animationRecord,
-													previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		animationTimeControl.RestoreAnimationRecord(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, 
+													elapsedTimeSinceLastRecord);
 
-		RestoreCharacterMovementRecord(settings.CharacterMovement, previousRecord.characterMovementRecord,
-									   nextRecord.characterMovementRecord, previousRecord.deltaTime);
+		characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
+																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
-		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 
 		Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());
