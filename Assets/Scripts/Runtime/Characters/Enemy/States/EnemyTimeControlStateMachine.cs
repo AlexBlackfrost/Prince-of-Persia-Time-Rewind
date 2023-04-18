@@ -17,33 +17,38 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	}
 
 	private EnemyTimeControlSettings settings;
+	private AnimationTimeControl animationTimeControl;
+	private StateMachineTimeControl stateMachineTimeControl;
+	private TransformTimeControl transformTimeControl;
+	private CharacterMovementTimeControl characterMovementTimeControl;
+
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
 	private EnemyRecord previousRecord, nextRecord;
 	private CircularStack<EnemyRecord> records;
-	private int recordFPS = 60;
+	private int recordFPS = 60; 
 	private int recordMaxseconds = 20;
 	private float rewindSpeed = 0.1f;
-	private NoneState noneState;
 
 	private AnimationRecord lastAnimationRecord;
 	private TransitionRecord[] lastInterruptedTransitionRecordInLayer;
-	private AnimationTimeControl animationTimeControl;
-	private StateMachineTimeControl stateMachineTimeControl;
-	//private TransformTimeControl transformTimeControl;
 
 	public EnemyTimeControlStateMachine(UpdateMode updateMode, EnemyTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
-		noneState = new NoneState();
-		timeIsRewinding = false;
+
 		animationTimeControl = new AnimationTimeControl(settings.Animator);
+		transformTimeControl = new TransformTimeControl(settings.Transform);
+		stateMachineTimeControl = new StateMachineTimeControl(this);
+		characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
+
+		records = new CircularStack<EnemyRecord>(recordFPS * recordMaxseconds);
+		timeIsRewinding = false;
 		TimeRewindManager.TimeRewindStart += OnTimeRewindStart;
 		TimeRewindManager.TimeRewindStop += OnTimeRewindStop;
 	}
 
 	protected override void OnLateUpdate() {
-
 		if (timeIsRewinding) {
 			RewindEnemyRecord();
 		} else {
@@ -63,9 +68,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		animationTimeControl.OnTimeRewindStart();
 
 		// State machine
-		CurrentStateObject.Exit();
-		// Do not change state using ChangeState() so that OnStateEnter is not triggered after rewind stops.
-		CurrentStateObject = noneState;
+		stateMachineTimeControl.OnTimeRewindStart();
 
 		// Sword
 		settings.Sword.OnTimeRewindStart();
@@ -84,11 +87,45 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 	}
 
-	private void RewindEnemyRecord() {
-
-    }
-
 	private void SaveEnemyRecord() {
+		EnemyRecord enemyRecord = new EnemyRecord(transformTimeControl.RecordTransformData(),
+													 animationTimeControl.RecordAnimationData(),
+													 stateMachineTimeControl.RecordStateMachineData(),
+													 characterMovementTimeControl.RecordCharacterMovementData(),
+													 settings.Sword.RecordSwordData(),
+													 Time.deltaTime);
 
-    }
+		// Check for interrupted transitions
+		animationTimeControl.TrackInterruptedTransitions(ref enemyRecord.animationRecord, enemyRecord.deltaTime);
+
+		records.Push(enemyRecord);
+	}
+
+
+	private void RewindEnemyRecord() {
+		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && records.Count > 2) {
+			elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
+			previousRecord = records.Pop();
+			nextRecord = records.Peek();
+		}
+
+		RestoreEnemyRecord(previousRecord, nextRecord);
+		elapsedTimeSinceLastRecord += Time.deltaTime * rewindSpeed;
+	}
+
+	private void RestoreEnemyRecord(EnemyRecord previousRecord, EnemyRecord nextRecord) {
+		transformTimeControl.RestoreTransformRecord(previousRecord.enemyTransform, nextRecord.enemyTransform, previousRecord.deltaTime,
+													elapsedTimeSinceLastRecord);
+
+		animationTimeControl.RestoreAnimationRecord(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime,
+													elapsedTimeSinceLastRecord);
+
+		characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord,
+																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+
+		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+
+
+		Debug.Log("Enemy Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());
+	}
 }

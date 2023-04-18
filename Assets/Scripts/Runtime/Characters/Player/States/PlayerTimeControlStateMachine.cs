@@ -33,17 +33,15 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private int recordFPS = 60;
 	private int recordMaxseconds = 20;
 	private float rewindSpeed = 0.1f;
-	private NoneState noneState;
 	private CinemachineBrain cinemachineBrain;
 
 	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
-		noneState = new NoneState();
 
 		animationTimeControl = new AnimationTimeControl(settings.Animator);
 		transformTimeControl = new TransformTimeControl(settings.Transform);
-		cameraTimeControl = new CameraTimeControl(settings.Camera, settings.timeRewindCamera);
+		cameraTimeControl = new CameraTimeControl(settings.Camera, settings.timeRewindCamera, settings.FreeLookCamera);
 		stateMachineTimeControl = new StateMachineTimeControl(this);
 		characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
 
@@ -82,15 +80,10 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		animationTimeControl.OnTimeRewindStart();
 
 		// Camera
-		settings.timeRewindCamera.transform.position = settings.Camera.transform.position;
-		settings.timeRewindCamera.transform.rotation = settings.Camera.transform.rotation;
-		settings.timeRewindCamera.gameObject.SetActive(true);
-		settings.FreeLookCamera.gameObject.SetActive(false);
+		cameraTimeControl.OnTimeRewindStart();
 
 		// State machine
-		CurrentStateObject.Exit();
-		// Do not change state using ChangeState() so that OnStateEnter is not triggered after rewind stops.
-		CurrentStateObject = noneState;
+		stateMachineTimeControl.OnTimeRewindStart();
 
 		// Sword
 		settings.Sword.OnTimeRewindStart();
@@ -101,16 +94,13 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		animationTimeControl.OnTimeRewindStop(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		// Camera
-		settings.timeRewindCamera.gameObject.SetActive(false);
-		settings.FreeLookCamera.gameObject.SetActive(true);
+		cameraTimeControl.OnTimeRewindStop();
 
 		// State machine
-		// RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
 		stateMachineTimeControl.RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
 
 		// Sword
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
-		
 	}
 
     private void SavePlayerRecord() {
@@ -122,16 +112,9 @@ public class PlayerTimeControlStateMachine : StateMachine {
 													 settings.Sword.RecordSwordData(),
 													 Time.deltaTime);
 
-		/*PlayerRecord playerRecord = RecordUtils.RecordPlayerData(settings.Transform,
-																 settings.Camera,
-																 this,
-																 settings.Animator,
-																 settings.CharacterMovement,
-																 settings.Sword.SaveSwordRecord());*/
-
 		// Check for interrupted transitions
 		animationTimeControl.TrackInterruptedTransitions(ref playerRecord.animationRecord, playerRecord.deltaTime);
-		
+
 		records.Push(playerRecord);
 	}
 
@@ -167,60 +150,5 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());
 	}
 
-	private void RestoreTransformRecord(Transform transform, TransformRecord previousTransformRecord,
-										TransformRecord nextTransformRecord, float previousRecordDeltaTime) {
-
-		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
-        
-		transform.position = Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha);
-		transform.rotation = Quaternion.Slerp(previousTransformRecord.rotation, nextTransformRecord.rotation, lerpAlpha);
-		transform.localScale = Vector3.Lerp(previousTransformRecord.localScale, nextTransformRecord.localScale, lerpAlpha);
-        
-	} 
-
-	private void RestoreCameraRecord(CinemachineVirtualCamera timeRewindCamera, CameraRecord previousCameraRecord, 
-									 CameraRecord nextCameraRecord, float previousRecordDeltaTime) {
-
-		TransformRecord previousTransformRecord = previousCameraRecord.cameraTransform;
-		TransformRecord nextTransformRecord = nextCameraRecord.cameraTransform;
-		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
-
-		RestoreTransformRecord(timeRewindCamera.transform, previousTransformRecord, nextTransformRecord, previousRecordDeltaTime);
-	}
-
-	private void RestoreStateMachineRecord(Dictionary<Type, StateObject> stateObjects, StateMachineRecord stateMachineRecord) {
-		for(int i=0; i < stateMachineRecord.hierarchy.Length-1; i++) {
-			Type id = stateMachineRecord.hierarchy[i];
-			StateMachine stateMachine = (StateMachine)stateObjects[id];
-			stateMachine.IsActive = true;
-			stateMachine.CurrentStateObject = stateObjects[stateMachineRecord.hierarchy[i + 1]];
-			stateMachine.RestoreFieldsAndProperties(stateMachineRecord.stateObjectRecords[i]);
-		}
-		int leaftStateIndex = stateMachineRecord.hierarchy.Length - 1;
-		Type leaftStateId = stateMachineRecord.hierarchy[leaftStateIndex];
-		StateObject leafState = stateObjects[leaftStateId];
-		leafState.IsActive = true;
-		leafState.RestoreFieldsAndProperties(stateMachineRecord.stateObjectRecords[leaftStateIndex]);
-		CurrentStateObject = stateObjects[stateMachineRecord.hierarchy[0]];
-
-		/*
-		StateObject newCurrentStateObject = settings.StateObjects[stateMachine.CurrentStateObject.GetType()];
-		newCurrentStateObject.RestorePropertiesValues(stateMachine.CurrentStateObject);
-		CurrentStateObject = newCurrentStateObject;*/
-		//copy stateMachine.CurrentStateObject values to the original stateobject that is referenced by transitions objects and so on
-	}
-
-
-	private void RestoreCharacterMovementRecord(CharacterMovement characterMovement,
-												CharacterMovementRecord previousCharacterMovementRecord,
-												CharacterMovementRecord nextCharacterMovementRecord,
-												float previousRecordDeltaTime) {
-
-		float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
-		Vector3 velocity = Vector3.Lerp(previousCharacterMovementRecord.velocity,
-										nextCharacterMovementRecord.velocity,
-										lerpAlpha);
-		characterMovement.Velocity = velocity;
-    }
 
 }
