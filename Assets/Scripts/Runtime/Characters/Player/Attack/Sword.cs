@@ -6,10 +6,10 @@ using static UnityEngine.InputSystem.InputAction;
 
 
 public class Sword : MonoBehaviour {
-    [SerializeField] private Transform sword;
     [SerializeField] private Transform backSocket;
     [SerializeField] private Transform handSocket;
 
+    private GameObject owner;
     public bool SheathingEnabled { get; set; } = true;
     public bool UnsheathingEnabled { get; set; } = true;
 
@@ -33,7 +33,15 @@ public class Sword : MonoBehaviour {
     private Coroutine layerTransitionCoroutine;
 
     private void Awake() {
-        animator = GetComponent<Animator>();
+        /*animator = Owner.GetComponent<Animator>();
+        unsheatheHash = Animator.StringToHash("Unsheathe");
+        unsheatheSpeedMultiplierHash = Animator.StringToHash("UnsheatheSpeedMultiplier");
+        unsheatheMotionTimeHash = Animator.StringToHash("UnsheatheMotionTime");
+        swordState = SwordState.InBack;*/
+    }
+
+    public void OnEquipped(GameObject owner) {
+        animator = owner.GetComponent<Animator>();
         unsheatheHash = Animator.StringToHash("Unsheathe");
         unsheatheSpeedMultiplierHash = Animator.StringToHash("UnsheatheSpeedMultiplier");
         unsheatheMotionTimeHash = Animator.StringToHash("UnsheatheMotionTime");
@@ -84,9 +92,9 @@ public class Sword : MonoBehaviour {
 
     public void SwitchSwordSocket() {
         if (swordState == SwordState.Sheathing) {
-            sword.SetParent(backSocket, false);
+            transform.SetParent(backSocket, false);
         } else if (swordState == SwordState.Unsheathing) {
-            sword.SetParent(handSocket, false);
+            transform.SetParent(handSocket, false);
         }
     }
 
@@ -212,7 +220,7 @@ public class Sword : MonoBehaviour {
     }
 
     public SwordRecord RecordSwordData() {
-        return new SwordRecord(SheathingEnabled, UnsheathingEnabled, unsheatheMotionTime, animatorSwordLayerWeight, animatorSwordLayerTargetWeight, swordState, sword.parent);
+        return new SwordRecord(SheathingEnabled, UnsheathingEnabled, unsheatheMotionTime, animatorSwordLayerWeight, animatorSwordLayerTargetWeight, swordState, transform.parent);
     }
 
     public void RestoreSwordRecord(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord,float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
@@ -224,7 +232,7 @@ public class Sword : MonoBehaviour {
         animatorSwordLayerWeight = Mathf.Lerp(previousSwordRecord.animatorSwordLayerWeight, nextSwordRecord.animatorSwordLayerWeight, lerpAlpha);
         animator.SetLayerWeight(swordAnimatorLayer, animatorSwordLayerWeight);
 
-        sword.SetParent(previousSwordRecord.swordSocket, false);
+        transform.SetParent(previousSwordRecord.swordSocket, false);
     }
 
     #endregion

@@ -9,7 +9,7 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class PlayerController : MonoBehaviour {
     [field:SerializeField] private CharacterMovement characterMovement;
-
+    [SerializeField] private Sword sword;
     [Header("State machine settings")]
     [field: SerializeField] private IdleState.IdleSettings idleSettings;
     [field: SerializeField] private MoveState.MoveSettings moveSettings;
@@ -27,7 +27,6 @@ public class PlayerController : MonoBehaviour {
     private Animator animator;
     private Dictionary<Type, StateObject> stateObjects;
     private PlayerPerceptionSystem perceptionSystem;
-    private Sword sword;
 
 
 
@@ -37,7 +36,7 @@ public class PlayerController : MonoBehaviour {
         animator = GetComponent<Animator>();
         InputController = GetComponent<InputController>();
         perceptionSystem = GetComponent<PlayerPerceptionSystem>();
-        sword = GetComponent<Sword>();
+        sword.OnEquipped(this.gameObject);
         stateObjects = new Dictionary<Type, StateObject>();
 
         InputController.Attack.performed += (CallbackContext ctx) => { sword.OnUnsheathePressed(); };
@@ -227,5 +226,16 @@ public class PlayerController : MonoBehaviour {
         rootStateMachine.LateUpdate();
     }
 
+    public void SwitchSwordSocket() {
+        sword.SwitchSwordSocket();
+    }
+
+    public void SetRotationEnabled(Bool enabled) {
+        sword.SetRotationEnabled(enabled);
+    }
+
+    public void SetComboEnabled(Bool enabled) {
+        sword.SetComboEnabled(enabled);
+    }
     
 }

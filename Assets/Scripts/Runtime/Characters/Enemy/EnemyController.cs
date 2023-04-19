@@ -7,6 +7,7 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour{
     [field: SerializeField] private Health health;
     [field: SerializeField] private CharacterMovement characterMovement;
+    [SerializeField] private Sword sword;
 
     [Header("State machine settings")]
     [field: SerializeField] private IdleState.IdleSettings idleSettings;
@@ -15,7 +16,6 @@ public class EnemyController : MonoBehaviour{
     [field: SerializeField] private DamagedState.DamagedSettings damagedSettings;
 
     private Animator animator;
-    private Sword sword;
     private Dictionary<Type, StateObject> stateObjects;
     private EnemyPerceptionSystem perceptionSystem;
     private DamageController damageController;
@@ -25,9 +25,10 @@ public class EnemyController : MonoBehaviour{
         characterMovement.Transform = transform;
         characterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
-        sword = GetComponent<Sword>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
         stateObjects = new Dictionary<Type, StateObject>();
+        sword.OnEquipped(this.gameObject);
+        damageController = new DamageController(this.gameObject);
 
         InjectDependencies();
         BuildHFSM();

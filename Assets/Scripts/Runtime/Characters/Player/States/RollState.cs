@@ -10,7 +10,6 @@ public class RollState : State {
 		public Animator Animator { get; set; }
 		public CharacterMovement CharacterMovement { get; set; }
 		public Camera MainCamera { get; set; }
-		[field:SerializeField]public CinemachineFreeLook FreeLookCamera { get; set; }
 		public InputController InputController { get; set; }
 		public Transform Transform { get; set; }
 		public AnimationCurve rollSpeed;
