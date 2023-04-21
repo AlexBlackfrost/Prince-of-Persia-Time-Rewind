@@ -9,7 +9,12 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class PlayerController : MonoBehaviour {
     [field:SerializeField] private CharacterMovement characterMovement;
+
+    [Header("Combat")]
+    [SerializeField] private DamageController damageController;
+    [SerializeField] private Health health;
     [SerializeField] private Sword sword;
+
     [Header("State machine settings")]
     [field: SerializeField] private IdleState.IdleSettings idleSettings;
     [field: SerializeField] private MoveState.MoveSettings moveSettings;
@@ -36,13 +41,14 @@ public class PlayerController : MonoBehaviour {
         animator = GetComponent<Animator>();
         InputController = GetComponent<InputController>();
         perceptionSystem = GetComponent<PlayerPerceptionSystem>();
-        sword.OnEquipped(this.gameObject);
         stateObjects = new Dictionary<Type, StateObject>();
 
-        InputController.Attack.performed += (CallbackContext ctx) => { sword.OnUnsheathePressed(); };
-        InputController.Sheathe.performed += (CallbackContext ctx) => { sword.OnSheathePressed(); };
+        health.Init();
+        sword.OnEquipped(this.gameObject);
 
-        InjectDependencies();
+        SubscribeEvents();
+
+        InjectHFSMDependencies();
         BuildHFSM();
         rootStateMachine.Init();
     }
@@ -113,7 +119,7 @@ public class PlayerController : MonoBehaviour {
 
     } 
 
-    private void InjectDependencies() {
+    private void InjectHFSMDependencies() {
         idleSettings.Animator = animator;
         idleSettings.CharacterMovement = characterMovement;
         idleSettings.Sword = sword;
@@ -162,6 +168,14 @@ public class PlayerController : MonoBehaviour {
         rollSettings.InputController = InputController;
         rollSettings.Transform = transform;
         rollSettings.MainCamera = Camera.main;
+    }
+
+
+    private void SubscribeEvents() {
+        InputController.Attack.performed += (CallbackContext ctx) => { sword.OnUnsheathePressed(); };
+        InputController.Sheathe.performed += (CallbackContext ctx) => { sword.OnSheathePressed(); };
+
+        damageController.DamageReceived += health.OnDamageReceived;
     }
 
     #region Transition conditions
@@ -213,6 +227,25 @@ public class PlayerController : MonoBehaviour {
     }
     #endregion
 
+
+    #region Animation Event Callbacks
+    public void SwitchSwordSocket() {
+        sword.SwitchSwordSocket();
+    }
+
+    public void SetRotationEnabled(Bool enabled) {
+        sword.SetRotationEnabled(enabled);
+    }
+
+    public void SetComboEnabled(Bool enabled) {
+        sword.SetComboEnabled(enabled);
+    }
+
+    public void SetHitboxEnabled(Bool enabled) {
+        sword.SetHitboxEnabled(enabled);
+    }
+
+    #endregion
     private void Update() {
         rootStateMachine.Update();
         //Debug.Log("Current state: " + rootStateMachine.GetCurrentStateName() );
@@ -226,16 +259,4 @@ public class PlayerController : MonoBehaviour {
         rootStateMachine.LateUpdate();
     }
 
-    public void SwitchSwordSocket() {
-        sword.SwitchSwordSocket();
-    }
-
-    public void SetRotationEnabled(Bool enabled) {
-        sword.SetRotationEnabled(enabled);
-    }
-
-    public void SetComboEnabled(Bool enabled) {
-        sword.SetComboEnabled(enabled);
-    }
-    
 }

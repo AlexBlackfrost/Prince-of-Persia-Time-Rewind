@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 3996241950722010136}
   - component: {fileID: 1193866941804861650}
   - component: {fileID: 5051892676281105162}
+  - component: {fileID: 5421577037422279278}
   m_Layer: 0
   m_Name: Caduceus
   m_TagString: Untagged
@@ -182,9 +183,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8af2ee9d5ab7934fb6cba4a0fdfca94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sword: {fileID: 0}
   backSocket: {fileID: 0}
   handSocket: {fileID: 0}
+--- !u!114 &5421577037422279278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833601167110174983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d334ed29a5c73340a234e61506e3836, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Type>k__BackingField: 0
+  <Radius>k__BackingField: 0.25
+  <Height>k__BackingField: 1.8
+  <Offset>k__BackingField: {x: 0, y: 0, z: 0.5}
+  <Rotation>k__BackingField: {x: 90, y: 0, z: 0}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &2392376309585549915
 GameObject:
   m_ObjectHideFlags: 0

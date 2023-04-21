@@ -5,8 +5,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour{
-    [field: SerializeField] private Health health;
     [field: SerializeField] private CharacterMovement characterMovement;
+
+    [Header("Combat")]
+    [SerializeField] private DamageController damageController;
+    [SerializeField] private Health health;
     [SerializeField] private Sword sword;
 
     [Header("State machine settings")]
@@ -18,7 +21,6 @@ public class EnemyController : MonoBehaviour{
     private Animator animator;
     private Dictionary<Type, StateObject> stateObjects;
     private EnemyPerceptionSystem perceptionSystem;
-    private DamageController damageController;
     private RootStateMachine rootStateMachine;
 
     private void Awake() {
@@ -27,12 +29,14 @@ public class EnemyController : MonoBehaviour{
         animator = GetComponent<Animator>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
         stateObjects = new Dictionary<Type, StateObject>();
+
+        health.Init();
         sword.OnEquipped(this.gameObject);
-        damageController = new DamageController(this.gameObject);
+
+        SubscribeEvents();
 
         InjectDependencies();
         BuildHFSM();
-        InitDamageSystem();
         rootStateMachine.Init();
         
     }
@@ -53,6 +57,10 @@ public class EnemyController : MonoBehaviour{
         timeControlSettings.Sword = sword;
 
         damagedSettings.Animator = animator;
+    }
+
+    private void SubscribeEvents() {
+        damageController.DamageReceived += health.OnDamageReceived;
     }
 
     private void BuildHFSM() {
@@ -82,12 +90,6 @@ public class EnemyController : MonoBehaviour{
         stateObjects[typeof(ApproachPlayerState)] = approachPlayerState;
         stateObjects[typeof(DamagedState)] = damagedState;
         stateObjects[typeof(EnemyTimeControlStateMachine)] = enemyTimeControlStateMachine;
-    }
-
-    private void InitDamageSystem() {
-        damageController = new DamageController(gameObject);
-        damageController.DamageReceived += health.OnDamageReceived;
-        health.Init();
     }
 
     private void Update(){
