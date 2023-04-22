@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 public class GizmosExtensions {
-
+    // Credit: https://forum.unity.com/threads/drawing-capsule-gizmo.354634/
     public static void DrawWireCapsule(Vector3 _pos, Quaternion _rot, float _radius, float _height, Color _color = default(Color)) {
         if (_color != default(Color))
             Handles.color = _color;

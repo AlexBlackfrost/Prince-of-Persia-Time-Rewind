@@ -31,6 +31,7 @@ public class AttackState : State {
     private bool followedCombo;
     private bool rotationEnabled;
     private Camera mainCamera;
+    private HashSet<IHittable> alreadyHitObjects;
 
     public AttackState(AttackSettings settings) : base() {
         this.settings = settings;
@@ -39,6 +40,7 @@ public class AttackState : State {
         settings.Sword.OnSetRotationEnabled = SetRotationEnabled;
         comboEnabled = false;
         attackInputBuffer = new AttackInputBuffer(ATTACK_PRESSED_BUFFER_SIZE);
+        alreadyHitObjects = new HashSet<IHittable>();
 
         attackHash = Animator.StringToHash("Attack");
         nextComboAttackHash = Animator.StringToHash("NextComboAttack");
@@ -54,6 +56,7 @@ public class AttackState : State {
         settings.Sword.SetSwordAnimatorLayerEnabled(false);
         
         attackInputBuffer.Clear();
+        alreadyHitObjects.Clear();
         
         attackIndex = 1;
         followedCombo = false;
@@ -67,6 +70,7 @@ public class AttackState : State {
     protected override void OnUpdate() {
         UpdateAttackCombo();
         UpdateRotation();
+        UpdateHitDetection();
     }
 
     protected override void OnExit() {
@@ -85,6 +89,7 @@ public class AttackState : State {
         if (comboEnabled && attackIndex < MAX_ATTACK_COMBO && attackInputBuffer.WasAttackPressedInLastSeconds(settings.AttackPressedBufferTime)) {
             comboEnabled = false;
             attackInputBuffer.Clear();
+            alreadyHitObjects.Clear();
             settings.Animator.SetTrigger(nextComboAttackHash);
             rotationEnabled = true;
             attackIndex++;
@@ -104,6 +109,23 @@ public class AttackState : State {
             if(moveDirection.magnitude > 0) {
                 Quaternion newRotation = Quaternion.Slerp(currentRotation, targetRotation, settings.RotationSpeed*Time.deltaTime);
                 settings.CharacterMovement.SetRotation(newRotation);
+            }
+        }
+    }
+
+    private void UpdateHitDetection() {
+        HitData[] hitsData = settings.Sword.CheckHit(); 
+        if (hitsData != null) {
+            foreach(HitData hitData in hitsData) {
+                IHittable hittableObject = hitData.hittableObject;
+                if (!alreadyHitObjects.Contains(hittableObject)) {
+                    hittableObject.Hit();
+                    alreadyHitObjects.Add(hittableObject);
+
+                    if(hittableObject is IDamageable) {
+                        ((IDamageable)hittableObject).ReceiveDamage(settings.Sword.Damage);
+                    }
+                }
             }
         }
     }
@@ -144,9 +166,13 @@ public class AttackState : State {
         comboEnabled = record.comboEnabled;
         rotationEnabled = record.rotationEnabled;
         followedCombo = record.followedCombo;
+
+        alreadyHitObjects = new HashSet<IHittable>(record.alreadyHitObjects);
     }
 
     public override object RecordFieldsAndProperties() {
-        return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo);
+        IHittable[] alreadyHitObjects = new IHittable[this.alreadyHitObjects.Count];
+        this.alreadyHitObjects.CopyTo(alreadyHitObjects);
+        return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo, alreadyHitObjects);
     }
 }

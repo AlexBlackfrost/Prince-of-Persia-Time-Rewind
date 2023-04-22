@@ -8,7 +8,7 @@ public class EnemyController : MonoBehaviour{
     [field: SerializeField] private CharacterMovement characterMovement;
 
     [Header("Combat")]
-    [SerializeField] private DamageController damageController;
+    [SerializeField] private Hurtbox hurtbox;
     [SerializeField] private Health health;
     [SerializeField] private Sword sword;
 
@@ -60,7 +60,7 @@ public class EnemyController : MonoBehaviour{
     }
 
     private void SubscribeEvents() {
-        damageController.DamageReceived += health.OnDamageReceived;
+        hurtbox.DamageReceived += health.OnDamageReceived;
     }
 
     private void BuildHFSM() {
@@ -74,15 +74,16 @@ public class EnemyController : MonoBehaviour{
 
         // Create transitions
         // Idle ->
-        idleState.AddTransition(approachPlayerState, perceptionSystem.IsSeeingPlayer);
-        damageController.DamageReceived += idleState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += idleState.AddEventTransition<float>(damagedState);
+        idleState.AddTransition(approachPlayerState, perceptionSystem.IsSeeingPlayer, ()=> !approachPlayerState.ReachedPlayer());
 
         // ApproachPlayer ->
+        hurtbox.DamageReceived += approachPlayerState.AddEventTransition<float>(damagedState);
         approachPlayerState.AddTransition(idleState, approachPlayerState.ReachedPlayer);
-        damageController.DamageReceived += approachPlayerState.AddEventTransition<float>(damagedState);
 
         // Damaged ->
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded);
+        hurtbox.DamageReceived += damagedState.AddEventTransition<float>(damagedState);
 
 
         stateObjects[typeof(IdleState)] = idleState;
@@ -108,6 +109,7 @@ public class EnemyController : MonoBehaviour{
     private bool DamagedAnimationEnded(int shortNameHash) {
         return Animator.StringToHash("Damaged") == shortNameHash;
     }
+
     #endregion
 
 }

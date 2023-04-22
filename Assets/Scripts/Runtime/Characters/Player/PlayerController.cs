@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour {
     [field:SerializeField] private CharacterMovement characterMovement;
 
     [Header("Combat")]
-    [SerializeField] private DamageController damageController;
+    [SerializeField] private Hurtbox damageController;
     [SerializeField] private Health health;
     [SerializeField] private Sword sword;
 

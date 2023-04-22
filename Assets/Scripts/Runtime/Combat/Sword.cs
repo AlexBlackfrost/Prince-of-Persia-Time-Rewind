@@ -2,22 +2,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.InputSystem.InputAction;
 
 
 public class Sword : MonoBehaviour {
     [SerializeField] private Transform backSocket;
     [SerializeField] private Transform handSocket;
+    [SerializeField, ReadOnly] private bool hitboxEnabled;
+    [field: SerializeField] public float Damage { get; private set; } = 10;
 
-    private GameObject owner;
     public bool SheathingEnabled { get; set; } = true;
     public bool UnsheathingEnabled { get; set; } = true;
 
     public Action<bool> OnSetComboEnabled;
     public Action<bool> OnSetRotationEnabled;
 
+    private GameObject owner;
     private Animator animator;
-    private Collider hitbox;
+    private Hitbox hitbox;
     private int unsheatheHash;
     private int unsheatheSpeedMultiplierHash;
     private int unsheatheMotionTimeHash;
@@ -34,7 +35,7 @@ public class Sword : MonoBehaviour {
     private Coroutine layerTransitionCoroutine;
 
     private void Awake() {
-        hitbox = GetComponent<Collider>();
+        hitbox = GetComponent<Hitbox>();
         /*animator = Owner.GetComponent<Animator>();
         unsheatheHash = Animator.StringToHash("Unsheathe");
         unsheatheSpeedMultiplierHash = Animator.StringToHash("UnsheatheSpeedMultiplier");
@@ -165,17 +166,6 @@ public class Sword : MonoBehaviour {
         OnSetRotationEnabled.Invoke(Convert.ToBoolean((int)enabled));
     }
 
-    public void SetHitboxEnabled(Bool enabled) {
-        hitbox.enabled = Convert.ToBoolean((int)enabled);
-    }
-
-    private void OnTriggerEnter(Collider other) {
-        IDamageable damageable = other.GetComponent<IDamageable>();
-        if (damageable != null) {
-            Debug.Log("Hit " + other.name);
-        }
-    }
-
     #endregion
 
     #region Input
@@ -233,7 +223,8 @@ public class Sword : MonoBehaviour {
     }
 
     public SwordRecord RecordSwordData() {
-        return new SwordRecord(SheathingEnabled, UnsheathingEnabled, unsheatheMotionTime, animatorSwordLayerWeight, animatorSwordLayerTargetWeight, swordState, transform.parent);
+        return new SwordRecord(SheathingEnabled, UnsheathingEnabled, unsheatheMotionTime, animatorSwordLayerWeight, animatorSwordLayerTargetWeight, 
+                               swordState, transform.parent, hitboxEnabled);
     }
 
     public void RestoreSwordRecord(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord,float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
@@ -246,7 +237,23 @@ public class Sword : MonoBehaviour {
         animator.SetLayerWeight(swordAnimatorLayer, animatorSwordLayerWeight);
 
         transform.SetParent(previousSwordRecord.swordSocket, false);
+
+        hitboxEnabled = previousSwordRecord.hitboxEnabled;
     }
 
+    #endregion
+
+    #region Hit detection
+    public void SetHitboxEnabled(Bool enabled) {
+        hitboxEnabled = Convert.ToBoolean((int)enabled);
+    }
+
+    public HitData[] CheckHit() {
+        if (hitboxEnabled) { 
+            return hitbox.CheckHit();
+        } else {
+            return null;
+        }
+    }
     #endregion
 }

@@ -153,12 +153,14 @@ public struct AttackStateRecord {
     public bool comboEnabled;
     public bool rotationEnabled;
     public bool followedCombo;
+    public IHittable[] alreadyHitObjects;
 
-    public AttackStateRecord(int attackIndex, bool comboEnabled, bool rotationEnabled, bool followedCombo) {
+    public AttackStateRecord(int attackIndex, bool comboEnabled, bool rotationEnabled, bool followedCombo, IHittable[] alreadyHitObjects) {
         this.attackIndex = attackIndex;
         this.comboEnabled = comboEnabled;
         this.rotationEnabled = rotationEnabled;
         this.followedCombo = followedCombo;
+        this.alreadyHitObjects = alreadyHitObjects;
     }
 }
 
@@ -184,9 +186,10 @@ public struct SwordRecord {
     public float animatorSwordLayerTargetWeight;
     public SwordState swordState;
     public Transform swordSocket;
+    public bool hitboxEnabled;
 
     public SwordRecord(bool sheathingEnabled, bool unsheathingEnabled, float unsheatheMotionTime, float animatorSwordLayerWeight,
-                       float animatorSwordLayerTargetWeight, SwordState swordState, Transform swordSocket) {
+                       float animatorSwordLayerTargetWeight, SwordState swordState, Transform swordSocket, bool hitboxEnabled) {
         this.sheathingEnabled = sheathingEnabled;
         this.unsheathingEnabled = unsheathingEnabled;
         this.unsheatheMotionTime = unsheatheMotionTime;
@@ -194,6 +197,7 @@ public struct SwordRecord {
         this.animatorSwordLayerTargetWeight = animatorSwordLayerTargetWeight;
         this.swordState = swordState;
         this.swordSocket = swordSocket;
+        this.hitboxEnabled = hitboxEnabled;
     }
 }
 
