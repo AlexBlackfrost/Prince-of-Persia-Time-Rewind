@@ -17,6 +17,8 @@ public class EnemyController : MonoBehaviour{
     [field: SerializeField] private ApproachPlayerState.ApproachPlayerSettings approachPlayerSettings;
     [field: SerializeField] private EnemyTimeControlStateMachine.EnemyTimeControlSettings timeControlSettings;
     [field: SerializeField] private DamagedState.DamagedSettings damagedSettings;
+    [field: SerializeField] private AliveStateMachine.AliveSettings aliveSettings;
+    [field: SerializeField] private DeadState.DeadSettings deadSettings;
 
     private Animator animator;
     private Dictionary<Type, StateObject> stateObjects;
@@ -57,6 +59,8 @@ public class EnemyController : MonoBehaviour{
         timeControlSettings.Sword = sword;
 
         damagedSettings.Animator = animator;
+
+        deadSettings.Animator = animator;
     }
 
     private void SubscribeEvents() {
@@ -68,8 +72,10 @@ public class EnemyController : MonoBehaviour{
         IdleState idleState = new IdleState(idleSettings);
         ApproachPlayerState approachPlayerState = new ApproachPlayerState(approachPlayerSettings);
         DamagedState damagedState = new DamagedState(damagedSettings);
+        AliveStateMachine aliveStateMachine = new AliveStateMachine(aliveSettings, idleState, approachPlayerState, damagedState);
+        DeadState deadState = new DeadState(deadSettings);
         EnemyTimeControlStateMachine enemyTimeControlStateMachine = new EnemyTimeControlStateMachine(UpdateMode.UpdateAfterChild, timeControlSettings,
-                                                                                                     idleState, approachPlayerState, damagedState);
+                                                                                                     aliveStateMachine, deadState);
         rootStateMachine = new RootStateMachine(enemyTimeControlStateMachine);
 
         // Create transitions
@@ -85,11 +91,15 @@ public class EnemyController : MonoBehaviour{
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded);
         hurtbox.DamageReceived += damagedState.AddEventTransition<float>(damagedState);
 
+        // Alive ->
+        health.Dead += aliveStateMachine.AddEventTransition(deadState);
 
         stateObjects[typeof(IdleState)] = idleState;
         stateObjects[typeof(ApproachPlayerState)] = approachPlayerState;
         stateObjects[typeof(ApproachPlayerState)] = approachPlayerState;
         stateObjects[typeof(DamagedState)] = damagedState;
+        stateObjects[typeof(AliveStateMachine)] = aliveStateMachine;
+        stateObjects[typeof(DeadState)] = deadState;
         stateObjects[typeof(EnemyTimeControlStateMachine)] = enemyTimeControlStateMachine;
     }
 

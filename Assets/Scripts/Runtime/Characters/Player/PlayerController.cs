@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour {
     [field:SerializeField] private CharacterMovement characterMovement;
 
     [Header("Combat")]
-    [SerializeField] private Hurtbox damageController;
+    [SerializeField] private Hurtbox hurtbox;
     [SerializeField] private Health health;
     [SerializeField] private Sword sword;
 
@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private LandState.LandSettings landSettings;
     [field: SerializeField] private AttackState.AttackSettings attackSettings;
     [field: SerializeField] private RollState.RollSettings rollSettings;
+    [field: SerializeField] private AliveStateMachine.AliveSettings aliveSettings;
+    [field: SerializeField] private DeadState.DeadSettings deadSettings;
 
     public InputController InputController { get; private set; }
     public RootStateMachine rootStateMachine;
@@ -63,11 +65,13 @@ public class PlayerController : MonoBehaviour {
         LandState landState = new LandState(landSettings);
         AttackState attackState = new AttackState(attackSettings);
         RollState rollState = new RollState(rollSettings);
-        PlayerTimeControlStateMachine timeControlStateMachine = new PlayerTimeControlStateMachine(UpdateMode.UpdateAfterChild, 
-                                                                                      timeControlSettings, 
-                                                                                      idleState, moveState, jumpState,
-                                                                                      wallRunState, fallState, landState,
-                                                                                      attackState, rollState);
+        AliveStateMachine aliveStateMachine = new AliveStateMachine(aliveSettings,
+                                                                    idleState, moveState, jumpState,
+                                                                    wallRunState, fallState, landState,
+                                                                    attackState, rollState);
+        DeadState deadState = new DeadState(deadSettings);
+        PlayerTimeControlStateMachine timeControlStateMachine = new PlayerTimeControlStateMachine(UpdateMode.UpdateAfterChild, timeControlSettings, 
+                                                                                                  aliveStateMachine, deadState);
         rootStateMachine = new RootStateMachine(timeControlStateMachine);
 
         // Create transitions
@@ -106,6 +110,9 @@ public class PlayerController : MonoBehaviour {
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(idleState, RollAnimationEnded, (int shortNameHash) => { return IsNotMoving(); });
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(moveState, RollAnimationEnded, (int shortNameHash) => { return IsMoving(); });
 
+        // Alive ->
+        health.Dead += aliveStateMachine.AddEventTransition(deadState);
+
         // Store them to modify their values after rewinding
         stateObjects[typeof(IdleState)] = idleState;
         stateObjects[typeof(MoveState)] = moveState;
@@ -115,6 +122,8 @@ public class PlayerController : MonoBehaviour {
         stateObjects[typeof(LandState)] = landState;
         stateObjects[typeof(AttackState)] = attackState;
         stateObjects[typeof(RollState)] = rollState;
+        stateObjects[typeof(DeadState)] = deadState;
+        stateObjects[typeof(AliveStateMachine)] = aliveStateMachine;
         stateObjects[typeof(PlayerTimeControlStateMachine)] = timeControlStateMachine;
 
     } 
@@ -168,6 +177,8 @@ public class PlayerController : MonoBehaviour {
         rollSettings.InputController = InputController;
         rollSettings.Transform = transform;
         rollSettings.MainCamera = Camera.main;
+
+        deadSettings.Animator = animator;
     }
 
 
@@ -175,7 +186,7 @@ public class PlayerController : MonoBehaviour {
         InputController.Attack.performed += (CallbackContext ctx) => { sword.OnUnsheathePressed(); };
         InputController.Sheathe.performed += (CallbackContext ctx) => { sword.OnSheathePressed(); };
 
-        damageController.DamageReceived += health.OnDamageReceived;
+        hurtbox.DamageReceived += health.OnDamageReceived;
     }
 
     #region Transition conditions

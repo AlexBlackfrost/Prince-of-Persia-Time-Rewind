@@ -293,7 +293,7 @@ MonoBehaviour:
     gravity: -40
   hurtbox: {fileID: 964352650}
   health:
-    <MaxHealth>k__BackingField: 0
+    <MaxHealth>k__BackingField: 20
     <CurrentHealth>k__BackingField: 0
   sword: {fileID: 919132149622075204}
   approachPlayerSettings:
@@ -4149,7 +4149,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 833601167110174983, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
       propertyPath: m_Name
-      value: Caduceus
+      value: EchionCaduceus
       objectReference: {fileID: 0}
     - target: {fileID: 5051892676281105162, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
       propertyPath: backSocket
@@ -4217,7 +4217,7 @@ GameObject:
   - component: {fileID: 964352651}
   - component: {fileID: 964352650}
   m_Layer: 7
-  m_Name: Hurtbox
+  m_Name: DarkEchionHurtbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5405,6 +5405,64 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -4148559733869012804, guid: 64e21eea820652642b4052305e600684, type: 3}
   m_PrefabInstance: {fileID: 391207920}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1612310788
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1612310789}
+  - component: {fileID: 1612310791}
+  - component: {fileID: 1612310790}
+  m_Layer: 7
+  m_Name: EchionHurtbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1612310789
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1612310788}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1920022712}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1612310790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1612310788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ecc83a1878396e46b12d6b38719bfec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!136 &1612310791
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1612310788}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2.5
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.03, z: 0}
 --- !u!1 &1654057740
 GameObject:
   m_ObjectHideFlags: 0
@@ -5789,7 +5847,7 @@ MonoBehaviour:
     rotationSpeed: 12
     acceleration: 6000
     gravity: -40
-  damageController: {fileID: 964352650}
+  hurtbox: {fileID: 1612310790}
   health:
     <MaxHealth>k__BackingField: 0
     <CurrentHealth>k__BackingField: 0
@@ -6233,7 +6291,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 833601167110174983, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
       propertyPath: m_Name
-      value: Caduceus
+      value: DarkEchionCaduceus
       objectReference: {fileID: 0}
     - target: {fileID: 5051892676281105162, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
       propertyPath: backSocket

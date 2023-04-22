@@ -25,36 +25,41 @@ public class Hitbox : MonoBehaviour {
 
     private Vector3 point1;
     private Vector3 point2;
+    private HashSet<IHittable> emptySet = new HashSet<IHittable>();
     #endregion
 
     public HitData[] CheckHit() {
+        return CheckHit(emptySet);
+    }
+
+    public HitData[] CheckHit(HashSet<IHittable> ignoreObjects) {
         HitData[] hitData = null;
 
         switch (Type) {
 
             case HitboxType.Capsule:
-                hitData = CheckHitCapsule();
+                hitData = CheckHitCapsule(ignoreObjects);
                 break;
         }
 
         return hitData;
     }
 
-    private HitData[] CheckHitCapsule() {
+    private HitData[] CheckHitCapsule(HashSet<IHittable> ignoreObjects) {
         point1 = transform.position - transform.rotation * Quaternion.Euler(Rotation) * Vector3.up * (Height / 2.0f - Radius) + transform.TransformDirection(Offset);
         point2 = transform.position + transform.TransformDirection(Offset) + transform.rotation * Quaternion.Euler(Rotation) * Vector3.up * (Height / 2.0f - Radius);
         Vector3 direction = (point2 - point1).normalized;
         RaycastHit[] raycastHits = Physics.CapsuleCastAll(point1, point2, Radius, direction, 0.01f, layerMask, QueryTriggerInteraction.Collide);
-        return GetHitData(raycastHits);
+        return GetHitData(raycastHits, ignoreObjects);
     }
 
-    private HitData[] GetHitData(RaycastHit[] raycastHits) {
+    private HitData[] GetHitData(RaycastHit[] raycastHits, HashSet<IHittable> ignoreObjects) {
         List<HitData> hitsData = null;
 
         foreach(RaycastHit raycastHit in raycastHits) {
             IHittable hittable = raycastHit.collider.gameObject.GetComponent<IHittable>();
 
-            if (hittable != null) {
+            if (hittable != null && !ignoreObjects.Contains(hittable)) {
                 Vector3 hitLocation;
 
                 /* "For colliders that overlap the capsule at the start of the sweep, RaycastHit.normal is set opposite to the direction of the sweep, 
@@ -70,6 +75,7 @@ public class Hitbox : MonoBehaviour {
                     hitsData = new List<HitData>();
                 }
                 hitsData.Add(hitData);
+                Debug.Log("Name: " + hittable);
             }
         }
 

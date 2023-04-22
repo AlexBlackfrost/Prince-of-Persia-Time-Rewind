@@ -33,9 +33,11 @@ public class Sword : MonoBehaviour {
     private SwordState swordState;
     private Coroutine animationCoroutine;
     private Coroutine layerTransitionCoroutine;
+    private HashSet<IHittable> ignoredHittableObjects;
 
     private void Awake() {
         hitbox = GetComponent<Hitbox>();
+        ignoredHittableObjects = new HashSet<IHittable>();
         /*animator = Owner.GetComponent<Animator>();
         unsheatheHash = Animator.StringToHash("Unsheathe");
         unsheatheSpeedMultiplierHash = Animator.StringToHash("UnsheatheSpeedMultiplier");
@@ -44,6 +46,11 @@ public class Sword : MonoBehaviour {
     }
 
     public void OnEquipped(GameObject owner) {
+        this.owner = owner;
+        
+        IHittable[] hurtboxes = owner.GetComponentsInChildren<IHittable>();
+        ignoredHittableObjects = new HashSet<IHittable>(hurtboxes); // ignore its own hurtbox
+        
         animator = owner.GetComponent<Animator>();
         unsheatheHash = Animator.StringToHash("Unsheathe");
         unsheatheSpeedMultiplierHash = Animator.StringToHash("UnsheatheSpeedMultiplier");
@@ -250,7 +257,7 @@ public class Sword : MonoBehaviour {
 
     public HitData[] CheckHit() {
         if (hitboxEnabled) { 
-            return hitbox.CheckHit();
+            return hitbox.CheckHit(ignoredHittableObjects);
         } else {
             return null;
         }
