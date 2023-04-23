@@ -18,8 +18,6 @@ public class WallRunState : State {
 
 	private const float DISTANCE_TO_WALL_SURFACE = 0.57f; //Animation is made so that there's a distance of DISTANCE_TO_WALL_SURFACE in the X axis
 	private WallRunSettings settings;
-	private int wallRunHash;
-	private int wallRunDirectionHash;
 	private float positionOffsetCorrectionSpeed;
 	private float rotationOffsetCorrectionSpeed;
 	private float wallHalfThickness;
@@ -29,8 +27,6 @@ public class WallRunState : State {
 
 	public WallRunState(WallRunSettings settings) : base() {
 		this.settings = settings;
-		wallRunHash = Animator.StringToHash("WallRun");
-		wallRunDirectionHash = Animator.StringToHash("WallRunDirection");
 	}
 
 	protected override void OnUpdate() {
@@ -54,8 +50,8 @@ public class WallRunState : State {
 	protected override void OnEnter() {
 		settings.Sword.SheatheIfPossible();
 		settings.Sword.UnsheathingEnabled = false;
-		settings.Animator.SetInteger(wallRunDirectionHash, (int)settings.WallSide);
-		settings.Animator.SetBool(wallRunHash, true);
+		settings.Animator.SetInteger(AnimatorUtils.wallRunDirectionHash, (int)settings.WallSide);
+		settings.Animator.SetBool(AnimatorUtils.wallRunHash, true);
 		settings.Animator.applyRootMotion = true;
 		wallHalfThickness = settings.Wall.GetComponent<BoxCollider>().size.z*settings.Wall.transform.localScale.z / 2;
 
@@ -75,7 +71,7 @@ public class WallRunState : State {
 
 	protected override void OnExit() {
 		settings.Sword.UnsheathingEnabled = true;
-		settings.Animator.SetBool(wallRunHash, false);
+		settings.Animator.SetBool(AnimatorUtils.wallRunHash, false);
 		settings.Animator.applyRootMotion = false;
 
 		settings.CharacterMovement.Velocity = new Vector3(settings.CharacterMovement.Velocity.x,

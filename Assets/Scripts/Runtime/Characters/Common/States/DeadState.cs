@@ -12,15 +12,13 @@ public class DeadState : State{
     }
 
     private DeadSettings settings;
-    private int dieHash;
     public DeadState(DeadSettings settings) {
         this.settings = settings;
-        dieHash = Animator.StringToHash("Die");
         AnimatorUtils.AnimationEnded += OnDieAnimationEnded;
     }
 
     protected override void OnEnter() {
-        settings.Animator.SetTrigger(dieHash);
+        settings.Animator.SetTrigger(AnimatorUtils.dieHash);
     }
 
     protected override void OnExit() {
@@ -28,7 +26,7 @@ public class DeadState : State{
     }
 
     private void OnDieAnimationEnded(int shortNameHash) {
-        if(shortNameHash == dieHash) {
+        if(shortNameHash == AnimatorUtils.dieHash) {
             settings.Animator.speed = 0;
         }
     }

@@ -11,11 +11,9 @@ public class MoveState : State {
 	}
 
 	private MoveSettings settings;
-	private int runBoolHash;
 	private Camera mainCamera;
 	public MoveState(MoveSettings settings) : base() {
 		this.settings = settings;
-		runBoolHash = Animator.StringToHash("Run");
 		mainCamera = Camera.main;
 	}
 
@@ -29,12 +27,12 @@ public class MoveState : State {
 	}
 
 	protected override void OnEnter() {
-		settings.Animator.SetBool(runBoolHash, true);
+		settings.Animator.SetBool(AnimatorUtils.runHash, true);
 		settings.Sword.UnsheathingEnabled = true;
 	}
 
 	protected override void OnExit() {
-		settings.Animator.SetBool(runBoolHash, false);
+		settings.Animator.SetBool(AnimatorUtils.runHash, false);
 		settings.Sword.UnsheathingEnabled = false;
 	}
 }

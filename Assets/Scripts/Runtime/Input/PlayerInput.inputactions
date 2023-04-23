@@ -76,6 +76,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Block",
+                    "type": "Button",
+                    "id": "223a010b-5c34-412c-bba8-0295b9347a61",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -208,6 +217,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Roll",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e35f2479-0019-400f-8424-d2f1bdeb09c6",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Block",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

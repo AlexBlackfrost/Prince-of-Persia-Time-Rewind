@@ -19,11 +19,10 @@ public class FallState : State {
 
     public FallState(FallSettings settings) : base() {
         this.settings = settings;
-        fallHash = Animator.StringToHash("Fall");
     }
 
     protected override void OnEnter() {
-        settings.Animator.SetTrigger(fallHash);
+        settings.Animator.SetTrigger(AnimatorUtils.fallHash);
     }
 
     protected override void OnUpdate() {

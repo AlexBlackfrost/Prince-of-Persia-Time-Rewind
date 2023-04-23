@@ -19,9 +19,6 @@ public class Sword : MonoBehaviour {
     private GameObject owner;
     private Animator animator;
     private Hitbox hitbox;
-    private int unsheatheHash;
-    private int unsheatheSpeedMultiplierHash;
-    private int unsheatheMotionTimeHash;
     private const float sheatheAnimationSpeed = 1.5f;
     private const float unsheatheAnimationSpeed = 1.5f;
     private const int swordAnimatorLayer = 1;
@@ -52,22 +49,19 @@ public class Sword : MonoBehaviour {
         ignoredHittableObjects = new HashSet<IHittable>(hurtboxes); // ignore its own hurtbox
         
         animator = owner.GetComponent<Animator>();
-        unsheatheHash = Animator.StringToHash("Unsheathe");
-        unsheatheSpeedMultiplierHash = Animator.StringToHash("UnsheatheSpeedMultiplier");
-        unsheatheMotionTimeHash = Animator.StringToHash("UnsheatheMotionTime");
         swordState = SwordState.InBack;
     }
 
     public void SheatheIfPossible() {
         if (SheathingEnabled) {
             if (swordState == SwordState.InHand) {
-                animator.SetFloat(unsheatheSpeedMultiplierHash, 0);
-                animator.SetTrigger(unsheatheHash);
+                animator.SetFloat(AnimatorUtils.unsheatheSpeedMultiplierHash, 0);
+                animator.SetTrigger(AnimatorUtils.unsheatheHash);
                 animationCoroutine = StartCoroutine(UpdateSheatheAnimation());
                 swordState = SwordState.Sheathing;
 
             } else if(swordState == SwordState.Unsheathing) {
-                animator.SetFloat(unsheatheSpeedMultiplierHash, 0);
+                animator.SetFloat(AnimatorUtils.unsheatheSpeedMultiplierHash, 0);
                 if(animationCoroutine != null) {
                     StopCoroutine(animationCoroutine);
                 }
@@ -80,8 +74,8 @@ public class Sword : MonoBehaviour {
     public void UnsheatheIfPossible() {
         if (UnsheathingEnabled) {
             if (swordState == SwordState.InBack) {
-                animator.SetFloat(unsheatheSpeedMultiplierHash, 0);
-                animator.SetTrigger(unsheatheHash);
+                animator.SetFloat(AnimatorUtils.unsheatheSpeedMultiplierHash, 0);
+                animator.SetTrigger(AnimatorUtils.unsheatheHash);
                 animationCoroutine = StartCoroutine(UpdateUnsheatheAnimation());
                 if (layerTransitionCoroutine != null) {
                     StopCoroutine(layerTransitionCoroutine);
@@ -90,7 +84,7 @@ public class Sword : MonoBehaviour {
                 swordState = SwordState.Unsheathing;
 
             } else if (swordState == SwordState.Sheathing) {
-                animator.SetFloat(unsheatheSpeedMultiplierHash, 0);
+                animator.SetFloat(AnimatorUtils.unsheatheSpeedMultiplierHash, 0);
                 if (animationCoroutine != null) {
                     StopCoroutine(animationCoroutine);
                 }
@@ -130,7 +124,7 @@ public class Sword : MonoBehaviour {
     private IEnumerator UpdateUnsheatheAnimation() {
         while (unsheatheMotionTime < 1) {
             unsheatheMotionTime = Mathf.Min(unsheatheMotionTime + Time.deltaTime * unsheatheAnimationSpeed, 1);
-            animator.SetFloat(unsheatheMotionTimeHash, unsheatheMotionTime);
+            animator.SetFloat(AnimatorUtils.unsheatheMotionTimeHash, unsheatheMotionTime);
             if (unsheatheMotionTime == 1.0f) {
                 OnUnsheatheAnimationEnded();
             }
@@ -142,7 +136,7 @@ public class Sword : MonoBehaviour {
     private IEnumerator UpdateSheatheAnimation() {
         while (unsheatheMotionTime > 0) { 
             unsheatheMotionTime = Mathf.Max(unsheatheMotionTime - Time.deltaTime * sheatheAnimationSpeed, 0);
-            animator.SetFloat(unsheatheMotionTimeHash, unsheatheMotionTime);
+            animator.SetFloat(AnimatorUtils.unsheatheMotionTimeHash, unsheatheMotionTime);
             if (unsheatheMotionTime == 0.0f) {
                 OnSheatheAnimationEnded();
             }
@@ -198,7 +192,7 @@ public class Sword : MonoBehaviour {
         }
     }
 
-    public void OnTimeRewindStop(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord, float elapsedTimeSinceLastRecord, float previousRecordDeltaTime) {
+    public void OnTimeRewindStop(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
         RestoreSwordRecord(previousSwordRecord,nextSwordRecord,  previousRecordDeltaTime, elapsedTimeSinceLastRecord);
         swordState = previousSwordRecord.swordState;
         SheathingEnabled = previousSwordRecord.sheathingEnabled;
@@ -238,7 +232,7 @@ public class Sword : MonoBehaviour {
         float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
 
         unsheatheMotionTime = Mathf.Lerp(previousSwordRecord.unsheatheMotionTime, nextSwordRecord.unsheatheMotionTime, lerpAlpha);
-        animator.SetFloat(unsheatheMotionTimeHash, unsheatheMotionTime);
+        animator.SetFloat(AnimatorUtils.unsheatheMotionTimeHash, unsheatheMotionTime);
 
         animatorSwordLayerWeight = Mathf.Lerp(previousSwordRecord.animatorSwordLayerWeight, nextSwordRecord.animatorSwordLayerWeight, lerpAlpha);
         animator.SetLayerWeight(swordAnimatorLayer, animatorSwordLayerWeight);

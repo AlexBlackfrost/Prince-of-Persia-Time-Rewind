@@ -17,17 +17,14 @@ public class ApproachPlayerState : State{
         public float stopApproachingPlayerAcceptanceRadius = 1;
 	}
 
-
-    private int runBoolHash;
     private ApproachPlayerSettings settings;
 
 	public ApproachPlayerState(ApproachPlayerSettings settings) {
 		this.settings = settings;
-        runBoolHash = Animator.StringToHash("Run");
     }
 
     protected override void OnEnter() {
-        settings.Animator.SetBool(runBoolHash, true);
+        settings.Animator.SetBool(AnimatorUtils.runHash, true);
     }
 
     protected override void OnUpdate() {
@@ -46,7 +43,7 @@ public class ApproachPlayerState : State{
     }
 
     protected override void OnExit() {
-        settings.Animator.SetBool(runBoolHash, false);
+        settings.Animator.SetBool(AnimatorUtils.runHash, false);
     }
 
     public bool ReachedPlayer() {

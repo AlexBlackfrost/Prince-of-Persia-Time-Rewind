@@ -14,11 +14,9 @@ public class LandState : State {
     }
 
     private LandSettings settings;
-    private int landHash;
 
     public LandState(LandSettings settings) : base() {
         this.settings = settings;
-        landHash = Animator.StringToHash("Land");
     }
 
     protected override void OnEnter() {
@@ -26,7 +24,7 @@ public class LandState : State {
         currentVelocity.x = 0;
         currentVelocity.z = 0;
         settings.CharacterMovement.Velocity = currentVelocity;
-        settings.Animator.SetTrigger(landHash);
+        settings.Animator.SetTrigger(AnimatorUtils.landHash);
     }
 
     protected override void OnUpdate() {

@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private LandState.LandSettings landSettings;
     [field: SerializeField] private AttackState.AttackSettings attackSettings;
     [field: SerializeField] private RollState.RollSettings rollSettings;
+    [field: SerializeField] private BlockState.BlockSettings blockSettings;
     [field: SerializeField] private AliveStateMachine.AliveSettings aliveSettings;
     [field: SerializeField] private DeadState.DeadSettings deadSettings;
 
@@ -65,10 +66,11 @@ public class PlayerController : MonoBehaviour {
         LandState landState = new LandState(landSettings);
         AttackState attackState = new AttackState(attackSettings);
         RollState rollState = new RollState(rollSettings);
+        BlockState blockState = new BlockState(blockSettings);
         AliveStateMachine aliveStateMachine = new AliveStateMachine(aliveSettings,
                                                                     idleState, moveState, jumpState,
                                                                     wallRunState, fallState, landState,
-                                                                    attackState, rollState);
+                                                                    attackState, rollState, blockState);
         DeadState deadState = new DeadState(deadSettings);
         PlayerTimeControlStateMachine timeControlStateMachine = new PlayerTimeControlStateMachine(UpdateMode.UpdateAfterChild, timeControlSettings, 
                                                                                                   aliveStateMachine, deadState);
@@ -78,12 +80,14 @@ public class PlayerController : MonoBehaviour {
         // Idle ->
         InputController.Roll.performed += idleState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
+        InputController.Block.performed += idleState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
         idleState.AddTransition(moveState, IsMoving);
         InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
          
         // Move ->
         InputController.Roll.performed += moveState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
+        InputController.Block.performed += moveState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
         moveState.AddTransition(idleState, IsNotMoving);
         moveState.AddTransition(wallRunState, SetWall, InputController.IsWallRunPressed, perceptionSystem.IsRunnableWallNear);
         InputController.Attack.performed += moveState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
@@ -110,6 +114,10 @@ public class PlayerController : MonoBehaviour {
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(idleState, RollAnimationEnded, (int shortNameHash) => { return IsNotMoving(); });
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(moveState, RollAnimationEnded, (int shortNameHash) => { return IsMoving(); });
 
+        // Block ->
+        AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(idleState, BlockAnimationEnded, (int shortNameHash) => !IsNotMoving() );
+        AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(moveState, BlockAnimationEnded, (int shortNameHash) => IsMoving() );
+
         // Alive ->
         health.Dead += aliveStateMachine.AddEventTransition(deadState);
 
@@ -122,6 +130,7 @@ public class PlayerController : MonoBehaviour {
         stateObjects[typeof(LandState)] = landState;
         stateObjects[typeof(AttackState)] = attackState;
         stateObjects[typeof(RollState)] = rollState;
+        stateObjects[typeof(BlockState)] = blockState;
         stateObjects[typeof(DeadState)] = deadState;
         stateObjects[typeof(AliveStateMachine)] = aliveStateMachine;
         stateObjects[typeof(PlayerTimeControlStateMachine)] = timeControlStateMachine;
@@ -179,6 +188,8 @@ public class PlayerController : MonoBehaviour {
         rollSettings.Transform = transform;
         rollSettings.MainCamera = Camera.main;
 
+        blockSettings.Animator = animator;
+
         deadSettings.Animator = animator;
     }
 
@@ -199,24 +210,24 @@ public class PlayerController : MonoBehaviour {
         return !InputController.IsMoving();
     }
     private bool JumpAnimationEnded(int stateNameHash) {
-        return Animator.StringToHash("Jump") == stateNameHash;
+        return AnimatorUtils.jumpHash == stateNameHash;
     }
 
     private bool WallRunAnimationEnded(int stateNameHash) {
-        return Animator.StringToHash("WallRunRight") == stateNameHash ||
-               Animator.StringToHash("WallRunLeft") == stateNameHash;
+        return AnimatorUtils.wallRunRightHash == stateNameHash ||
+               AnimatorUtils.wallRunLeftHash == stateNameHash;
     }
 
     private bool LandAnimationEnded(int stateNameHash) {
-        return Animator.StringToHash("Land") == stateNameHash;
+        return AnimatorUtils.landHash == stateNameHash;
     }
 
     private bool RollAnimationEnded(int stateNameHash) {
-        return Animator.StringToHash("Roll") == stateNameHash;
+        return AnimatorUtils.rollHash == stateNameHash;
     }
-
-    private bool StateNameHashEquals(int stateNameHash, string stateName) {
-        return Animator.StringToHash(stateName) == stateNameHash;
+    
+    private bool BlockAnimationEnded(int stateNameHash) {
+        return AnimatorUtils.blockHash == stateNameHash;
     }
 
     private bool IsNotDetectingRunnableWall(){

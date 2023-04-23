@@ -42,12 +42,12 @@ public class AttackState : State {
         attackInputBuffer = new AttackInputBuffer(ATTACK_PRESSED_BUFFER_SIZE);
         alreadyHitObjects = new HashSet<IHittable>();
 
-        attackHash = Animator.StringToHash("Attack");
-        nextComboAttackHash = Animator.StringToHash("NextComboAttack");
+        attackHash = AnimatorUtils.attackHash;
+        nextComboAttackHash = AnimatorUtils.nextComboAttackHash;
         comboAttackNameHashes = new int[MAX_ATTACK_COMBO];
-        comboAttackNameHashes[0] = Animator.StringToHash("Attack1");
-        comboAttackNameHashes[1] = Animator.StringToHash("Attack2");
-        comboAttackNameHashes[2] = Animator.StringToHash("Attack3");
+        comboAttackNameHashes[0] = AnimatorUtils.attack1Hash;
+        comboAttackNameHashes[1] = AnimatorUtils.attack2Hash;
+        comboAttackNameHashes[2] = AnimatorUtils.attack3Hash;
         AnimatorUtils.AnimationEnded += OnAnimationEnded;
     }
 

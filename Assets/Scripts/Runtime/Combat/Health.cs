@@ -5,9 +5,21 @@ using UnityEngine;
 
 [Serializable]
 public class Health{
+    [SerializeField] private float currentHealth;
     [field:SerializeField] public float MaxHealth { get; private set; }
-    [field:SerializeField] public float CurrentHealth { get; set; }
+    public float CurrentHealth {
+        get {
+            return currentHealth;
+        }
 
+        set {
+            float previousHealth = currentHealth;
+            currentHealth = value;
+            HealthChanged?.Invoke(previousHealth, currentHealth);
+        } 
+    }
+
+    public Action<float, float> HealthChanged;
     public Action Dead;
     
     public void Init() {

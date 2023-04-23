@@ -11,14 +11,12 @@ public class DamagedState : State{
     }
 
     private DamagedSettings settings;
-    private int damagedHash;
     public DamagedState(DamagedSettings settings) {
         this.settings = settings;
-        damagedHash = Animator.StringToHash("Damaged");
     }
 
     protected override void OnEnter() {
-        settings.Animator.SetTrigger(damagedHash);
+        settings.Animator.SetTrigger(AnimatorUtils.damagedHash);
     }
 
     protected override void OnExit() {

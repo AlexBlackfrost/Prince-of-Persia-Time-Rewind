@@ -109,10 +109,10 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
 													  previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 		// Sword
-		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		// Health
-		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 	}
 
     private void SavePlayerRecord() {
@@ -125,8 +125,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 													 healthTimeControl.RecordHealthData(),
 													 Time.deltaTime);
 
-		// Check for interrupted transitions
-		animationTimeControl.TrackInterruptedTransitions(ref playerRecord.animationRecord, playerRecord.deltaTime);
+		// Check for interrupted transitions -- Now it's done inside animationTimeControl
+		//animationTimeControl.TrackInterruptedTransitions(ref playerRecord.animationRecord, playerRecord.deltaTime);
 
 		records.Push(playerRecord);
 	}
@@ -161,6 +161,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 											  elapsedTimeSinceLastRecord);
 
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+
 
 
 		Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());

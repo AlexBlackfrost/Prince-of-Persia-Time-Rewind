@@ -118,7 +118,7 @@ public class EnemyController : MonoBehaviour{
 
     #region Transition conditions
     private bool DamagedAnimationEnded(int shortNameHash) {
-        return Animator.StringToHash("Damaged") == shortNameHash;
+        return AnimatorUtils.damagedHash == shortNameHash;
     }
 
     #endregion

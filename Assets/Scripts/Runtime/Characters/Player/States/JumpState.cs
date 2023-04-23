@@ -15,11 +15,9 @@ public class JumpState : State {
 	}
 
 	private JumpSettings settings;
-	private int jumpHash;
 
 	public JumpState(JumpSettings settings):base() {
 		this.settings = settings;
-		jumpHash = Animator.StringToHash("Jump");
     }
 
 	protected override void OnEnter() {
@@ -27,7 +25,7 @@ public class JumpState : State {
 		settings.Sword.UnsheathingEnabled = false;
 
 		settings.Animator.applyRootMotion = true;
-		settings.Animator.SetTrigger(jumpHash);
+		settings.Animator.SetTrigger(AnimatorUtils.jumpHash);
     } 
 
 	protected override void OnExit() {

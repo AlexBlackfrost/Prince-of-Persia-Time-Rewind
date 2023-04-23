@@ -13,6 +13,7 @@ public class InputController : MonoBehaviour {
     public InputAction Attack { get; private set;  }
     public InputAction Sheathe { get; private set;  }
     public InputAction Roll { get; private set;  }
+    public InputAction Block { get; private set;  }
 
     private void Awake() {
         playerInput = new PlayerInput();
@@ -22,6 +23,7 @@ public class InputController : MonoBehaviour {
         Attack = playerInput.ActionMap.Attack;
         Sheathe = playerInput.ActionMap.Sheathe;
         Roll = playerInput.ActionMap.Roll;
+        Block = playerInput.ActionMap.Block;
     }
     
 

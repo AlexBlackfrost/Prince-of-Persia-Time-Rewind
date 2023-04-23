@@ -109,8 +109,8 @@ public class EnemyTimeControlStateMachine : StateMachine {
 													 healthTimeControl.RecordHealthData(),
 													 Time.deltaTime);
 
-		// Check for interrupted transitions
-		animationTimeControl.TrackInterruptedTransitions(ref enemyRecord.animationRecord, enemyRecord.deltaTime);
+		// Check for interrupted transitions -- Now it's done inside animationTimeControl
+		//animationTimeControl.TrackInterruptedTransitions(ref enemyRecord.animationRecord, enemyRecord.deltaTime);
 
 		records.Push(enemyRecord);
 	}

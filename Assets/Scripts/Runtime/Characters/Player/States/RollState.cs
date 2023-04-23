@@ -18,12 +18,10 @@ public class RollState : State {
 	}
 
 	private RollSettings settings;
-	private int rollHash;
 	private float rollElapsedTime;
 
 	public RollState(RollSettings settings) : base() {
 		this.settings = settings;
-		rollHash = Animator.StringToHash("Roll");
 	}
 
 	protected override void OnUpdate() {
@@ -47,7 +45,7 @@ public class RollState : State {
 
 	protected override void OnEnter() {
 		Vector2 inputDirection = settings.InputController.GetMoveDirection();
-		settings.Animator.SetTrigger(rollHash);
+		settings.Animator.SetTrigger(AnimatorUtils.rollHash);
 		rollElapsedTime = 0;
 		Vector3 cameraRelativeInputDirection = settings.MainCamera.transform.TransformDirection(new Vector3(inputDirection.x, 0, inputDirection.y));
 		cameraRelativeInputDirection.y = 0;

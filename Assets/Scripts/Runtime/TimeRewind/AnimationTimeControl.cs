@@ -60,7 +60,10 @@ public class AnimationTimeControl {
 			animationLayerRecords[layer] = animationLayerRecord;
 			Debug.Log(output);
 		}
-		return new AnimationRecord(parameters, animationLayerRecords, animator.applyRootMotion);
+
+		AnimationRecord animationRecord = new AnimationRecord(parameters, animationLayerRecords, animator.applyRootMotion);
+		TrackInterruptedTransitions(ref animationRecord, Time.deltaTime);
+		return animationRecord;
 	}
 
 	private static AnimationParameter[] RecordAnimatorParameters(Animator animator) {
