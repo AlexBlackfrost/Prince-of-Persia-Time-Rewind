@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private AttackState.AttackSettings attackSettings;
     [field: SerializeField] private RollState.RollSettings rollSettings;
     [field: SerializeField] private BlockState.BlockSettings blockSettings;
+    [field: SerializeField] private ParriedState.ParriedSettings parriedSettings;
     [field: SerializeField] private AliveStateMachine.AliveSettings aliveSettings;
     [field: SerializeField] private DeadState.DeadSettings deadSettings;
 
@@ -67,10 +68,12 @@ public class PlayerController : MonoBehaviour {
         AttackState attackState = new AttackState(attackSettings);
         RollState rollState = new RollState(rollSettings);
         BlockState blockState = new BlockState(blockSettings);
+        ParriedState parriedState = new ParriedState(parriedSettings);
         AliveStateMachine aliveStateMachine = new AliveStateMachine(aliveSettings,
                                                                     idleState, moveState, jumpState,
                                                                     wallRunState, fallState, landState,
-                                                                    attackState, rollState, blockState);
+                                                                    attackState, rollState, blockState, 
+                                                                    parriedState);
         DeadState deadState = new DeadState(deadSettings);
         PlayerTimeControlStateMachine timeControlStateMachine = new PlayerTimeControlStateMachine(UpdateMode.UpdateAfterChild, timeControlSettings, 
                                                                                                   aliveStateMachine, deadState);
@@ -109,14 +112,19 @@ public class PlayerController : MonoBehaviour {
         // Attack ->
         attackState.AttackEnded += attackState.AddEventTransition(idleState, IsNotMoving);
         attackState.AttackEnded += attackState.AddEventTransition(moveState, IsMoving);
+        attackState.Parried += attackState.AddEventTransition(parriedState);
 
         // Roll ->
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(idleState, RollAnimationEnded, (int shortNameHash) => { return IsNotMoving(); });
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(moveState, RollAnimationEnded, (int shortNameHash) => { return IsMoving(); });
 
         // Block ->
-        AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(idleState, BlockAnimationEnded, (int shortNameHash) => !IsNotMoving() );
+        AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(idleState, BlockAnimationEnded, (int shortNameHash) => IsNotMoving() );
         AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(moveState, BlockAnimationEnded, (int shortNameHash) => IsMoving() );
+
+        // Parried ->
+        AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(moveState, ParriedAnimationEnded, (int shortNameHash) => IsMoving());
+        AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded, (int shortNameHash) => IsNotMoving());
 
         // Alive ->
         health.Dead += aliveStateMachine.AddEventTransition(deadState);
@@ -131,6 +139,7 @@ public class PlayerController : MonoBehaviour {
         stateObjects[typeof(AttackState)] = attackState;
         stateObjects[typeof(RollState)] = rollState;
         stateObjects[typeof(BlockState)] = blockState;
+        stateObjects[typeof(ParriedState)] = parriedState;
         stateObjects[typeof(DeadState)] = deadState;
         stateObjects[typeof(AliveStateMachine)] = aliveStateMachine;
         stateObjects[typeof(PlayerTimeControlStateMachine)] = timeControlStateMachine;
@@ -190,6 +199,8 @@ public class PlayerController : MonoBehaviour {
 
         blockSettings.Animator = animator;
 
+        parriedSettings.Animator = animator;
+
         deadSettings.Animator = animator;
     }
 
@@ -228,6 +239,10 @@ public class PlayerController : MonoBehaviour {
     
     private bool BlockAnimationEnded(int stateNameHash) {
         return AnimatorUtils.blockHash == stateNameHash;
+    }
+    
+    private bool ParriedAnimationEnded(int stateNameHash) {
+        return AnimatorUtils.parriedHash == stateNameHash;
     }
 
     private bool IsNotDetectingRunnableWall(){

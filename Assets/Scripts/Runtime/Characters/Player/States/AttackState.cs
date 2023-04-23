@@ -19,6 +19,8 @@ public class AttackState : State {
     }
 
     public Action AttackEnded;
+    public Action Parried;
+
     private const int ATTACK_PRESSED_BUFFER_SIZE = 500;
     private const int MAX_ATTACK_COMBO = 3;
     private AttackSettings settings;
@@ -76,6 +78,7 @@ public class AttackState : State {
     protected override void OnExit() {
         settings.Sword.SheathingEnabled = true;
         settings.Sword.SetSwordAnimatorLayerEnabled(true);
+        settings.Sword.SetHitboxEnabled(Bool.False);
 
         settings.Animator.SetBool(attackHash, false);
         settings.Animator.applyRootMotion = false;
@@ -123,7 +126,15 @@ public class AttackState : State {
                     alreadyHitObjects.Add(hittableObject);
 
                     if(hittableObject is IDamageable) {
-                        ((IDamageable)hittableObject).ReceiveDamage(settings.Sword.Damage);
+                        IDamageable damageableObject = (IDamageable)hittableObject;
+                        if (damageableObject.CanBeDamaged()) {
+                            if (damageableObject is IShieldable && ((IShieldable)damageableObject).IsShielded()) {
+                                Parried?.Invoke();
+                            } else {
+                                damageableObject.ReceiveDamage(settings.Sword.Damage);
+                            }
+                        }
+                        
                     }
                 }
             }

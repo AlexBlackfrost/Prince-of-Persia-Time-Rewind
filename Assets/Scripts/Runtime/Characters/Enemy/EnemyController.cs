@@ -17,6 +17,8 @@ public class EnemyController : MonoBehaviour{
     [field: SerializeField] private ApproachPlayerState.ApproachPlayerSettings approachPlayerSettings;
     [field: SerializeField] private EnemyTimeControlStateMachine.EnemyTimeControlSettings timeControlSettings;
     [field: SerializeField] private DamagedState.DamagedSettings damagedSettings;
+    [field: SerializeField] private ParriedState.ParriedSettings parriedSettings;
+    [field: SerializeField] private BlockState.BlockSettings blockSettings;
     [field: SerializeField] private AliveStateMachine.AliveSettings aliveSettings;
     [field: SerializeField] private DeadState.DeadSettings deadSettings;
 
@@ -59,6 +61,9 @@ public class EnemyController : MonoBehaviour{
         timeControlSettings.Health = health;
         timeControlSettings.Sword = sword;
 
+        parriedSettings.Animator = animator;
+        blockSettings.Animator = animator;
+
         damagedSettings.Animator = animator;
 
         deadSettings.Animator = animator;
@@ -73,7 +78,10 @@ public class EnemyController : MonoBehaviour{
         IdleState idleState = new IdleState(idleSettings);
         ApproachPlayerState approachPlayerState = new ApproachPlayerState(approachPlayerSettings);
         DamagedState damagedState = new DamagedState(damagedSettings);
-        AliveStateMachine aliveStateMachine = new AliveStateMachine(aliveSettings, idleState, approachPlayerState, damagedState);
+        ParriedState parriedState = new ParriedState(parriedSettings);
+        BlockState blockState = new BlockState(blockSettings);
+        AliveStateMachine aliveStateMachine = new AliveStateMachine(aliveSettings, idleState, approachPlayerState, damagedState,
+                                                                    blockState, parriedState);
         DeadState deadState = new DeadState(deadSettings);
         EnemyTimeControlStateMachine enemyTimeControlStateMachine = new EnemyTimeControlStateMachine(UpdateMode.UpdateAfterChild, timeControlSettings,
                                                                                                      aliveStateMachine, deadState);
@@ -99,6 +107,8 @@ public class EnemyController : MonoBehaviour{
         stateObjects[typeof(ApproachPlayerState)] = approachPlayerState;
         stateObjects[typeof(ApproachPlayerState)] = approachPlayerState;
         stateObjects[typeof(DamagedState)] = damagedState;
+        stateObjects[typeof(BlockState)] = blockState;
+        stateObjects[typeof(ParriedState)] = parriedState;
         stateObjects[typeof(AliveStateMachine)] = aliveStateMachine;
         stateObjects[typeof(DeadState)] = deadState;
         stateObjects[typeof(EnemyTimeControlStateMachine)] = enemyTimeControlStateMachine;

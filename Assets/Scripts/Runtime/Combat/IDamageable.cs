@@ -5,4 +5,5 @@ using UnityEngine;
 public interface IDamageable {
 
     public void ReceiveDamage(float amount);
+    public bool CanBeDamaged();
 }

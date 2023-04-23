@@ -75,7 +75,6 @@ public class Hitbox : MonoBehaviour {
                     hitsData = new List<HitData>();
                 }
                 hitsData.Add(hitData);
-                Debug.Log("Name: " + hittable);
             }
         }
 

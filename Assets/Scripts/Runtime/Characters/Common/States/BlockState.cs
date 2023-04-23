@@ -9,6 +9,7 @@ public class BlockState : State {
     [Serializable]
     public class BlockSettings {
         public Animator Animator { get; set; }
+        public Hurtbox Hurtbox { get; set; }
     }
 
     private BlockSettings settings;
@@ -18,5 +19,10 @@ public class BlockState : State {
 
     protected override void OnEnter() {
         settings.Animator.SetTrigger(AnimatorUtils.blockHash);
+        settings.Hurtbox.SetIsShielded(true);
+    }
+
+    protected override void OnExit() {
+        settings.Hurtbox.SetIsShielded(false);
     }
 }
