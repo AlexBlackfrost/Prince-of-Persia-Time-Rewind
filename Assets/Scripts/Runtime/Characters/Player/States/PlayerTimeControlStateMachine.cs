@@ -17,6 +17,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		public Animator Animator { get; set; }
 		public Dictionary<Type, StateObject> StateObjects { get; set; }
 		public Sword Sword { get; set; }
+		public Health Health { get; set; }
 		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
 
@@ -26,6 +27,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private TransformTimeControl transformTimeControl;
 	private CameraTimeControl cameraTimeControl;
 	private CharacterMovementTimeControl characterMovementTimeControl;
+	private HealthTimeControl healthTimeControl;
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
 	private PlayerRecord previousRecord, nextRecord;
@@ -44,6 +46,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		cameraTimeControl = new CameraTimeControl(settings.Camera, settings.timeRewindCamera, settings.FreeLookCamera);
 		stateMachineTimeControl = new StateMachineTimeControl(this);
 		characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
+		healthTimeControl = new HealthTimeControl(settings.Health);
 
 		cinemachineBrain = settings.Camera.GetComponent<CinemachineBrain>();
 
@@ -99,8 +102,17 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		// State machine
 		stateMachineTimeControl.RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
 
+		// Transform
+		transformTimeControl.OnTimeRewindStop(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+
+		// Character movement
+		characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
+													  previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 		// Sword
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+
+		// Health
+		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 	}
 
     private void SavePlayerRecord() {
@@ -110,6 +122,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 													 stateMachineTimeControl.RecordStateMachineData(),
 													 characterMovementTimeControl.RecordCharacterMovementData(),
 													 settings.Sword.RecordSwordData(),
+													 healthTimeControl.RecordHealthData(),
 													 Time.deltaTime);
 
 		// Check for interrupted transitions
@@ -143,6 +156,9 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 		characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
 																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+
+		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
+											  elapsedTimeSinceLastRecord);
 
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 

@@ -12,7 +12,7 @@ public class Hurtbox: MonoBehaviour, IDamageable, IHittable {
     }
 
     public void ReceiveDamage(float amount) {
-        DamageReceived.Invoke(amount);
+        DamageReceived?.Invoke(amount);
     }
 
 

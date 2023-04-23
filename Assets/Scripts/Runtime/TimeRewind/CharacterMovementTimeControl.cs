@@ -13,8 +13,9 @@ public class CharacterMovementTimeControl{
 
     }
 
-    public void OnTimeRewindStop() {
-
+    public void OnTimeRewindStop(CharacterMovementRecord previousRecord, CharacterMovementRecord nextRecord,
+                                               float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
+        RestoreCharacterMovementRecord(previousRecord, nextRecord, previousRecordDeltaTime, elapsedTimeSinceLastRecord);
     }
 
     public void RestoreCharacterMovementRecord(CharacterMovementRecord previousRecord, CharacterMovementRecord nextRecord, 

@@ -13,6 +13,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		public Animator Animator { get; set; }
 		public Dictionary<Type, StateObject> StateObjects { get; set; }
 		public Sword Sword { get; set; }
+		public Health Health { get; set; }
 		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
 
@@ -21,6 +22,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	private StateMachineTimeControl stateMachineTimeControl;
 	private TransformTimeControl transformTimeControl;
 	private CharacterMovementTimeControl characterMovementTimeControl;
+	private HealthTimeControl healthTimeControl;
 
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
@@ -41,6 +43,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		transformTimeControl = new TransformTimeControl(settings.Transform);
 		stateMachineTimeControl = new StateMachineTimeControl(this);
 		characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
+		healthTimeControl = new HealthTimeControl(settings.Health);
 
 		records = new CircularStack<EnemyRecord>(recordFPS * recordMaxseconds);
 		timeIsRewinding = false;
@@ -83,8 +86,18 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		// State machine
 		stateMachineTimeControl.RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
 
+		// Transform
+		transformTimeControl.OnTimeRewindStop(previousRecord.enemyTransform, nextRecord.enemyTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+
+		// Character movement
+		characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord,
+													  previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+
 		// Sword
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+
+		// Health
+		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 	}
 
 	private void SaveEnemyRecord() {
@@ -93,6 +106,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 													 stateMachineTimeControl.RecordStateMachineData(),
 													 characterMovementTimeControl.RecordCharacterMovementData(),
 													 settings.Sword.RecordSwordData(),
+													 healthTimeControl.RecordHealthData(),
 													 Time.deltaTime);
 
 		// Check for interrupted transitions
@@ -124,6 +138,9 @@ public class EnemyTimeControlStateMachine : StateMachine {
 																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+
+		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
+											  elapsedTimeSinceLastRecord);
 
 
 		Debug.Log("Enemy Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());

@@ -148,6 +148,7 @@ public class PlayerController : MonoBehaviour {
         timeControlSettings.StateObjects = stateObjects;
         timeControlSettings.CharacterMovement = characterMovement;
         timeControlSettings.Sword = sword;
+        timeControlSettings.Health = health;
 
         wallRunSettings.Animator = animator;
         wallRunSettings.Transform = transform;

@@ -12,8 +12,8 @@ public class TransformTimeControl {
 
     }
 
-    public void OnTimeRewindStop() {
-
+    public void OnTimeRewindStop(TransformRecord previousRecord, TransformRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
+        RestoreTransformRecord(previousRecord, nextRecord, previousRecordDeltaTime, elapsedTimeSinceLastRecord);
     }
 
     public void RestoreTransformRecord(TransformRecord previousRecord, TransformRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {

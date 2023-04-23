@@ -12,11 +12,12 @@ public struct PlayerRecord {
     public StateMachineRecord stateMachineRecord;
     public CharacterMovementRecord characterMovementRecord;
     public SwordRecord swordRecord;
+    public HealthRecord healthRecord;
     public float deltaTime;
 
     public PlayerRecord(TransformRecord playerTransform, CameraRecord cameraRecord, AnimationRecord animationRecord,
                         StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
-                        SwordRecord swordRecord, float deltaTime) {
+                        SwordRecord swordRecord, HealthRecord healthRecord, float deltaTime) {
 
         this.playerTransform = playerTransform;
         this.cameraRecord = cameraRecord;
@@ -24,6 +25,7 @@ public struct PlayerRecord {
         this.stateMachineRecord = stateMachineRecord;
         this.characterMovementRecord = characterMovementRecord;
         this.swordRecord = swordRecord;
+        this.healthRecord = healthRecord;
         this.deltaTime = deltaTime;
     }
 }
@@ -35,17 +37,19 @@ public struct EnemyRecord {
     public StateMachineRecord stateMachineRecord;
     public CharacterMovementRecord characterMovementRecord;
     public SwordRecord swordRecord;
+    public HealthRecord healthRecord;
     public float deltaTime;
 
     public EnemyRecord(TransformRecord enemyTransform, AnimationRecord animationRecord,
                         StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
-                        SwordRecord swordRecord, float deltaTime) {
+                        SwordRecord swordRecord, HealthRecord healthRecord,float deltaTime) {
 
         this.enemyTransform = enemyTransform;
         this.animationRecord = animationRecord;
         this.stateMachineRecord = stateMachineRecord;
         this.characterMovementRecord = characterMovementRecord;
         this.swordRecord = swordRecord;
+        this.healthRecord = healthRecord;
         this.deltaTime = deltaTime;
     }
 }
@@ -198,6 +202,14 @@ public struct SwordRecord {
         this.swordState = swordState;
         this.swordSocket = swordSocket;
         this.hitboxEnabled = hitboxEnabled;
+    }
+}
+
+public struct HealthRecord {
+    public float currentHealth;
+
+    public HealthRecord(float currentHealth) {
+        this.currentHealth = currentHealth;
     }
 }
 

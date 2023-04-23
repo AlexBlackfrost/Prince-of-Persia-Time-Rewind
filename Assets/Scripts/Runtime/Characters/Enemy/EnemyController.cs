@@ -56,6 +56,7 @@ public class EnemyController : MonoBehaviour{
         timeControlSettings.Animator = animator;
         timeControlSettings.StateObjects = stateObjects;
         timeControlSettings.CharacterMovement = characterMovement;
+        timeControlSettings.Health = health;
         timeControlSettings.Sword = sword;
 
         damagedSettings.Animator = animator;
