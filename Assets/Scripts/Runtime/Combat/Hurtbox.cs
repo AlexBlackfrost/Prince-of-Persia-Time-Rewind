@@ -9,14 +9,13 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
     public Action<float> DamageReceived;
     public Action HitReceived;
 
-    private float isDamageableRemainingTime;
-    private bool isShielded = false;
+    [field:SerializeField, ReadOnly] public float IsDamageableRemainingTime { get; set; }
+    [SerializeField, ReadOnly]private bool isShielded = false;
 
 
     public void Update() {
-        isDamageableRemainingTime = Math.Max(isDamageableRemainingTime - Time.deltaTime, 0);            
+        IsDamageableRemainingTime = Math.Max(IsDamageableRemainingTime - Time.deltaTime, 0);            
     }
-
 
     public void Hit() {
         HitReceived?.Invoke();
@@ -24,7 +23,7 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
 
     public void ReceiveDamage(float amount) {
         DamageReceived?.Invoke(amount);
-        isDamageableRemainingTime = isDamageableCooldown;
+        IsDamageableRemainingTime = isDamageableCooldown;
     }
 
     public bool IsShielded() {
@@ -36,6 +35,6 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
     }
 
     public bool CanBeDamaged() {
-        return isDamageableRemainingTime <= 0;
+        return IsDamageableRemainingTime <= 0;
     }
 }

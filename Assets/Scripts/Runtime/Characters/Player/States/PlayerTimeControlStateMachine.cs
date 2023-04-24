@@ -18,6 +18,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		public Dictionary<Type, StateObject> StateObjects { get; set; }
 		public Sword Sword { get; set; }
 		public Health Health { get; set; }
+		public Hurtbox Hurtbox { get; set; }
 		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
 
@@ -28,6 +29,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private CameraTimeControl cameraTimeControl;
 	private CharacterMovementTimeControl characterMovementTimeControl;
 	private HealthTimeControl healthTimeControl;
+	private HurtboxTimeControl hurtboxTimeControl;
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
 	private PlayerRecord previousRecord, nextRecord;
@@ -47,6 +49,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		stateMachineTimeControl = new StateMachineTimeControl(this);
 		characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
 		healthTimeControl = new HealthTimeControl(settings.Health);
+		hurtboxTimeControl = new HurtboxTimeControl(settings.Hurtbox);
 
 		cinemachineBrain = settings.Camera.GetComponent<CinemachineBrain>();
 
@@ -113,6 +116,9 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 		// Health
 		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		
+		// Hurtbox
+		hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 	}
 
     private void SavePlayerRecord() {
@@ -123,6 +129,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 													 characterMovementTimeControl.RecordCharacterMovementData(),
 													 settings.Sword.RecordSwordData(),
 													 healthTimeControl.RecordHealthData(),
+													 hurtboxTimeControl.RecordHurtboxData(),
 													 Time.deltaTime);
 
 		// Check for interrupted transitions -- Now it's done inside animationTimeControl
@@ -159,6 +166,9 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
 											  elapsedTimeSinceLastRecord);
+
+		hurtboxTimeControl.RestoreHurtboxRecord(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime,
+												elapsedTimeSinceLastRecord);
 
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 

@@ -25,6 +25,9 @@ public static class AnimatorUtils  {
     public static int nextComboAttackHash = Animator.StringToHash("NextComboAttack");
     public static int damagedHash = Animator.StringToHash("Damaged");
     public static int parriedHash = Animator.StringToHash("Parried");
+    public static int attackRecoveryHash = Animator.StringToHash("Recovery");
+    public static int AIAttackHash = Animator.StringToHash("AIAttack");
+    public static int attackWindUpHash = Animator.StringToHash("WindUp");
     
     public static int sheatheHash = Animator.StringToHash("Sheathe");
     public static int unsheatheHash = Animator.StringToHash("Unsheathe");

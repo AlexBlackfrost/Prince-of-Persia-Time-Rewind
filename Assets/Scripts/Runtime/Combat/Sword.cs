@@ -7,6 +7,7 @@ using UnityEngine;
 public class Sword : MonoBehaviour {
     [SerializeField] private Transform backSocket;
     [SerializeField] private Transform handSocket;
+    [SerializeField] private float attackCooldown = 0;
     [SerializeField, ReadOnly] private bool hitboxEnabled;
     [field: SerializeField] public float Damage { get; private set; } = 10;
 
@@ -19,6 +20,7 @@ public class Sword : MonoBehaviour {
     private GameObject owner;
     private Animator animator;
     private Hitbox hitbox;
+    private float attackCooldownRemainingTime;
     private const float sheatheAnimationSpeed = 1.5f;
     private const float unsheatheAnimationSpeed = 1.5f;
     private const int swordAnimatorLayer = 1;
@@ -257,4 +259,16 @@ public class Sword : MonoBehaviour {
         }
     }
     #endregion
+
+    private void Update() {
+        attackCooldownRemainingTime = Mathf.Max(attackCooldownRemainingTime - Time.deltaTime, 0);
+    }
+
+    public void StartCooldown() {
+        attackCooldownRemainingTime = attackCooldown;
+    }
+
+    public bool CooldownFinished() {
+        return attackCooldownRemainingTime <= 0;
+    }
 }

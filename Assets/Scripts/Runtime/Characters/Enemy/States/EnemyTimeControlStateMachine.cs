@@ -14,6 +14,8 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		public Dictionary<Type, StateObject> StateObjects { get; set; }
 		public Sword Sword { get; set; }
 		public Health Health { get; set; }
+
+		public Hurtbox Hurtbox { get; set; }
 		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
 
@@ -23,6 +25,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	private TransformTimeControl transformTimeControl;
 	private CharacterMovementTimeControl characterMovementTimeControl;
 	private HealthTimeControl healthTimeControl;
+	private HurtboxTimeControl hurtboxTimeControl;
 
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
@@ -44,6 +47,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		stateMachineTimeControl = new StateMachineTimeControl(this);
 		characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
 		healthTimeControl = new HealthTimeControl(settings.Health);
+		hurtboxTimeControl = new HurtboxTimeControl(settings.Hurtbox);
 
 		records = new CircularStack<EnemyRecord>(recordFPS * recordMaxseconds);
 		timeIsRewinding = false;
@@ -98,6 +102,9 @@ public class EnemyTimeControlStateMachine : StateMachine {
 
 		// Health
 		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		
+		// Hurtbox		
+		hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 	}
 
 	private void SaveEnemyRecord() {
@@ -107,6 +114,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 													 characterMovementTimeControl.RecordCharacterMovementData(),
 													 settings.Sword.RecordSwordData(),
 													 healthTimeControl.RecordHealthData(),
+													 hurtboxTimeControl.RecordHurtboxData(),
 													 Time.deltaTime);
 
 		// Check for interrupted transitions -- Now it's done inside animationTimeControl
@@ -141,6 +149,9 @@ public class EnemyTimeControlStateMachine : StateMachine {
 
 		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
 											  elapsedTimeSinceLastRecord);
+
+		hurtboxTimeControl.RestoreHurtboxRecord(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime,
+												elapsedTimeSinceLastRecord);
 
 
 		Debug.Log("Enemy Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());

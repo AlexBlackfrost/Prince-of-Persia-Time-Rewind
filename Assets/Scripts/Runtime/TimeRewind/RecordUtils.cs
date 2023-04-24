@@ -13,11 +13,13 @@ public struct PlayerRecord {
     public CharacterMovementRecord characterMovementRecord;
     public SwordRecord swordRecord;
     public HealthRecord healthRecord;
+    public HurtboxRecord hurtboxRecord;
     public float deltaTime;
 
     public PlayerRecord(TransformRecord playerTransform, CameraRecord cameraRecord, AnimationRecord animationRecord,
                         StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
-                        SwordRecord swordRecord, HealthRecord healthRecord, float deltaTime) {
+                        SwordRecord swordRecord, HealthRecord healthRecord, HurtboxRecord hurtboxRecord,
+                        float deltaTime) {
 
         this.playerTransform = playerTransform;
         this.cameraRecord = cameraRecord;
@@ -26,6 +28,7 @@ public struct PlayerRecord {
         this.characterMovementRecord = characterMovementRecord;
         this.swordRecord = swordRecord;
         this.healthRecord = healthRecord;
+        this.hurtboxRecord = hurtboxRecord;
         this.deltaTime = deltaTime;
     }
 }
@@ -38,11 +41,13 @@ public struct EnemyRecord {
     public CharacterMovementRecord characterMovementRecord;
     public SwordRecord swordRecord;
     public HealthRecord healthRecord;
+    public HurtboxRecord hurtboxRecord;
     public float deltaTime;
 
     public EnemyRecord(TransformRecord enemyTransform, AnimationRecord animationRecord,
                         StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
-                        SwordRecord swordRecord, HealthRecord healthRecord,float deltaTime) {
+                        SwordRecord swordRecord, HealthRecord healthRecord, HurtboxRecord hurtboxRecord,
+                        float deltaTime) {
 
         this.enemyTransform = enemyTransform;
         this.animationRecord = animationRecord;
@@ -50,6 +55,7 @@ public struct EnemyRecord {
         this.characterMovementRecord = characterMovementRecord;
         this.swordRecord = swordRecord;
         this.healthRecord = healthRecord;
+        this.hurtboxRecord = hurtboxRecord;
         this.deltaTime = deltaTime;
     }
 }
@@ -210,6 +216,16 @@ public struct HealthRecord {
 
     public HealthRecord(float currentHealth) {
         this.currentHealth = currentHealth;
+    }
+}
+
+public struct HurtboxRecord {
+    public float isDamageableRemainingTime;
+    public bool isShielded;
+
+    public HurtboxRecord(float isDamageableRemainingTime, bool isShielded) {
+        this.isDamageableRemainingTime = isDamageableRemainingTime;
+        this.isShielded = isShielded;
     }
 }
 

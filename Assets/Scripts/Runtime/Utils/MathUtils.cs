@@ -15,4 +15,10 @@ public static class MathUtils {
     public static int NonNegativeMod(int x, int m) {
         return (x % m + m) % m;
     }
+
+    public static float DistanceXZ(Vector3 position1, Vector3 position2) {
+        position1.y = 0;
+        position2.y = 0;
+        return Vector3.Distance(position1, position2);
+    }
 }

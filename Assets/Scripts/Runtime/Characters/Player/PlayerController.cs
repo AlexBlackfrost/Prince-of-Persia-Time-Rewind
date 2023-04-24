@@ -167,6 +167,7 @@ public class PlayerController : MonoBehaviour {
         timeControlSettings.CharacterMovement = characterMovement;
         timeControlSettings.Sword = sword;
         timeControlSettings.Health = health;
+        timeControlSettings.Hurtbox = hurtbox;
 
         wallRunSettings.Animator = animator;
         wallRunSettings.Transform = transform;
@@ -198,6 +199,7 @@ public class PlayerController : MonoBehaviour {
         rollSettings.MainCamera = Camera.main;
 
         blockSettings.Animator = animator;
+        blockSettings.Hurtbox = hurtbox;
 
         parriedSettings.Animator = animator;
 
