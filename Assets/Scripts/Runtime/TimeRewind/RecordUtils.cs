@@ -197,9 +197,12 @@ public struct SwordRecord {
     public SwordState swordState;
     public Transform swordSocket;
     public bool hitboxEnabled;
+    public float attackCooldownRemainingTime;
 
     public SwordRecord(bool sheathingEnabled, bool unsheathingEnabled, float unsheatheMotionTime, float animatorSwordLayerWeight,
-                       float animatorSwordLayerTargetWeight, SwordState swordState, Transform swordSocket, bool hitboxEnabled) {
+                       float animatorSwordLayerTargetWeight, SwordState swordState, Transform swordSocket, bool hitboxEnabled, 
+                       float attackCooldownRemainingTime) {
+
         this.sheathingEnabled = sheathingEnabled;
         this.unsheathingEnabled = unsheathingEnabled;
         this.unsheatheMotionTime = unsheatheMotionTime;
@@ -208,6 +211,7 @@ public struct SwordRecord {
         this.swordState = swordState;
         this.swordSocket = swordSocket;
         this.hitboxEnabled = hitboxEnabled;
+        this.attackCooldownRemainingTime = attackCooldownRemainingTime;
     }
 }
 

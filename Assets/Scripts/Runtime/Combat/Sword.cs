@@ -9,6 +9,7 @@ public class Sword : MonoBehaviour {
     [SerializeField] private Transform handSocket;
     [SerializeField] private float attackCooldown = 0;
     [SerializeField, ReadOnly] private bool hitboxEnabled;
+    [SerializeField, ReadOnly] private float attackCooldownRemainingTime;
     [field: SerializeField] public float Damage { get; private set; } = 10;
 
     public bool SheathingEnabled { get; set; } = true;
@@ -20,7 +21,6 @@ public class Sword : MonoBehaviour {
     private GameObject owner;
     private Animator animator;
     private Hitbox hitbox;
-    private float attackCooldownRemainingTime;
     private const float sheatheAnimationSpeed = 1.5f;
     private const float unsheatheAnimationSpeed = 1.5f;
     private const int swordAnimatorLayer = 1;
@@ -52,6 +52,8 @@ public class Sword : MonoBehaviour {
         
         animator = owner.GetComponent<Animator>();
         swordState = SwordState.InBack;
+
+        attackCooldownRemainingTime = 0;
     }
 
     public void SheatheIfPossible() {
@@ -227,21 +229,23 @@ public class Sword : MonoBehaviour {
 
     public SwordRecord RecordSwordData() {
         return new SwordRecord(SheathingEnabled, UnsheathingEnabled, unsheatheMotionTime, animatorSwordLayerWeight, animatorSwordLayerTargetWeight, 
-                               swordState, transform.parent, hitboxEnabled);
+                               swordState, transform.parent, hitboxEnabled, attackCooldownRemainingTime);
     }
 
-    public void RestoreSwordRecord(SwordRecord previousSwordRecord, SwordRecord nextSwordRecord,float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
+    public void RestoreSwordRecord(SwordRecord previousRecord, SwordRecord nextRecord,float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
         float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
 
-        unsheatheMotionTime = Mathf.Lerp(previousSwordRecord.unsheatheMotionTime, nextSwordRecord.unsheatheMotionTime, lerpAlpha);
+        unsheatheMotionTime = Mathf.Lerp(previousRecord.unsheatheMotionTime, nextRecord.unsheatheMotionTime, lerpAlpha);
         animator.SetFloat(AnimatorUtils.unsheatheMotionTimeHash, unsheatheMotionTime);
 
-        animatorSwordLayerWeight = Mathf.Lerp(previousSwordRecord.animatorSwordLayerWeight, nextSwordRecord.animatorSwordLayerWeight, lerpAlpha);
+        animatorSwordLayerWeight = Mathf.Lerp(previousRecord.animatorSwordLayerWeight, nextRecord.animatorSwordLayerWeight, lerpAlpha);
         animator.SetLayerWeight(swordAnimatorLayer, animatorSwordLayerWeight);
 
-        transform.SetParent(previousSwordRecord.swordSocket, false);
+        transform.SetParent(previousRecord.swordSocket, false);
 
-        hitboxEnabled = previousSwordRecord.hitboxEnabled;
+        hitboxEnabled = previousRecord.hitboxEnabled;
+
+        attackCooldownRemainingTime = Mathf.Lerp(previousRecord.attackCooldownRemainingTime, nextRecord.attackCooldownRemainingTime, lerpAlpha);
     }
 
     #endregion

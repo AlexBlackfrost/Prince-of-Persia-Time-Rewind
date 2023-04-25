@@ -4162,6 +4162,10 @@ PrefabInstance:
       propertyPath: handSocket
       value: 
       objectReference: {fileID: 1555095649}
+    - target: {fileID: 5051892676281105162, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
+      propertyPath: attackCooldown
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5421577037422279278, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
       propertyPath: <Offset>k__BackingField.z
       value: 0.5
