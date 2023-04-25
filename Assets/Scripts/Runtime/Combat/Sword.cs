@@ -32,11 +32,10 @@ public class Sword : MonoBehaviour {
     private SwordState swordState;
     private Coroutine animationCoroutine;
     private Coroutine layerTransitionCoroutine;
-    private HashSet<IHittable> ignoredHittableObjects;
+    private HashSet<IHittable> ignoredHittableObjects = new HashSet<IHittable>();
 
     private void Awake() {
         hitbox = GetComponent<Hitbox>();
-        ignoredHittableObjects = new HashSet<IHittable>();
         /*animator = Owner.GetComponent<Animator>();
         unsheatheHash = Animator.StringToHash("Unsheathe");
         unsheatheSpeedMultiplierHash = Animator.StringToHash("UnsheatheSpeedMultiplier");

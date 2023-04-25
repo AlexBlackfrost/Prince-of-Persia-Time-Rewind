@@ -4,13 +4,14 @@ using System;
 using UnityEngine;
 
 public class RollState : State {
-	
+
 	[Serializable]
 	public class RollSettings {
 		public Animator Animator { get; set; }
 		public CharacterMovement CharacterMovement { get; set; }
 		public Camera MainCamera { get; set; }
 		public InputController InputController { get; set; }
+		public Hurtbox Hurtbox {get; set;}
 		public Transform Transform { get; set; }
 		public AnimationCurve rollSpeed;
 		public float rollSpeedMultiplier = 15;
@@ -44,6 +45,8 @@ public class RollState : State {
 	}
 
 	protected override void OnEnter() {
+		settings.Hurtbox.IsInvincible = true;
+
 		Vector2 inputDirection = settings.InputController.GetMoveDirection();
 		settings.Animator.SetTrigger(AnimatorUtils.rollHash);
 		rollElapsedTime = 0;
@@ -57,7 +60,9 @@ public class RollState : State {
 
 	}
 
-	protected override void OnExit() { }
+	protected override void OnExit() { 
+		settings.Hurtbox.IsInvincible = false;
+	}
 
 	public override void RestoreFieldsAndProperties(object stateObjectRecord) {
 		RollStateRecord record = (RollStateRecord)stateObjectRecord;

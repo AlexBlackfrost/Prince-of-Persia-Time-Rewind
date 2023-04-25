@@ -110,10 +110,14 @@ public class EnemyController : MonoBehaviour{
 
         // AIAttack ->
         AnimatorUtils.AnimationEnded += AIAttackState.AddEventTransition<int>(idleState, AIAttackEnded);
+        AIAttackState.Parried += AIAttackState.AddEventTransition(parriedState);
 
         // Damaged ->
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded);
         hurtbox.DamageReceived += damagedState.AddEventTransition<float>(damagedState);
+
+        // Parried ->
+        AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded);
 
         // Alive ->
         health.Dead += aliveStateMachine.AddEventTransition(deadState);
@@ -145,6 +149,10 @@ public class EnemyController : MonoBehaviour{
     #region Transition conditions
     private bool DamagedAnimationEnded(int shortNameHash) {
         return AnimatorUtils.damagedHash == shortNameHash;
+    }
+    
+    private bool ParriedAnimationEnded(int shortNameHash) {
+        return AnimatorUtils.parriedHash == shortNameHash;
     }
     
     private bool AIAttackEnded(int shortNameHash) {

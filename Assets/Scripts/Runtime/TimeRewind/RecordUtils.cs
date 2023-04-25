@@ -174,6 +174,14 @@ public struct AttackStateRecord {
     }
 }
 
+public struct AIAttackStateRecord {
+    public IHittable[] alreadyHitObjects;
+
+    public AIAttackStateRecord(IHittable[] alreadyHitObjects) {
+        this.alreadyHitObjects = alreadyHitObjects;
+    }
+}
+
 public struct RollStateRecord {
     public float rollElapsedTime;
     public RollStateRecord(float rollElapsedTime) {
@@ -233,89 +241,5 @@ public struct HurtboxRecord {
     }
 }
 
-public static class RecordUtils {
-    public static TransformRecord RecordTransformData(Transform transform) {
-        return new TransformRecord(transform.position,
-                                   transform.rotation,
-                                   transform.localScale);
-    }
-
-    public static CameraRecord RecordCameraData(Camera camera) {
-        TransformRecord transformRecord = RecordTransformData(camera.transform);
-        return new CameraRecord(transformRecord);
-    }
-
-
-    public static PlayerRecord RecordPlayerData(Transform transform, Camera camera, StateMachine stateMachine, 
-                                                Animator animator, CharacterMovement characterMovement, SwordRecord swordRecord) {
-
-        /*TransformRecord transformRecord = RecordTransformData(transform);
-        CameraRecord cameraRecord = RecordCameraData(camera);
-        AnimationRecord animationRecord = RecordAnimationData(animator);
-        StateMachineRecord stateMachineRecord = RecordStateMachineData(stateMachine);
-        CharacterMovementRecord characterMovementRecord = RecordCharacterMovementData(characterMovement);
-        StateMachine stateMachineCopy = (StateMachine) stateMachine.Copy();
-        //Debug.Log("Saving... " + stateMachineCopy.GetCurrentStateName());
-        return new PlayerRecord(transformRecord, cameraRecord, animationRecord, stateMachineRecord,
-                                characterMovementRecord, swordRecord, Time.deltaTime);*/
-        return default(PlayerRecord);
-    }
-
-    private static TransformRecord[] RecordPose(Transform[] bones) {
-        TransformRecord[] pose = new TransformRecord[bones.Length];
-        int index = 0;
-        foreach (Transform bone in bones) {
-            pose[index++] = RecordTransformData(bone);
-        }
-        return pose;
-    }
-
-    
-
-    private static StateMachineRecord RecordStateMachineData(StateMachine stateMachine) {
-        Type[] hierarchy = GetTypeHierarchy(stateMachine.CurrentStateObject);
-        object[] stateObjectsRecords = GetStateObjectsRecords(stateMachine.CurrentStateObject);
-        StateMachineRecord stateMachineRecord = new StateMachineRecord(hierarchy, stateObjectsRecords);
-
-        return stateMachineRecord;
-    }
-
-    private static Type[] GetTypeHierarchy(StateObject stateObject) {
-        return GetTypeHierarchyRecursive(stateObject, 0);
-    }
-
-    private static Type[] GetTypeHierarchyRecursive(StateObject stateObject, int depth) {
-        if(stateObject is State) {
-            Type[] hierarchy = new Type[depth + 1]; 
-            hierarchy[depth] = stateObject.GetType();
-            return hierarchy;
-        } else {
-            Type[] hierarchy = GetTypeHierarchyRecursive(((StateMachine)stateObject).CurrentStateObject, depth + 1);
-            hierarchy[depth] = stateObject.GetType();
-            return hierarchy;
-        }
-    }
-
-
-    private static object[] GetStateObjectsRecords(StateObject stateObject) {
-        return GetStateObjectsRecordsRecursive(stateObject, 0);
-        
-    }
-
-    private static object[] GetStateObjectsRecordsRecursive(StateObject stateObject, int depth) {
-        if (stateObject is State) {
-            object[] stateObjectsRecords = new object[depth + 1];
-            stateObjectsRecords[depth] = stateObject.RecordFieldsAndProperties();
-            return stateObjectsRecords;
-        } else {
-            object[] stateObjectsRecords = GetStateObjectsRecordsRecursive(((StateMachine)stateObject).CurrentStateObject, depth+1);
-            stateObjectsRecords[depth] = stateObject.RecordFieldsAndProperties();
-            return stateObjectsRecords;
-        }
-    }
-
-    private static CharacterMovementRecord RecordCharacterMovementData(CharacterMovement characterMovement) {
-        return new CharacterMovementRecord(characterMovement.Velocity);
-    }
-}
+public static class RecordUtils { }
 

@@ -5958,7 +5958,7 @@ MonoBehaviour:
   hurtbox: {fileID: 1612310790}
   health:
     currentHealth: 0
-    <MaxHealth>k__BackingField: 0
+    <MaxHealth>k__BackingField: 100
   sword: {fileID: 68330440}
   timeControlSettings:
     <FreeLookCamera>k__BackingField: {fileID: 223078464}
@@ -6423,7 +6423,7 @@ PrefabInstance:
       objectReference: {fileID: 560597657}
     - target: {fileID: 5051892676281105162, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
       propertyPath: attackCooldown
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}

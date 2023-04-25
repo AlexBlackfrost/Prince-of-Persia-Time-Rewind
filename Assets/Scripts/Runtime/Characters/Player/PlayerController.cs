@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private AttackState.AttackSettings attackSettings;
     [field: SerializeField] private RollState.RollSettings rollSettings;
     [field: SerializeField] private BlockState.BlockSettings blockSettings;
+    [field: SerializeField] private DamagedState.DamagedSettings damagedSettings;
     [field: SerializeField] private ParriedState.ParriedSettings parriedSettings;
     [field: SerializeField] private AliveStateMachine.AliveSettings aliveSettings;
     [field: SerializeField] private DeadState.DeadSettings deadSettings;
@@ -68,12 +69,13 @@ public class PlayerController : MonoBehaviour {
         AttackState attackState = new AttackState(attackSettings);
         RollState rollState = new RollState(rollSettings);
         BlockState blockState = new BlockState(blockSettings);
+        DamagedState damagedState = new DamagedState(damagedSettings);
         ParriedState parriedState = new ParriedState(parriedSettings);
         AliveStateMachine aliveStateMachine = new AliveStateMachine(aliveSettings,
                                                                     idleState, moveState, jumpState,
                                                                     wallRunState, fallState, landState,
                                                                     attackState, rollState, blockState, 
-                                                                    parriedState);
+                                                                    parriedState, damagedState);
         DeadState deadState = new DeadState(deadSettings);
         PlayerTimeControlStateMachine timeControlStateMachine = new PlayerTimeControlStateMachine(UpdateMode.UpdateAfterChild, timeControlSettings, 
                                                                                                   aliveStateMachine, deadState);
@@ -85,10 +87,12 @@ public class PlayerController : MonoBehaviour {
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         InputController.Block.performed += idleState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
         idleState.AddTransition(moveState, IsMoving);
+        hurtbox.DamageReceived += idleState.AddEventTransition<float>(damagedState);
         InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
          
         // Move ->
         InputController.Roll.performed += moveState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
+        hurtbox.DamageReceived += moveState.AddEventTransition<float>(damagedState);
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
         InputController.Block.performed += moveState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
         moveState.AddTransition(idleState, IsNotMoving);
@@ -110,6 +114,7 @@ public class PlayerController : MonoBehaviour {
         AnimatorUtils.AnimationEnded += landState.AddEventTransition<int>(idleState, LandAnimationEnded);
 
         // Attack ->
+        hurtbox.DamageReceived += attackState.AddEventTransition<float>(damagedState);
         attackState.AttackEnded += attackState.AddEventTransition(idleState, IsNotMoving);
         attackState.AttackEnded += attackState.AddEventTransition(moveState, IsMoving);
         attackState.Parried += attackState.AddEventTransition(parriedState);
@@ -125,6 +130,10 @@ public class PlayerController : MonoBehaviour {
         // Parried ->
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(moveState, ParriedAnimationEnded, (int shortNameHash) => IsMoving());
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded, (int shortNameHash) => IsNotMoving());
+
+        // Damaged ->
+        AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(moveState, DamagedAnimationEnded, (int shortNameHash) => IsMoving());
+        AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded, (int shortNameHash) => IsNotMoving());
 
         // Alive ->
         health.Dead += aliveStateMachine.AddEventTransition(deadState);
@@ -201,6 +210,8 @@ public class PlayerController : MonoBehaviour {
         blockSettings.Animator = animator;
         blockSettings.Hurtbox = hurtbox;
 
+        damagedSettings.Animator = animator;
+
         parriedSettings.Animator = animator;
 
         deadSettings.Animator = animator;
@@ -245,6 +256,10 @@ public class PlayerController : MonoBehaviour {
     
     private bool ParriedAnimationEnded(int stateNameHash) {
         return AnimatorUtils.parriedHash == stateNameHash;
+    }
+    
+    private bool DamagedAnimationEnded(int stateNameHash) {
+        return AnimatorUtils.damagedHash == stateNameHash;
     }
 
     private bool IsNotDetectingRunnableWall(){

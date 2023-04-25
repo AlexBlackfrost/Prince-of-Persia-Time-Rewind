@@ -8,6 +8,7 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
     [SerializeField] private float isDamageableCooldown = 0.0f;
     public Action<float> DamageReceived;
     public Action HitReceived;
+    [field:SerializeField] public bool IsInvincible{ get; set;}
 
     [field:SerializeField, ReadOnly] public float IsDamageableRemainingTime { get; set; }
     [SerializeField, ReadOnly]private bool isShielded = false;
@@ -35,6 +36,6 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
     }
 
     public bool CanBeDamaged() {
-        return IsDamageableRemainingTime <= 0;
+        return IsDamageableRemainingTime <= 0 && !IsInvincible;
     }
 }
