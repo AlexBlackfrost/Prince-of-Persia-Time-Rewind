@@ -206,6 +206,7 @@ public class PlayerController : MonoBehaviour {
         rollSettings.InputController = InputController;
         rollSettings.Transform = transform;
         rollSettings.MainCamera = Camera.main;
+        rollSettings.Hurtbox = hurtbox;
 
         blockSettings.Animator = animator;
         blockSettings.Hurtbox = hurtbox;

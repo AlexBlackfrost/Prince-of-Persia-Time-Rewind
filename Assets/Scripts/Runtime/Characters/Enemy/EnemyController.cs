@@ -11,6 +11,7 @@ public class EnemyController : MonoBehaviour{
     [SerializeField] private Hurtbox hurtbox;
     [SerializeField] private Health health;
     [SerializeField] private Sword sword;
+    [SerializeField] private float damagedFrequencyTriggerBlock = 1;
 
     [Header("State machine settings")]
     [field: SerializeField] private IdleState.IdleSettings idleSettings;
@@ -27,6 +28,10 @@ public class EnemyController : MonoBehaviour{
     private Dictionary<Type, StateObject> stateObjects;
     private EnemyPerceptionSystem perceptionSystem;
     private RootStateMachine rootStateMachine;
+    private CircularStack<DateTime> damagedTimeStamps;
+    private const int MAX_DAMAGED_TIMESTAMPS = 15;
+    private bool damagedTooOften;
+    private bool hasBeenAttacked;
 
     private void Awake() {
         characterMovement.Transform = transform;
@@ -34,6 +39,9 @@ public class EnemyController : MonoBehaviour{
         animator = GetComponent<Animator>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
         stateObjects = new Dictionary<Type, StateObject>();
+        damagedTimeStamps = new CircularStack<DateTime>(MAX_DAMAGED_TIMESTAMPS);
+        damagedTooOften = false;
+        hasBeenAttacked = false;
 
         health.Init();
         sword.OnEquipped(this.gameObject);
@@ -80,6 +88,7 @@ public class EnemyController : MonoBehaviour{
 
     private void SubscribeEvents() {
         hurtbox.DamageReceived += health.OnDamageReceived;
+        hurtbox.DamageReceived += OnDamageReceived;
     }
 
     private void BuildHFSM() {
@@ -100,13 +109,13 @@ public class EnemyController : MonoBehaviour{
         // Create transitions
         // Idle ->
         hurtbox.DamageReceived += idleState.AddEventTransition<float>(damagedState);
-        idleState.AddTransition(approachPlayerState, perceptionSystem.IsSeeingPlayer, ()=> !approachPlayerState.ReachedPlayer());
-        idleState.AddTransition(AIAttackState, SetPlayerAsAttackTarget, perceptionSystem.IsSeeingPlayer, perceptionSystem.IsPlayerInAttackRange, AttackCooldownFinished);
+        idleState.AddTransition(approachPlayerState, HasDetectedPlayer, ()=> !approachPlayerState.ReachedPlayer());
+        idleState.AddTransition(AIAttackState, SetPlayerAsAttackTarget, CanAttackPlayer);
 
         // ApproachPlayer ->
         hurtbox.DamageReceived += approachPlayerState.AddEventTransition<float>(damagedState);
         approachPlayerState.AddTransition(idleState, approachPlayerState.ReachedPlayer);
-        approachPlayerState.AddTransition(AIAttackState, SetPlayerAsAttackTarget, perceptionSystem.IsSeeingPlayer, perceptionSystem.IsPlayerInAttackRange, AttackCooldownFinished);
+        approachPlayerState.AddTransition(AIAttackState, SetPlayerAsAttackTarget, CanAttackPlayer);
 
         // AIAttack ->
         AnimatorUtils.AnimationEnded += AIAttackState.AddEventTransition<int>(idleState, AIAttackEnded);
@@ -115,9 +124,14 @@ public class EnemyController : MonoBehaviour{
         // Damaged ->
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded);
         hurtbox.DamageReceived += damagedState.AddEventTransition<float>(damagedState);
+        damagedState.AddTransition(blockState, ResetDamagedTooOften, () => damagedTooOften);
 
         // Parried ->
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded);
+        hurtbox.DamageReceived += parriedState.AddEventTransition<float>(damagedState);
+
+        // Block ->
+        AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(idleState, BlockAnimationEnded);
 
         // Alive ->
         health.Dead += aliveStateMachine.AddEventTransition(deadState);
@@ -154,7 +168,11 @@ public class EnemyController : MonoBehaviour{
     private bool ParriedAnimationEnded(int shortNameHash) {
         return AnimatorUtils.parriedHash == shortNameHash;
     }
-    
+
+    private bool BlockAnimationEnded(int shortNameHash) {
+        return AnimatorUtils.blockHash == shortNameHash;
+    }
+
     private bool AIAttackEnded(int shortNameHash) {
         return AnimatorUtils.attackRecoveryHash == shortNameHash;
     }
@@ -163,11 +181,23 @@ public class EnemyController : MonoBehaviour{
         return sword.CooldownFinished();
     }
 
+    private bool CanAttackPlayer() {
+        return HasDetectedPlayer()  && perceptionSystem.IsPlayerInAttackRange() && AttackCooldownFinished();
+    }
+
+    private bool HasDetectedPlayer() {
+        return perceptionSystem.IsSeeingPlayer() || hasBeenAttacked;
+    }
+
     #endregion
 
     #region Transition actions
     private void SetPlayerAsAttackTarget() {
         AIAttackSettings.Target = perceptionSystem.player;
+    }
+
+    private void ResetDamagedTooOften() {
+        damagedTooOften = false;
     }
     #endregion
 
@@ -176,4 +206,18 @@ public class EnemyController : MonoBehaviour{
         sword.SetHitboxEnabled(enabled);
     }
     #endregion
+
+    private void OnDamageReceived(float amount) {
+        hasBeenAttacked = true;
+
+        DateTime now = DateTime.Now;
+        if (!damagedTimeStamps.IsEmpty()) {
+            DateTime lastDamagedTime = damagedTimeStamps.Peek();
+            if (now.Subtract(lastDamagedTime).TotalSeconds < damagedFrequencyTriggerBlock) {
+                damagedTooOften = true;
+            }
+        }
+
+        damagedTimeStamps.Push(now);
+    }
 }

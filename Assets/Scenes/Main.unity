@@ -293,13 +293,15 @@ MonoBehaviour:
   hurtbox: {fileID: 964352650}
   health:
     currentHealth: 0
-    <MaxHealth>k__BackingField: 20
+    <MaxHealth>k__BackingField: 1000
   sword: {fileID: 919132149622075204}
+  damagedFrequencyTriggerBlock: 1
   approachPlayerSettings:
     <PlayerController>k__BackingField: {fileID: 1920022715}
     approachPlayerSpeed: 5
     approachPlayerRotationSpeed: 10
     stopApproachingPlayerAcceptanceRadius: 2
+    stopApproachingPlayerAcceptanceDotProduct: 0.8
   AIAttackSettings:
     <RotationSpeed>k__BackingField: 8
 --- !u!143 &58233412
@@ -4257,6 +4259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDamageableCooldown: 0.1
+  <IsInvincible>k__BackingField: 0
   <IsDamageableRemainingTime>k__BackingField: 0
   isShielded: 0
 --- !u!136 &964352651
@@ -5555,6 +5558,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDamageableCooldown: 0.5
+  <IsInvincible>k__BackingField: 0
   <IsDamageableRemainingTime>k__BackingField: 0
   isShielded: 0
 --- !u!136 &1612310791

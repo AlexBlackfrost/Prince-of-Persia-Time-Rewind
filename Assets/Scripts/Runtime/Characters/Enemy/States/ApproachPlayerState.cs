@@ -15,6 +15,7 @@ public class ApproachPlayerState : State{
         public float approachPlayerSpeed = 8;
         public float approachPlayerRotationSpeed = 13;
         public float stopApproachingPlayerAcceptanceRadius = 1;
+        public float stopApproachingPlayerAcceptanceDotProduct = 0.8f;
 	}
 
     private ApproachPlayerSettings settings;
@@ -47,6 +48,12 @@ public class ApproachPlayerState : State{
     }
 
     public bool ReachedPlayer() {
-        return Vector3.Distance(settings.PlayerController.transform.position, settings.Transform.position) < settings.stopApproachingPlayerAcceptanceRadius;
+        float distanceXZ = Vector2.Distance(settings.PlayerController.transform.position.XZ(), settings.Transform.position.XZ());
+        Vector2 playerDirectionXZ = (settings.PlayerController.transform.position - settings.Transform.position).XZ().normalized;
+        Vector3 lookDirectionXZ = settings.Transform.forward.XZ();
+        float dotProduct = Vector2.Dot(playerDirectionXZ, lookDirectionXZ);
+        Debug.Log("Dot: " + dotProduct);
+        return distanceXZ < settings.stopApproachingPlayerAcceptanceRadius &&
+               dotProduct >= settings.stopApproachingPlayerAcceptanceDotProduct;
     }
 }
