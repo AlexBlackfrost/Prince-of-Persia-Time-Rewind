@@ -19,6 +19,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		public Sword Sword { get; set; }
 		public Health Health { get; set; }
 		public Hurtbox Hurtbox { get; set; }
+
 		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
 
@@ -171,7 +172,6 @@ public class PlayerTimeControlStateMachine : StateMachine {
 												elapsedTimeSinceLastRecord);
 
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
-
 
 
 		Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());

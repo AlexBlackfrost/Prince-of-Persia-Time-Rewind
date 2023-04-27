@@ -42,12 +42,13 @@ public struct EnemyRecord {
     public SwordRecord swordRecord;
     public HealthRecord healthRecord;
     public HurtboxRecord hurtboxRecord;
+    public EnemyAIRecord enemyAIRecord;
     public float deltaTime;
 
     public EnemyRecord(TransformRecord enemyTransform, AnimationRecord animationRecord,
                         StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
                         SwordRecord swordRecord, HealthRecord healthRecord, HurtboxRecord hurtboxRecord,
-                        float deltaTime) {
+                        EnemyAIRecord enemyAIRecord, float deltaTime) {
 
         this.enemyTransform = enemyTransform;
         this.animationRecord = animationRecord;
@@ -56,6 +57,7 @@ public struct EnemyRecord {
         this.swordRecord = swordRecord;
         this.healthRecord = healthRecord;
         this.hurtboxRecord = hurtboxRecord;
+        this.enemyAIRecord = enemyAIRecord;
         this.deltaTime = deltaTime;
     }
 }
@@ -238,6 +240,16 @@ public struct HurtboxRecord {
     public HurtboxRecord(float isDamageableRemainingTime, bool isShielded) {
         this.isDamageableRemainingTime = isDamageableRemainingTime;
         this.isShielded = isShielded;
+    }
+}
+
+public struct EnemyAIRecord {
+    public bool hasBeenAttacked;
+    public bool damagedTooOften;
+
+    public EnemyAIRecord(bool hasBeenAttacked, bool damagedTooOften) {
+        this.hasBeenAttacked = hasBeenAttacked;
+        this.damagedTooOften = damagedTooOften;
     }
 }
 

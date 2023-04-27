@@ -118,6 +118,7 @@ public class PlayerController : MonoBehaviour {
         attackState.AttackEnded += attackState.AddEventTransition(idleState, IsNotMoving);
         attackState.AttackEnded += attackState.AddEventTransition(moveState, IsMoving);
         attackState.Parried += attackState.AddEventTransition(parriedState);
+        InputController.Block.performed += attackState.AddEventTransition<CallbackContext>(blockState);
 
         // Roll ->
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(idleState, RollAnimationEnded, (int shortNameHash) => { return IsNotMoving(); });
@@ -304,7 +305,7 @@ public class PlayerController : MonoBehaviour {
     #endregion
     private void Update() {
         rootStateMachine.Update();
-        //Debug.Log("Current state: " + rootStateMachine.GetCurrentStateName() );
+        Debug.Log("Current state: " + rootStateMachine.GetCurrentStateName() );
     }
 
     private void FixedUpdate() {

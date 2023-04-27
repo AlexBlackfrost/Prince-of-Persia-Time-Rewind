@@ -11,7 +11,7 @@ public class EnemyController : MonoBehaviour{
     [SerializeField] private Hurtbox hurtbox;
     [SerializeField] private Health health;
     [SerializeField] private Sword sword;
-    [SerializeField] private float damagedFrequencyTriggerBlock = 1;
+    [SerializeField] private EnemyAI enemyAI;
 
     [Header("State machine settings")]
     [field: SerializeField] private IdleState.IdleSettings idleSettings;
@@ -28,10 +28,6 @@ public class EnemyController : MonoBehaviour{
     private Dictionary<Type, StateObject> stateObjects;
     private EnemyPerceptionSystem perceptionSystem;
     private RootStateMachine rootStateMachine;
-    private CircularStack<DateTime> damagedTimeStamps;
-    private const int MAX_DAMAGED_TIMESTAMPS = 15;
-    private bool damagedTooOften;
-    private bool hasBeenAttacked;
 
     private void Awake() {
         characterMovement.Transform = transform;
@@ -39,18 +35,19 @@ public class EnemyController : MonoBehaviour{
         animator = GetComponent<Animator>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
         stateObjects = new Dictionary<Type, StateObject>();
-        damagedTimeStamps = new CircularStack<DateTime>(MAX_DAMAGED_TIMESTAMPS);
-        damagedTooOften = false;
-        hasBeenAttacked = false;
-
+        
+        enemyAI.Init();
         health.Init();
-        sword.OnEquipped(this.gameObject);
 
         SubscribeEvents();
-
         InjectDependencies();
         BuildHFSM();
         rootStateMachine.Init();
+        
+    }
+
+    private void Start() {
+        sword.OnEquipped(this.gameObject);
         
     }
 
@@ -75,6 +72,7 @@ public class EnemyController : MonoBehaviour{
         timeControlSettings.Health = health;
         timeControlSettings.Hurtbox = hurtbox;
         timeControlSettings.Sword = sword;
+        timeControlSettings.EnemyAI = enemyAI;
 
         parriedSettings.Animator = animator;
 
@@ -88,7 +86,7 @@ public class EnemyController : MonoBehaviour{
 
     private void SubscribeEvents() {
         hurtbox.DamageReceived += health.OnDamageReceived;
-        hurtbox.DamageReceived += OnDamageReceived;
+        hurtbox.DamageReceived += enemyAI.OnDamageReceived;
     }
 
     private void BuildHFSM() {
@@ -124,7 +122,7 @@ public class EnemyController : MonoBehaviour{
         // Damaged ->
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded);
         hurtbox.DamageReceived += damagedState.AddEventTransition<float>(damagedState);
-        damagedState.AddTransition(blockState, ResetDamagedTooOften, () => damagedTooOften);
+        damagedState.AddTransition(blockState, enemyAI.ResetDamagedTooOften, () => enemyAI.DamagedTooOften);
 
         // Parried ->
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded);
@@ -186,7 +184,7 @@ public class EnemyController : MonoBehaviour{
     }
 
     private bool HasDetectedPlayer() {
-        return perceptionSystem.IsSeeingPlayer() || hasBeenAttacked;
+        return perceptionSystem.IsSeeingPlayer() || enemyAI.HasBeenAttacked;
     }
 
     #endregion
@@ -196,9 +194,6 @@ public class EnemyController : MonoBehaviour{
         AIAttackSettings.Target = perceptionSystem.player;
     }
 
-    private void ResetDamagedTooOften() {
-        damagedTooOften = false;
-    }
     #endregion
 
     #region Animation events
@@ -207,17 +202,4 @@ public class EnemyController : MonoBehaviour{
     }
     #endregion
 
-    private void OnDamageReceived(float amount) {
-        hasBeenAttacked = true;
-
-        DateTime now = DateTime.Now;
-        if (!damagedTimeStamps.IsEmpty()) {
-            DateTime lastDamagedTime = damagedTimeStamps.Peek();
-            if (now.Subtract(lastDamagedTime).TotalSeconds < damagedFrequencyTriggerBlock) {
-                damagedTooOften = true;
-            }
-        }
-
-        damagedTimeStamps.Push(now);
-    }
 }
