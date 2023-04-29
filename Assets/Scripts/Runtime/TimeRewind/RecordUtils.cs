@@ -245,11 +245,11 @@ public struct HurtboxRecord {
 
 public struct EnemyAIRecord {
     public bool hasBeenAttacked;
-    public bool damagedTooOften;
+    public bool receivedTooMuchDamageRecently;
 
     public EnemyAIRecord(bool hasBeenAttacked, bool damagedTooOften) {
         this.hasBeenAttacked = hasBeenAttacked;
-        this.damagedTooOften = damagedTooOften;
+        this.receivedTooMuchDamageRecently = damagedTooOften;
     }
 }
 

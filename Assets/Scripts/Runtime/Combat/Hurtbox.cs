@@ -38,4 +38,8 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
     public bool CanBeDamaged() {
         return IsDamageableRemainingTime <= 0 && !IsInvincible;
     }
+
+    public Transform GetTransform() {
+        return transform;
+    }
 }

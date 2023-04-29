@@ -122,13 +122,14 @@ public class EnemyController : MonoBehaviour{
         // Damaged ->
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded);
         hurtbox.DamageReceived += damagedState.AddEventTransition<float>(damagedState);
-        damagedState.AddTransition(blockState, enemyAI.ResetDamagedTooOften, () => enemyAI.DamagedTooOften);
+        damagedState.AddTransition(blockState, enemyAI.ResetReceivedTooMuchDamageRecently, () => enemyAI.ReceivedTooMuchDamageRecently);
 
         // Parried ->
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded);
         hurtbox.DamageReceived += parriedState.AddEventTransition<float>(damagedState);
 
         // Block ->
+        hurtbox.DamageReceived += blockState.AddEventTransition<float>(damagedState);
         AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(idleState, BlockAnimationEnded);
 
         // Alive ->
@@ -200,6 +201,11 @@ public class EnemyController : MonoBehaviour{
     public void SetHitboxEnabled(Bool enabled) {
         sword.SetHitboxEnabled(enabled);
     }
+
+    public void SetIsShielded(Bool enabled) {
+        hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+    }
+
     #endregion
 
 }

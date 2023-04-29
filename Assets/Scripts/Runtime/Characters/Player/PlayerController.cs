@@ -125,6 +125,7 @@ public class PlayerController : MonoBehaviour {
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(moveState, RollAnimationEnded, (int shortNameHash) => { return IsMoving(); });
 
         // Block ->
+        hurtbox.DamageReceived += blockState.AddEventTransition<float>(damagedState);
         AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(idleState, BlockAnimationEnded, (int shortNameHash) => IsNotMoving() );
         AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(moveState, BlockAnimationEnded, (int shortNameHash) => IsMoving() );
 
@@ -133,6 +134,7 @@ public class PlayerController : MonoBehaviour {
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded, (int shortNameHash) => IsNotMoving());
 
         // Damaged ->
+        AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(blockState, DamagedAnimationEnded, (int shortNameHash) => InputController.Block.IsPressed());
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(moveState, DamagedAnimationEnded, (int shortNameHash) => IsMoving());
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded, (int shortNameHash) => IsNotMoving());
 
@@ -151,6 +153,7 @@ public class PlayerController : MonoBehaviour {
         stateObjects[typeof(BlockState)] = blockState;
         stateObjects[typeof(ParriedState)] = parriedState;
         stateObjects[typeof(DeadState)] = deadState;
+        stateObjects[typeof(DamagedState)] = damagedState;
         stateObjects[typeof(AliveStateMachine)] = aliveStateMachine;
         stateObjects[typeof(PlayerTimeControlStateMachine)] = timeControlStateMachine;
 
@@ -300,6 +303,10 @@ public class PlayerController : MonoBehaviour {
 
     public void SetHitboxEnabled(Bool enabled) {
         sword.SetHitboxEnabled(enabled);
+    }
+
+    public void SetIsShielded(Bool enabled) {
+        hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
     }
 
     #endregion

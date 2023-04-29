@@ -37,7 +37,6 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private  CircularStack<PlayerRecord> records;
 	private int recordFPS = 60;
 	private int recordMaxseconds = 20;
-	private float rewindSpeed = 0.1f;
 	private CinemachineBrain cinemachineBrain;
 
 	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
@@ -148,7 +147,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		}
 		
 		RestorePlayerRecord(previousRecord, nextRecord);
-		elapsedTimeSinceLastRecord += Time.deltaTime * rewindSpeed;
+		elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindManager.RewindSpeed;
 	}
 
 

@@ -33,7 +33,6 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	private CircularStack<EnemyRecord> records;
 	private int recordFPS = 60; 
 	private int recordMaxseconds = 20;
-	private float rewindSpeed = 0.1f;
 
 	private AnimationRecord lastAnimationRecord;
 	private TransitionRecord[] lastInterruptedTransitionRecordInLayer;
@@ -95,7 +94,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 				
 		hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 
-		settings.EnemyAI.OnTimeRewindStop(previousRecord.enemyAIRecord, nextRecord.enemyAIRecord, rewindSpeed, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		settings.EnemyAI.OnTimeRewindStop(previousRecord.enemyAIRecord, nextRecord.enemyAIRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 	}
 
 	private void SaveEnemyRecord() {
@@ -124,7 +123,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		}
 
 		RestoreEnemyRecord(previousRecord, nextRecord);
-		elapsedTimeSinceLastRecord += Time.deltaTime * rewindSpeed;
+		elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindManager.RewindSpeed;
 	}
 
 	private void RestoreEnemyRecord(EnemyRecord previousRecord, EnemyRecord nextRecord) {

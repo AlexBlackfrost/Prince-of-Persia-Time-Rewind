@@ -295,7 +295,9 @@ MonoBehaviour:
     currentHealth: 0
     <MaxHealth>k__BackingField: 1000
   sword: {fileID: 919132149622075204}
-  damagedFrequencyTriggerBlock: 1
+  enemyAI:
+    recentDamageLookbackTimeTriggerBlock: 2
+    recentDamageAmountTriggerBlock: 30
   approachPlayerSettings:
     <PlayerController>k__BackingField: {fileID: 1920022715}
     approachPlayerSpeed: 5
@@ -5962,7 +5964,7 @@ MonoBehaviour:
   hurtbox: {fileID: 1612310790}
   health:
     currentHealth: 0
-    <MaxHealth>k__BackingField: 100
+    <MaxHealth>k__BackingField: 10000
   sword: {fileID: 68330440}
   timeControlSettings:
     <FreeLookCamera>k__BackingField: {fileID: 223078464}

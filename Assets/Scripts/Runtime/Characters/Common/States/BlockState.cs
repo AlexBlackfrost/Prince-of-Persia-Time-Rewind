@@ -19,7 +19,6 @@ public class BlockState : State {
 
     protected override void OnEnter() {
         settings.Animator.SetTrigger(AnimatorUtils.blockHash);
-        settings.Hurtbox.SetIsShielded(true);
     }
 
     protected override void OnExit() {

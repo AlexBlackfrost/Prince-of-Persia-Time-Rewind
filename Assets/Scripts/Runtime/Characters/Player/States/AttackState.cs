@@ -15,7 +15,8 @@ public class AttackState : State {
         public Transform Transform { get; set; }
         [field: SerializeField] public float AttackPressedBufferTime { get; private set; }  = 0.3f;
         [field: SerializeField] public float RotationSpeed { get; private set; }  = 5f;
-        
+        [field: SerializeField] public float BlockableAttackAngleThreshold { get; private set; } = 100;
+
     }
 
     public Action AttackEnded;
@@ -128,7 +129,7 @@ public class AttackState : State {
                     if(hittableObject is IDamageable) {
                         IDamageable damageableObject = (IDamageable)hittableObject;
                         if (damageableObject.CanBeDamaged()) {
-                            if (damageableObject is IShieldable && ((IShieldable)damageableObject).IsShielded()) {
+                            if (damageableObject is IShieldable && ((IShieldable)damageableObject).IsShielded() && HittableObjectIsFacingAttacker(hitData.hittableObject)) {
                                 Parried?.Invoke();
                             } else {
                                 damageableObject.ReceiveDamage(settings.Sword.Damage);
@@ -167,6 +168,13 @@ public class AttackState : State {
                 }
             }
         }
+    }
+
+    private bool HittableObjectIsFacingAttacker(IHittable hittableObject) {
+        Vector2 attackedHorizontalForward = hittableObject.GetTransform().forward.XZ().normalized;
+        Vector2 attackerHorizontalForward = settings.Transform.forward.XZ().normalized;
+
+        return Vector2.Angle(attackerHorizontalForward, -attackedHorizontalForward) < settings.BlockableAttackAngleThreshold;
     }
 
     public override void RestoreFieldsAndProperties(object stateObjectRecord) {

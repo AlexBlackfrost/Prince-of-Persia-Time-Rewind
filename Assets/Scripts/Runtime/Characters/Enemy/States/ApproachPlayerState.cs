@@ -52,7 +52,7 @@ public class ApproachPlayerState : State{
         Vector2 playerDirectionXZ = (settings.PlayerController.transform.position - settings.Transform.position).XZ().normalized;
         Vector3 lookDirectionXZ = settings.Transform.forward.XZ();
         float dotProduct = Vector2.Dot(playerDirectionXZ, lookDirectionXZ);
-        Debug.Log("Dot: " + dotProduct);
+
         return distanceXZ < settings.stopApproachingPlayerAcceptanceRadius &&
                dotProduct >= settings.stopApproachingPlayerAcceptanceDotProduct;
     }

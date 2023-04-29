@@ -20,7 +20,7 @@ public class DamagedState : State{
     }
 
     protected override void OnExit() {
-
+        //settings.Animator.SetBool(AnimatorUtils.damagedHash, false);
     }
 
     protected override void OnUpdate() {

@@ -54,6 +54,18 @@ public class CircularStack<T>: ICollection, ICloneable {
         return array[index];
     }
 
+    public T Peek(int depth) {
+        if (IsEmpty()) {
+            throw new InvalidOperationException(this.GetType().Name + " is empty");
+        }
+
+        if(depth > Count) {
+            throw new InvalidOperationException(this.GetType().Name + " only has " + Count  +
+                                                " elements and you have tried to peek at element " + depth);
+        }
+        return array[MathUtils.NonNegativeMod(index - depth, array.Length)];
+    }
+
     public void CopyTo(Array array, int index) {
         this.array.CopyTo(array, index);
     }

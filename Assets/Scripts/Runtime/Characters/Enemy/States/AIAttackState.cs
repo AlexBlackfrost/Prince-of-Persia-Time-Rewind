@@ -9,6 +9,7 @@ public class AIAttackState : State{
     [Serializable]
     public class AIAttackSettings {
         [field:SerializeField] public float RotationSpeed { get; private set; } = 8f;
+        [field:SerializeField] public float BlockableAttackAngleThreshold { get; private set; } = 100f;
         public Animator Animator { get; set; }
         public CharacterMovement CharacterMovement { get; set; }
         public GameObject Target { get; set; }
@@ -54,7 +55,7 @@ public class AIAttackState : State{
                     if (hittableObject is IDamageable) {
                         IDamageable damageableObject = (IDamageable)hittableObject;
                         if (damageableObject.CanBeDamaged()) {
-                            if (damageableObject is IShieldable && ((IShieldable)damageableObject).IsShielded()) {
+                            if (damageableObject is IShieldable && ((IShieldable)damageableObject).IsShielded() && HittableObjectIsFacingAttacker(hitData.hittableObject)) {
                                 Parried?.Invoke();
                                 
                             } else {
@@ -66,6 +67,13 @@ public class AIAttackState : State{
                 }
             }
         }
+    }
+
+    private bool HittableObjectIsFacingAttacker(IHittable hittableObject) {
+        Vector2 attackedHorizontalForward = hittableObject.GetTransform().forward.XZ().normalized;
+        Vector2 attackerHorizontalForward = settings.Transform.forward.XZ().normalized;
+
+        return Vector2.Angle(attackerHorizontalForward, -attackedHorizontalForward) < settings.BlockableAttackAngleThreshold;
     }
 
     protected override void OnExit() {
