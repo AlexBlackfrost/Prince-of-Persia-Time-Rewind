@@ -306,6 +306,7 @@ MonoBehaviour:
     stopApproachingPlayerAcceptanceDotProduct: 0.8
   AIAttackSettings:
     <RotationSpeed>k__BackingField: 8
+    <BlockableAttackAngleThreshold>k__BackingField: 100
 --- !u!143 &58233412
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1290,12 +1291,16 @@ PrefabInstance:
       value: DarkEchion
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_TagString
-      value: Player
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 986733608626484135, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -3131,6 +3136,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_Name
       value: Echion
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_IsActive
@@ -5976,6 +5985,7 @@ MonoBehaviour:
   attackSettings:
     <AttackPressedBufferTime>k__BackingField: 0.3
     <RotationSpeed>k__BackingField: 18
+    <BlockableAttackAngleThreshold>k__BackingField: 100
   rollSettings:
     rollSpeed:
       serializedVersion: 2
@@ -6012,6 +6022,9 @@ MonoBehaviour:
       m_RotationOrder: 4
     rollSpeedMultiplier: 15
     rollRotationSpeed: 8
+  strafeSettings:
+    StrafeSpeed: 8
+    RotationSpeed: 8
 --- !u!114 &1920022716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6149,6 +6162,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   groundHeight: 2
+  enemyDetectionRadius: 10
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!4 &1951035962 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5780113979703223108, guid: 64e21eea820652642b4052305e600684, type: 3}

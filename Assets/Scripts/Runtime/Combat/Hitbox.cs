@@ -63,7 +63,7 @@ public class Hitbox : MonoBehaviour {
                 Vector3 hitLocation;
 
                 /* "For colliders that overlap the capsule at the start of the sweep, RaycastHit.normal is set opposite to the direction of the sweep, 
-                 * RaycastHit.distance is set to zero, and the zero vector gets returned in RaycastHit.point*/
+                 * RaycastHit.distance is set to zero, and the zero vector gets returned in RaycastHit.point" */
                 if(raycastHit.point == Vector3.zero && raycastHit.distance == 0) {
                     hitLocation = raycastHit.collider.ClosestPoint(point1);
                 } else {

@@ -22,9 +22,13 @@ public class PlayerPerceptionSystem : MonoBehaviour {
     public LayerMask jumpGroundMask;
     public float groundHeight = 2f;
 
+    [Header("Enemy")]
+    public float enemyDetectionRadius = 4;
+    public LayerMask enemyMask;
+
 
     private int AheadDistanceSteps = 5;
-
+    public Collider[] CurrentDetectedEnemies { get; set; }
     public GameObject CurrentWall { get; private set; }
     public Direction CurrentWallDirection { get; private set; }
 
@@ -107,6 +111,15 @@ public class PlayerPerceptionSystem : MonoBehaviour {
         }
 
         return groundAhead;
+    }
+
+    public void ScanEnemies() {
+        CurrentDetectedEnemies = Physics.OverlapSphere(transform.position, enemyDetectionRadius, enemyMask);
+    }
+
+    public bool IsEnemyNear() {
+        ScanEnemies();
+        return CurrentDetectedEnemies.Length > 0;
     }
 }
 
