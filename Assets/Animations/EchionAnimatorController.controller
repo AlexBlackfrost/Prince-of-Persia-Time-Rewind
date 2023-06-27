@@ -353,6 +353,31 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &-5719477411850520106
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 2
+    m_ConditionEvent: Strafe
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -482161282245791972}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 0.6296296
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &-5687849677691177608
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -438,7 +463,7 @@ AnimatorStateMachine:
     m_Position: {x: 720, y: 120, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -4078097232933839920}
-    m_Position: {x: 0, y: 0, z: 0}
+    m_Position: {x: 730, y: -50, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -447,7 +472,7 @@ AnimatorStateMachine:
   m_AnyStatePosition: {x: 10, y: 70, z: 0}
   m_EntryPosition: {x: 20, y: 120, z: 0}
   m_ExitPosition: {x: 50, y: -20, z: 0}
-  m_ParentStateMachinePosition: {x: 490, y: -20, z: 0}
+  m_ParentStateMachinePosition: {x: 240, y: -40, z: 0}
   m_DefaultState: {fileID: -2908881634691724946}
 --- !u!1102 &-4503080026958232606
 AnimatorState:
@@ -456,10 +481,11 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Blend Tree
+  m_Name: Strafe
   m_Speed: 1
   m_CycleOffset: 0
-  m_Transitions: []
+  m_Transitions:
+  - {fileID: -5719477411850520106}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
@@ -1172,6 +1198,7 @@ AnimatorState:
   - {fileID: -2154533731734258452}
   - {fileID: -8733994821421447837}
   - {fileID: 4612181601336732525}
+  - {fileID: 9041314923970790030}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
@@ -1298,14 +1325,20 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
-  - m_Name: StrafeHorizontal
+  - m_Name: StrafeSide
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
-  - m_Name: StrafeVertical
+  - m_Name: StrafeForward
     m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 0}
+  - m_Name: Strafe
+    m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
@@ -2059,7 +2092,7 @@ AnimatorStateTransition:
   m_ExitTime: 0.74137926
   m_HasExitTime: 0
   m_HasFixedDuration: 1
-  m_InterruptionSource: 0
+  m_InterruptionSource: 1
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
 --- !u!114 &5207412065336477749
@@ -2142,7 +2175,7 @@ BlendTree:
     m_Motion: {fileID: -623603649343465320, guid: 750833a9134fe8248b36f98a3b1733f7, type: 3}
     m_Threshold: 0
     m_Position: {x: 1, y: 0}
-    m_TimeScale: 1
+    m_TimeScale: 1.25
     m_CycleOffset: 0
     m_DirectBlendParameter: UnsheatheSpeedMultiplier
     m_Mirror: 0
@@ -2150,7 +2183,7 @@ BlendTree:
     m_Motion: {fileID: -623603649343465320, guid: 9e292067b05964b4d869177a3d837718, type: 3}
     m_Threshold: 0.125
     m_Position: {x: -1, y: 0}
-    m_TimeScale: 1
+    m_TimeScale: 1.25
     m_CycleOffset: 0
     m_DirectBlendParameter: UnsheatheSpeedMultiplier
     m_Mirror: 0
@@ -2166,7 +2199,7 @@ BlendTree:
     m_Motion: {fileID: -623603649343465320, guid: 327849d95a1b8414b9cb6c7967558106, type: 3}
     m_Threshold: 0.375
     m_Position: {x: 0, y: -1}
-    m_TimeScale: 1
+    m_TimeScale: 1.25
     m_CycleOffset: 0
     m_DirectBlendParameter: UnsheatheSpeedMultiplier
     m_Mirror: 0
@@ -2174,7 +2207,7 @@ BlendTree:
     m_Motion: {fileID: -623603649343465320, guid: 41e8aa948b145e34c9a81c3c45d83a22, type: 3}
     m_Threshold: 0.5
     m_Position: {x: 1, y: 1}
-    m_TimeScale: 1
+    m_TimeScale: 1.25
     m_CycleOffset: 0
     m_DirectBlendParameter: UnsheatheSpeedMultiplier
     m_Mirror: 0
@@ -2182,7 +2215,7 @@ BlendTree:
     m_Motion: {fileID: -623603649343465320, guid: 11219b396f834ee49954d63b2df1b26a, type: 3}
     m_Threshold: 0.625
     m_Position: {x: -1, y: -1}
-    m_TimeScale: 1
+    m_TimeScale: 1.25
     m_CycleOffset: 0
     m_DirectBlendParameter: UnsheatheSpeedMultiplier
     m_Mirror: 0
@@ -2190,7 +2223,7 @@ BlendTree:
     m_Motion: {fileID: -623603649343465320, guid: 0ff321190ec7f484f902dab3a0af48eb, type: 3}
     m_Threshold: 0.75
     m_Position: {x: 1, y: -1}
-    m_TimeScale: 1
+    m_TimeScale: 1.25
     m_CycleOffset: 0
     m_DirectBlendParameter: UnsheatheSpeedMultiplier
     m_Mirror: 0
@@ -2198,12 +2231,12 @@ BlendTree:
     m_Motion: {fileID: -623603649343465320, guid: 569b2273641101249a9f06d5145e2dba, type: 3}
     m_Threshold: 0.875
     m_Position: {x: -1, y: 1}
-    m_TimeScale: 1
+    m_TimeScale: 1.25
     m_CycleOffset: 0
     m_DirectBlendParameter: UnsheatheSpeedMultiplier
     m_Mirror: 0
-  m_BlendParameter: StrafeHorizontal
-  m_BlendParameterY: StrafeVertical
+  m_BlendParameter: StrafeSide
+  m_BlendParameterY: StrafeForward
   m_MinThreshold: 0
   m_MaxThreshold: 0.875
   m_UseAutomaticThresholds: 1
@@ -2595,7 +2628,7 @@ AnimatorStateMachine:
     m_Position: {x: 300, y: 610, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -4503080026958232606}
-    m_Position: {x: 7.958069, y: 5.88266, z: 0}
+    m_Position: {x: 0, y: 280, z: 0}
   m_ChildStateMachines:
   - serializedVersion: 1
     m_StateMachine: {fileID: 6738370339932853861}
@@ -2979,6 +3012,31 @@ AnimatorTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 1
+--- !u!1101 &9041314923970790030
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: Strafe
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -4503080026958232606}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 0.9892396
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1102 &9098000968833624890
 AnimatorState:
   serializedVersion: 6

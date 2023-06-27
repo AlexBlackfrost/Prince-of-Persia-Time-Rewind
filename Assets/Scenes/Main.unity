@@ -6025,6 +6025,7 @@ MonoBehaviour:
   strafeSettings:
     StrafeSpeed: 8
     RotationSpeed: 8
+    StrafeAnimationSmoothTime: 0.1
 --- !u!114 &1920022716
 MonoBehaviour:
   m_ObjectHideFlags: 0

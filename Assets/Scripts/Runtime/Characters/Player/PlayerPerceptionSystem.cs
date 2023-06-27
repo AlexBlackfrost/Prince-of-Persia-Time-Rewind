@@ -23,7 +23,8 @@ public class PlayerPerceptionSystem : MonoBehaviour {
     public float groundHeight = 2f;
 
     [Header("Enemy")]
-    public float enemyDetectionRadius = 4;
+    public float enemyStrafeDetectionRadius = 4;
+    public float enemyStrafeIgnoreRadius = 5;
     public LayerMask enemyMask;
 
 
@@ -113,12 +114,25 @@ public class PlayerPerceptionSystem : MonoBehaviour {
         return groundAhead;
     }
 
-    public void ScanEnemies() {
-        CurrentDetectedEnemies = Physics.OverlapSphere(transform.position, enemyDetectionRadius, enemyMask);
+    public void ScanEnemiesInStrafeDetectionRadius() {
+        ScanEnemies(enemyStrafeDetectionRadius);
     }
 
-    public bool IsEnemyNear() {
-        ScanEnemies();
+    public void ScanEnemiesInStrafeIgnoreRadius() {
+        ScanEnemies(enemyStrafeIgnoreRadius);
+    }
+
+    private void ScanEnemies(float radius) {
+        CurrentDetectedEnemies = Physics.OverlapSphere(transform.position, radius, enemyMask);
+    }
+
+    public bool IsEnemyNearToStrafe() {
+        ScanEnemies(enemyStrafeDetectionRadius);
+        return CurrentDetectedEnemies.Length > 0;
+    }
+
+    public bool IsEnemyFarToStrafe() {
+        ScanEnemies(enemyStrafeIgnoreRadius);
         return CurrentDetectedEnemies.Length > 0;
     }
 }

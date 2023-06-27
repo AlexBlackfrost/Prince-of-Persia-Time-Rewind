@@ -13,27 +13,31 @@ public class StrafeState : State {
 		public InputController InputController { get; set; }
 		public float StrafeSpeed = 8;
 		public float RotationSpeed = 8;
+		public float StrafeAnimationSmoothTime = 0.1f;
     }
 
 	private StrafeSettings settings;
+	private float strafeSideAnimationVelocity;
+	private float strafeForwardAnimationVelocity;
 	public StrafeState(StrafeSettings settings) : base() {
 		this.settings = settings;
 	}
 
 	protected override void OnUpdate() {
 		Vector2 inputDirection = settings.InputController.GetMoveDirection();
-		settings.PerceptionSystem.ScanEnemies();
+		settings.PerceptionSystem.ScanEnemiesInStrafeIgnoreRadius();
 		Transform closestEnemy = GetClosestEnemyTransform(inputDirection);
 
 		UpdateStrafeMovement(inputDirection, closestEnemy);
+		UpdateAnimation(inputDirection);
 	}
 
 	protected override void OnEnter() {
-		
+		settings.Animator.SetBool(AnimatorUtils.strafeHash, true);
 	}
 
 	protected override void OnExit() {
-	
+		settings.Animator.SetBool(AnimatorUtils.strafeHash, false);
 	}
 
 	private Transform GetClosestEnemyTransform(Vector2 inputDirection) {
@@ -71,4 +75,32 @@ public class StrafeState : State {
 		Quaternion rotation = Quaternion.Slerp(settings.Transform.rotation, targetRotation, settings.RotationSpeed * Time.deltaTime);
 		settings.CharacterMovement.SetRotation(rotation);
 	}
+
+	private void UpdateAnimation(Vector2 inputDirection) {
+		Vector2 cameraRelativeInputDirection = settings.MainCamera.transform.TransformDirection(inputDirection.x, 0, inputDirection.y).XZ().normalized;
+		Vector2 characterRelativeDirection = settings.Transform.InverseTransformDirection(cameraRelativeInputDirection.x, 0, cameraRelativeInputDirection.y).XZ().normalized;
+
+		/*Round the vector coordinates to integer values since those are the ones that look better.
+		* Non integer values output a blended pose that doesn't look really good. 
+		* Blended poses should only be used for abrief amount of time when interpolating with SmoothDamp.*/
+		Vector2 discretizedCharacterRelativeDirection = Discretize(characterRelativeDirection);
+
+		float currentStrafeSideSpeed = settings.Animator.GetFloat(AnimatorUtils.strafeSideHash);
+		float currentStrafeForwardSpeed = settings.Animator.GetFloat(AnimatorUtils.strafeForwardHash);
+
+		float targetStrafeSideSpeed = Mathf.SmoothDamp(currentStrafeSideSpeed, discretizedCharacterRelativeDirection.x, 
+													   ref strafeSideAnimationVelocity, settings.StrafeAnimationSmoothTime);
+		float targetStrafeForwardSpeed = Mathf.SmoothDamp(currentStrafeForwardSpeed, discretizedCharacterRelativeDirection.y, 
+														  ref strafeForwardAnimationVelocity, settings.StrafeAnimationSmoothTime);
+		
+		settings.Animator.SetFloat(AnimatorUtils.strafeSideHash, targetStrafeSideSpeed);
+		settings.Animator.SetFloat(AnimatorUtils.strafeForwardHash, targetStrafeForwardSpeed);
+		
+    }
+
+	private Vector2 Discretize(Vector2 input) {
+		input.x = Mathf.RoundToInt(input.x);
+		input.y = Mathf.RoundToInt(input.y);
+		return input;
+    }
 }

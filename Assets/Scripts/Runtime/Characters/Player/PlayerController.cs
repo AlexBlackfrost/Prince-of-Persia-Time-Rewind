@@ -88,13 +88,13 @@ public class PlayerController : MonoBehaviour {
         InputController.Roll.performed += idleState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         InputController.Block.performed += idleState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
-        idleState.AddTransition(strafeState, IsMoving, SwordIsInHand, perceptionSystem.IsEnemyNear);
+        idleState.AddTransition(strafeState, IsMoving, SwordIsInHand, perceptionSystem.IsEnemyNearToStrafe);
         idleState.AddTransition(moveState, IsMoving);
         hurtbox.DamageReceived += idleState.AddEventTransition<float>(damagedState);
         InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
          
         // Move ->
-        moveState.AddTransition(strafeState, IsMoving, SwordIsInHand, perceptionSystem.IsEnemyNear);
+        moveState.AddTransition(strafeState, IsMoving, SwordIsInHand, perceptionSystem.IsEnemyNearToStrafe);
         InputController.Roll.performed += moveState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
         hurtbox.DamageReceived += moveState.AddEventTransition<float>(damagedState);
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
@@ -138,7 +138,7 @@ public class PlayerController : MonoBehaviour {
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded, (int shortNameHash) => IsNotMoving());
 
         // Strafe ->
-        strafeState.AddTransition(moveState, () => !perceptionSystem.IsEnemyNear());
+        strafeState.AddTransition(moveState, () => !perceptionSystem.IsEnemyFarToStrafe());
         strafeState.AddTransition(idleState, IsNotMoving);
 
         // Damaged ->

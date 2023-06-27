@@ -11,6 +11,9 @@ public static class AnimatorUtils  {
     public static int jumpHash = Animator.StringToHash("Jump");
     public static int fallHash = Animator.StringToHash("Fall");
     public static int landHash = Animator.StringToHash("Land");
+    public static int strafeHash = Animator.StringToHash("Strafe");
+    public static int strafeSideHash = Animator.StringToHash("StrafeSide");
+    public static int strafeForwardHash = Animator.StringToHash("StrafeForward");
     public static int wallRunHash = Animator.StringToHash("WallRun");
     public static int wallRunDirectionHash = Animator.StringToHash("WallRunDirection");
     public static int wallRunRightHash = Animator.StringToHash("WallRunRight");
