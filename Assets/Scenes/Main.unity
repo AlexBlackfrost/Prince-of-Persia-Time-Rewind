@@ -3528,7 +3528,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: cc455ce04f9969c4c89300fd7d1413b9, type: 2}
+      objectReference: {fileID: 9100000, guid: 026742e955a6881448f67f0a31211d1c, type: 2}
     - target: {fileID: 5866666021909216657, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -6163,7 +6163,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   groundHeight: 2
-  enemyDetectionRadius: 10
+  enemyStrafeDetectionRadius: 4
+  enemyStrafeIgnoreRadius: 5
   enemyMask:
     serializedVersion: 2
     m_Bits: 256
