@@ -13,6 +13,7 @@ public class AttackState : State {
         public InputController InputController { get; set; }
         public CharacterMovement CharacterMovement { get; set; }
         public Transform Transform { get; set; }
+        public PlayerPerceptionSystem PerceptionSystem { get; set; }
         [field: SerializeField] public float AttackPressedBufferTime { get; private set; }  = 0.3f;
         [field: SerializeField] public float RotationSpeed { get; private set; }  = 5f;
         [field: SerializeField] public float BlockableAttackAngleThreshold { get; private set; } = 100;
@@ -35,6 +36,7 @@ public class AttackState : State {
     private bool rotationEnabled;
     private Camera mainCamera;
     private HashSet<IHittable> alreadyHitObjects;
+    private Transform closestAttackTarget;
 
     public AttackState(AttackSettings settings) : base() {
         this.settings = settings;
@@ -68,6 +70,11 @@ public class AttackState : State {
 
         settings.Animator.applyRootMotion = true;
         settings.Animator.SetBool(attackHash, true);
+
+        closestAttackTarget = null;
+        if(settings.PerceptionSystem.IsEnemyInsideStrafeDetectionRadius()) {
+            closestAttackTarget = settings.PerceptionSystem.CurrentDetectedEnemies[0].transform;
+        }
     }
 
     protected override void OnUpdate() {
@@ -103,8 +110,14 @@ public class AttackState : State {
 
     private void UpdateRotation() {
         if (rotationEnabled) {
-            Vector2 inputDirection = settings.InputController.GetMoveDirection();
-            Vector3 moveDirection = mainCamera.transform.TransformDirection(inputDirection.x, 0, inputDirection.y);
+            Vector3  moveDirection = Vector3.zero;
+            if (closestAttackTarget == null) { // No target near, use input direction
+                Vector2 inputDirection = settings.InputController.GetMoveDirection();
+                moveDirection = mainCamera.transform.TransformDirection(inputDirection.x, 0, inputDirection.y);
+                
+            } else { // target near, lock attack direction towards target
+                moveDirection = (closestAttackTarget.position - settings.Transform.position);
+            }
             moveDirection.y = 0;
             moveDirection.Normalize();
 

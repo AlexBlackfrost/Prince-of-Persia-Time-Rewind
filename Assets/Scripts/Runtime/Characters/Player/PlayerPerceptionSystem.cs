@@ -126,12 +126,13 @@ public class PlayerPerceptionSystem : MonoBehaviour {
         CurrentDetectedEnemies = Physics.OverlapSphere(transform.position, radius, enemyMask);
     }
 
-    public bool IsEnemyNearToStrafe() {
+    public bool IsEnemyInsideStrafeDetectionRadius() {
         ScanEnemies(enemyStrafeDetectionRadius);
         return CurrentDetectedEnemies.Length > 0;
     }
 
-    public bool IsEnemyFarToStrafe() {
+
+    public bool IsEnemyInsideStrafeIgnoreRadius() {
         ScanEnemies(enemyStrafeIgnoreRadius);
         return CurrentDetectedEnemies.Length > 0;
     }
