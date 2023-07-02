@@ -251,6 +251,8 @@ public class Sword : MonoBehaviour {
 
     #region Hit detection
     public void SetHitboxEnabled(Bool enabled) {
+
+        //Debug.Log(owner.name+ " hitbox Enabled: " + enabled);
         hitboxEnabled = Convert.ToBoolean((int)enabled);
     }
 

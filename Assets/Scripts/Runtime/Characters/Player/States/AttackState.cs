@@ -171,16 +171,24 @@ public class AttackState : State {
     }
 
     private void OnAnimationEnded(int shortNameHash) {
-        if(shortNameHash == comboAttackNameHashes[MAX_ATTACK_COMBO - 1]) { // Last combo attack finished
+        if (shortNameHash == comboAttackNameHashes[MAX_ATTACK_COMBO - 1]) { // Last combo attack finished
             AttackEnded.Invoke();
-        } else if (!followedCombo){ // Other combo attacks finished but player didn't keep pressing attack
-            foreach(int comboAttackNameHash in comboAttackNameHashes) {
+        } else if (!followedCombo) { // Other combo attacks finished but player didn't keep pressing attack
+            foreach (int comboAttackNameHash in comboAttackNameHashes) {
                 if (comboAttackNameHash == shortNameHash) {
                     AttackEnded.Invoke();
                     break;
                 }
             }
         }
+
+        /* Cant disable hitbox at OnExit() function because the animation event that enables the hitbox is fired after 
+         * exiting this state, that is, while transitioning to a different animation state. Since the event at the end of 
+         * the animation won't be fired if the transition ends before, here's where the hitbox is disabled safely */
+        if (shortNameHash == AnimatorUtils.attack1Hash || shortNameHash == AnimatorUtils.attack2Hash || shortNameHash == AnimatorUtils.attack3Hash) {
+            settings.Sword.SetHitboxEnabled(Bool.False);
+        }
+        
     }
 
     private bool HittableObjectIsFacingAttacker(IHittable hittableObject) {
@@ -207,4 +215,6 @@ public class AttackState : State {
         this.alreadyHitObjects.CopyTo(alreadyHitObjects);
         return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo, alreadyHitObjects);
     }
+
+    
 }

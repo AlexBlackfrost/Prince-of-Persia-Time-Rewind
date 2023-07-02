@@ -15,6 +15,7 @@ public class AIAttackState : State{
         public GameObject Target { get; set; }
         public Transform Transform { get; set; }
         public Sword Sword { get; set; }
+        public Hurtbox Hurtbox { get; set; }
     }
     public Action Parried;
 
@@ -23,6 +24,7 @@ public class AIAttackState : State{
     public AIAttackState(AIAttackSettings settings) {
         this.settings = settings;
         alreadyHitObjects = new HashSet<IHittable>();
+        AnimatorUtils.AnimationEnded += OnAnimationEnded;
     }
 
     protected override void OnEnter() {
@@ -60,6 +62,7 @@ public class AIAttackState : State{
                                 
                             } else {
                                 damageableObject.ReceiveDamage(settings.Sword.Damage);
+                                Debug.Log("Damaged");
                             }
                         }
 
@@ -81,6 +84,8 @@ public class AIAttackState : State{
         settings.Animator.SetBool(AnimatorUtils.attackHash, false);
         settings.Sword.StartCooldown();
         alreadyHitObjects.Clear();
+
+        settings.Hurtbox.IsInvincible = false;
     }
 
     public override void RestoreFieldsAndProperties(object stateObjectRecord) {
@@ -92,5 +97,15 @@ public class AIAttackState : State{
         IHittable[] alreadyHitObjects = new IHittable[this.alreadyHitObjects.Count];
         this.alreadyHitObjects.CopyTo(alreadyHitObjects);
         return new AIAttackStateRecord(alreadyHitObjects);
+    }
+
+    public void OnAnimationEnded(int shortNameHash) {
+        /* Cant disable hitbox at OnExit() function because the animation event that enables the hitbox is fired after 
+         * exiting this state, that is, while transitioning to a different animation state. Since the event at the end of 
+         * the animation won't be fired if the transition ends before, here's where the hitbox is disabled safely */
+        if(shortNameHash == AnimatorUtils.AIAttackHash) {
+            Debug.Log("Dark Echion hitbox Enabled code: False");
+            settings.Sword.SetHitboxEnabled(Bool.False);
+        }
     }
 }

@@ -144,6 +144,7 @@ public class PlayerController : MonoBehaviour {
 
         // Strafe ->
         InputController.Attack.performed += strafeState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
+        hurtbox.DamageReceived += strafeState.AddEventTransition<float>(damagedState);
         strafeState.AddTransition(moveState, () => !perceptionSystem.IsEnemyInsideStrafeIgnoreRadius());
         InputController.Block.performed += strafeState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
         strafeState.AddTransition(idleState, IsNotMoving);
@@ -333,6 +334,18 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void SetHitboxEnabled(Bool enabled) {
+        int attackLayerIndex = 0;
+        // Don't enable hitbox when the animation event is fired during an animation transitions whose source state is AIAttack.
+        if (animator.IsInTransition(attackLayerIndex)) {
+            AnimatorStateInfo currentStateInfo = animator.GetCurrentAnimatorStateInfo(attackLayerIndex);
+            if (enabled == Bool.False || (currentStateInfo.shortNameHash != AnimatorUtils.attack1Hash && 
+                                          currentStateInfo.shortNameHash != AnimatorUtils.attack2Hash &&
+                                          currentStateInfo.shortNameHash != AnimatorUtils.attack3Hash )) {
+                sword.SetHitboxEnabled(enabled);
+            }
+        } else {
+            sword.SetHitboxEnabled(enabled);
+        }
         sword.SetHitboxEnabled(enabled);
     }
 

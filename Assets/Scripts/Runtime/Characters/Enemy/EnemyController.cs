@@ -64,6 +64,7 @@ public class EnemyController : MonoBehaviour{
         AIAttackSettings.Transform = transform;
         AIAttackSettings.CharacterMovement = characterMovement;
         AIAttackSettings.Sword = sword;
+        AIAttackSettings.Hurtbox = hurtbox;
 
         timeControlSettings.Transform = transform;
         timeControlSettings.Animator = animator;
@@ -117,6 +118,7 @@ public class EnemyController : MonoBehaviour{
 
         // AIAttack ->
         AnimatorUtils.AnimationEnded += AIAttackState.AddEventTransition<int>(idleState, AIAttackEnded);
+        hurtbox.DamageReceived += AIAttackState.AddEventTransition<float>(damagedState);
         AIAttackState.Parried += AIAttackState.AddEventTransition(parriedState);
 
         // Damaged ->
@@ -200,10 +202,26 @@ public class EnemyController : MonoBehaviour{
     #region Animation events
     public void SetHitboxEnabled(Bool enabled) {
         sword.SetHitboxEnabled(enabled);
+       
+        /*
+        int AIAttackLayerIndex = 0;
+        // Don't enable hitbox when the animation event is fired during an animation transitions whose source state is AIAttack.
+        if (animator.IsInTransition(AIAttackLayerIndex)) {
+            AnimatorStateInfo currentStateInfo = animator.GetCurrentAnimatorStateInfo(AIAttackLayerIndex);
+            if((currentStateInfo.shortNameHash != AnimatorUtils.AIAttackHash) || enabled == Bool.False) {
+                sword.SetHitboxEnabled(enabled);
+            }
+        } else {
+            sword.SetHitboxEnabled(enabled);
+        }*/
     }
 
     public void SetIsShielded(Bool enabled) {
         hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+    }
+
+    public void SetHurtboxInvincible(Bool invincible) {
+        hurtbox.IsInvincible = Convert.ToBoolean((int)invincible);
     }
 
     #endregion
