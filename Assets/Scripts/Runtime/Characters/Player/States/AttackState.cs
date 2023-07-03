@@ -206,14 +206,14 @@ public class AttackState : State {
         comboEnabled = record.comboEnabled;
         rotationEnabled = record.rotationEnabled;
         followedCombo = record.followedCombo;
-
+        closestAttackTarget = record.closestAttackTarget;
         alreadyHitObjects = new HashSet<IHittable>(record.alreadyHitObjects);
     }
 
     public override object RecordFieldsAndProperties() {
         IHittable[] alreadyHitObjects = new IHittable[this.alreadyHitObjects.Count];
         this.alreadyHitObjects.CopyTo(alreadyHitObjects);
-        return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo, alreadyHitObjects);
+        return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo, alreadyHitObjects, closestAttackTarget);
     }
 
     

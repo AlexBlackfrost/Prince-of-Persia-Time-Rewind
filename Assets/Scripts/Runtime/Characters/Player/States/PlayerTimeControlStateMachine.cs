@@ -160,6 +160,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 		animationTimeControl.RestoreAnimationRecord(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, 
 													elapsedTimeSinceLastRecord);
+		animationTimeControl.RestoreAnimatorFloatParameters(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime,
+													elapsedTimeSinceLastRecord);
 
 		characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
 																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);

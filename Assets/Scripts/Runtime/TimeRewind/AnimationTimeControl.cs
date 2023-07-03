@@ -92,7 +92,7 @@ public class AnimationTimeControl {
 	}
 
 	public void RestoreAnimatorParameters(AnimationRecord previousRecord) {
-		foreach (AnimationParameter parameter in previousRecord.parameters) {
+		foreach(AnimationParameter parameter in previousRecord.parameters) {
 			switch (parameter.type) {
 				case AnimatorControllerParameterType.Float:
 					animator.SetFloat(parameter.nameHash, (float)parameter.value);
@@ -112,6 +112,17 @@ public class AnimationTimeControl {
 					}
 					break;
 			}
+		}
+	}
+
+	public void RestoreAnimatorFloatParameters(AnimationRecord previousRecord, AnimationRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
+		for (int i = 0; i < previousRecord.parameters.Length; i++) {
+			AnimationParameter parameter = previousRecord.parameters[i];
+			if (parameter.type == AnimatorControllerParameterType.Float) {
+				float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
+				float interpolatedValue = Mathf.Lerp((float)parameter.value, (float)nextRecord.parameters[i].value, lerpAlpha);
+				animator.SetFloat(parameter.nameHash, interpolatedValue);
+			}	
 		}
 	}
 

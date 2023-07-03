@@ -24,10 +24,11 @@ public class HurtboxTimeControl {
                                                      elapsedTimeSinceLastRecord / previousRecordDeltaTime);
 
         hurtbox.SetIsShielded(previousRecord.isShielded);
-        hurtbox.IsDamageableRemainingTime = isDamageableRemainingTime; 
+        hurtbox.IsDamageableRemainingTime = isDamageableRemainingTime;
+        hurtbox.IsInvincible = previousRecord.isInvincible;
     }
 
     public HurtboxRecord RecordHurtboxData() {
-        return new HurtboxRecord(hurtbox.IsDamageableRemainingTime, hurtbox.IsShielded());
+        return new HurtboxRecord(hurtbox.IsDamageableRemainingTime, hurtbox.IsShielded(), hurtbox.IsInvincible);
     }
 }

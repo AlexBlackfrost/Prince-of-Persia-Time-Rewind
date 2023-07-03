@@ -166,13 +166,25 @@ public struct AttackStateRecord {
     public bool rotationEnabled;
     public bool followedCombo;
     public IHittable[] alreadyHitObjects;
+    public Transform closestAttackTarget;
 
-    public AttackStateRecord(int attackIndex, bool comboEnabled, bool rotationEnabled, bool followedCombo, IHittable[] alreadyHitObjects) {
+    public AttackStateRecord(int attackIndex, bool comboEnabled, bool rotationEnabled, bool followedCombo, IHittable[] alreadyHitObjects, Transform attackTarget) {
         this.attackIndex = attackIndex;
         this.comboEnabled = comboEnabled;
         this.rotationEnabled = rotationEnabled;
         this.followedCombo = followedCombo;
         this.alreadyHitObjects = alreadyHitObjects;
+        this.closestAttackTarget = attackTarget;
+    }
+}
+
+public struct StrafeStateRecord {
+    public float strafeSideAnimationVelocity;
+    public float strafeForwardAnimationVelocity;
+
+    public StrafeStateRecord(float strafeSideAnimationVelocity, float strafeForwardAnimationVelocity) {
+        this.strafeSideAnimationVelocity = strafeSideAnimationVelocity;
+        this.strafeForwardAnimationVelocity = strafeForwardAnimationVelocity;
     }
 }
 
@@ -236,10 +248,12 @@ public struct HealthRecord {
 public struct HurtboxRecord {
     public float isDamageableRemainingTime;
     public bool isShielded;
+    public bool isInvincible;
 
-    public HurtboxRecord(float isDamageableRemainingTime, bool isShielded) {
+    public HurtboxRecord(float isDamageableRemainingTime, bool isShielded, bool isInvincible) {
         this.isDamageableRemainingTime = isDamageableRemainingTime;
         this.isShielded = isShielded;
+        this.isInvincible = isInvincible;
     }
 }
 

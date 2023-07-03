@@ -103,4 +103,14 @@ public class StrafeState : State {
 		input.y = Mathf.RoundToInt(input.y);
 		return input;
     }
+
+	public override void RestoreFieldsAndProperties(object stateObjectRecord) {
+		StrafeStateRecord record = (StrafeStateRecord)stateObjectRecord;
+		strafeSideAnimationVelocity = record.strafeSideAnimationVelocity;
+		strafeForwardAnimationVelocity = record.strafeForwardAnimationVelocity;
+	}
+
+	public override object RecordFieldsAndProperties() {
+		return new StrafeStateRecord(strafeSideAnimationVelocity, strafeForwardAnimationVelocity);
+	}
 }
