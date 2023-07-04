@@ -33,6 +33,10 @@ public class JumpState : State {
 
 		settings.Animator.applyRootMotion = false;
 	}
+	public override object RecordFieldsAndProperties() {
+		return null;
+	}
 
+	public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }
 

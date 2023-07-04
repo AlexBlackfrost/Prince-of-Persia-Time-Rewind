@@ -483,12 +483,23 @@ namespace HFSM {
             return copy;
         }
 
-        public virtual void RestoreFieldsAndProperties(object stateObjectRecord) { }
-
-        public virtual object RecordFieldsAndProperties() {
-            return null; 
+        // Time rewind recording and restoring
+        protected StateObjectRecord RecordStateObject() {
+            return new StateObjectRecord(this, RecordFieldsAndProperties());
         }
+        public abstract object RecordFieldsAndProperties();
+        public abstract void RestoreFieldsAndProperties(object fieldsAndProperties);
+        public abstract StateObjectRecord[] RecordStateMachineHierarchy(int hiearchyDepth);
+        public abstract void RestoreStateMachineHierarchy(StateObjectRecord[] stateObjectRecords, int hiearchyDepth);
 
+    }
+    public struct StateObjectRecord {
+        public StateObject stateObject;
+        public object fieldsAndProperties;
+        public StateObjectRecord(StateObject stateObject, object stateObjectData) {
+            this.stateObject = stateObject;
+            this.fieldsAndProperties = stateObjectData;
+        }
     }
 }
 

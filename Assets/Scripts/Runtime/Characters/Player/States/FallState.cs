@@ -49,5 +49,11 @@ public class FallState : State {
     protected override void OnExit() {
         
     }
+
+    public override object RecordFieldsAndProperties() {
+        return null;
+    }
+
+    public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }
 

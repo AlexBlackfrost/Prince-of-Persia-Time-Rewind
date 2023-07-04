@@ -14,4 +14,10 @@ public class AliveStateMachine : StateMachine{
     public AliveStateMachine(AliveSettings settings, params StateObject[] stateObjects) :base(UpdateMode.UpdateBeforeChild, stateObjects) {
         this.settings = settings;
     }
+
+    public override object RecordFieldsAndProperties() {
+        return null;
+    }
+
+    public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

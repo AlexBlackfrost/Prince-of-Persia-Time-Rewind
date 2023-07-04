@@ -24,4 +24,10 @@ public class BlockState : State {
     protected override void OnExit() {
         settings.Hurtbox.SetIsShielded(false);
     }
+
+    public override object RecordFieldsAndProperties() {
+        return null;
+    }
+
+    public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

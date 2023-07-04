@@ -31,4 +31,9 @@ public class DeadState : State{
         }
     }
 
+    public override object RecordFieldsAndProperties() {
+        return null;
+    }
+
+    public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

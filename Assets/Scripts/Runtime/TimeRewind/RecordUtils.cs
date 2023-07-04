@@ -150,15 +150,8 @@ public struct TransitionRecord {
     }
 }
 
-public struct StateMachineRecord {
-    public Type[] hierarchy;
-    public object[] stateObjectRecords;
 
-    public StateMachineRecord(Type[] hierarchy, object[] stateObjectRecords) {
-        this.hierarchy = hierarchy;
-        this.stateObjectRecords = stateObjectRecords;
-    }
-}
+
 
 public struct AttackStateRecord {
     public int attackIndex;

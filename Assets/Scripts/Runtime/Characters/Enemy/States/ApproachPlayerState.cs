@@ -56,4 +56,10 @@ public class ApproachPlayerState : State{
         return distanceXZ < settings.stopApproachingPlayerAcceptanceRadius &&
                dotProduct >= settings.stopApproachingPlayerAcceptanceDotProduct;
     }
+
+    public override object RecordFieldsAndProperties() {
+        return null;
+    }
+
+    public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

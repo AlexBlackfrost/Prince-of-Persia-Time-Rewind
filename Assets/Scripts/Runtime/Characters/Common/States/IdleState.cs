@@ -27,5 +27,9 @@ public class IdleState : State {
 		settings.Sword.UnsheathingEnabled = false;
 	}
 
+	public override object RecordFieldsAndProperties() {
+		return null;
+	}
 
+	public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

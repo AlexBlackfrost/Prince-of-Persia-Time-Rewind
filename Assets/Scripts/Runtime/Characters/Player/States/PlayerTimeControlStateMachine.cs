@@ -103,7 +103,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		cameraTimeControl.OnTimeRewindStop();
 
 		// State machine
-		stateMachineTimeControl.RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
+		stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
 
 		// Transform
 		transformTimeControl.OnTimeRewindStop(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
@@ -175,8 +175,12 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 
-		Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());
+		Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.stateObjectRecords[0].stateObject.ToString());
 	}
 
+	public override object RecordFieldsAndProperties() {
+		return null;
+	}
 
+	public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

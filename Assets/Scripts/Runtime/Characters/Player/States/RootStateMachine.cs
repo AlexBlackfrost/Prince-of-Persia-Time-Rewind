@@ -18,4 +18,9 @@ public class RootStateMachine : StateMachine {
 	protected override void OnExit() {
 	
 	}
+	public override object RecordFieldsAndProperties() {
+		return null;
+	}
+
+	public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

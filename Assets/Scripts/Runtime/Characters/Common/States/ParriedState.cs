@@ -22,4 +22,10 @@ public class ParriedState : State{
     protected override void OnExit() {
         settings.Animator.SetBool(AnimatorUtils.parriedHash, false);
     }
+
+    public override object RecordFieldsAndProperties() {
+        return null;
+    }
+
+    public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

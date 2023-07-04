@@ -35,4 +35,10 @@ public class MoveState : State {
 		settings.Animator.SetBool(AnimatorUtils.runHash, false);
 		settings.Sword.UnsheathingEnabled = false;
 	}
+
+	public override object RecordFieldsAndProperties() {
+		return null;
+	}
+
+	public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

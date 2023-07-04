@@ -111,4 +111,10 @@ public class WallRunState : State {
 			settings.CharacterMovement.SetRotation(newRotation);
 		}
 	}
+
+	public override object RecordFieldsAndProperties() {
+		return null;
+	}
+
+	public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

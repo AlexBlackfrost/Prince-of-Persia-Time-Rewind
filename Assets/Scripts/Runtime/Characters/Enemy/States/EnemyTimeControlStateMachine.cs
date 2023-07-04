@@ -81,7 +81,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 
 		animationTimeControl.OnTimeRewindStop(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
-		stateMachineTimeControl.RestoreStateMachineRecord(settings.StateObjects, previousRecord.stateMachineRecord);
+		stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
 
 		transformTimeControl.OnTimeRewindStop(previousRecord.enemyTransform, nextRecord.enemyTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
@@ -148,6 +148,12 @@ public class EnemyTimeControlStateMachine : StateMachine {
 											  elapsedTimeSinceLastRecord);
 
 
-		Debug.Log("Enemy Rewinding... " + nextRecord.stateMachineRecord.hierarchy[0].ToString());
+		Debug.Log("Enemy Rewinding... " + nextRecord.stateMachineRecord.stateObjectRecords[0].stateObject.ToString());
 	}
+
+	public override object RecordFieldsAndProperties() {
+		return null;
+	}
+
+	public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

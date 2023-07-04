@@ -4,12 +4,7 @@ using UnityEngine;
 
 
 namespace HFSM {
-    public struct StateMachineRecord {
-        public bool initialized;
-        public StateMachineRecord(bool initialized) {
-            this.initialized = initialized;
-        }
-    }
+    
 
     public enum UpdateMode {  UpdateBeforeChild, UpdateAfterChild }
     /// <summary>
@@ -647,13 +642,37 @@ namespace HFSM {
             return copy;
         }
 
-        public override object RecordFieldsAndProperties() {
-            return new StateMachineRecord(initialized);
+        public override StateObjectRecord[] RecordStateMachineHierarchy(int hierarchyDepth) {
+            StateObjectRecord[] stateObjectRecords = CurrentStateObject.RecordStateMachineHierarchy(hierarchyDepth+1);
+            stateObjectRecords[hierarchyDepth - 1] = RecordStateObject();
+            return stateObjectRecords;
         }
 
-        public override void RestoreFieldsAndProperties(object stateObjectRecord) {
-            StateMachineRecord stateMachineRecord = (StateMachineRecord)stateObjectRecord;
+        public override void RestoreStateMachineHierarchy(StateObjectRecord[] stateObjectRecords, int hierarchyDepth) {
+            RestoreFieldsAndProperties(stateObjectRecords[hierarchyDepth].fieldsAndProperties);
+            CurrentStateObject = stateObjectRecords[hierarchyDepth+1].stateObject;
+            CurrentStateObject.RestoreStateMachineHierarchy(stateObjectRecords, hierarchyDepth + 1);
+            IsActive = true;
+        }
+
+        public StateMachineRecord RecordStateMachine() {
+            StateObjectRecord[] stateObjectRecords = RecordStateMachineHierarchy(1);
+            StateMachineRecord stateMachineRecord = new StateMachineRecord(initialized, stateObjectRecords);
+            return stateMachineRecord;
+        }
+
+        public void RestoreStateMachineRecord(StateMachineRecord stateMachineRecord) {
             initialized = stateMachineRecord.initialized;
+            RestoreStateMachineHierarchy(stateMachineRecord.stateObjectRecords, 0);
+        }
+    }
+
+    public struct StateMachineRecord {
+        public bool initialized;
+        public StateObjectRecord[] stateObjectRecords;
+        public StateMachineRecord(bool initialized, StateObjectRecord[] stateObjectRecords) {
+            this.initialized = initialized;
+            this.stateObjectRecords = stateObjectRecords;
         }
     }
 }

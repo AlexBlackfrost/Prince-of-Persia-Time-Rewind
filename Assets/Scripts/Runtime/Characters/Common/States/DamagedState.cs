@@ -26,4 +26,9 @@ public class DamagedState : State{
     protected override void OnUpdate() {
 
     }
+    public override object RecordFieldsAndProperties() {
+        return null;
+    }
+
+    public override void RestoreFieldsAndProperties(object fieldsAndProperties) { }
 }

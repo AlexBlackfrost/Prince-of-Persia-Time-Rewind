@@ -114,10 +114,36 @@ namespace HFSM {
             return copy;
         }
 
+        public override StateObjectRecord[] RecordStateMachineHierarchy(int hierarchyDepth) {
+            StateObjectRecord[] stateObjectRecords = new StateObjectRecord[hierarchyDepth];
+            stateObjectRecords[hierarchyDepth - 1] = RecordStateObject();
+            return stateObjectRecords;
+        }
+
+        public override void RestoreStateMachineHierarchy(StateObjectRecord[] stateObjectRecords, int hierarchyDepth) {
+            RestoreFieldsAndProperties(stateObjectRecords[hierarchyDepth].fieldsAndProperties);
+            IsActive = true;
+        }
         /// <summary>
         /// Definition of "Any State" used in <see cref="Transition"/>s from whose <see cref="Transition.OriginStateObject"/>
         /// can be any. 
         /// </summary>
-        internal class Any : State { }
+        internal class Any : State {
+            public override object RecordFieldsAndProperties() {
+                throw new NotImplementedException();
+            }
+
+            public override StateObjectRecord[] RecordStateMachineHierarchy(int hiearchyDepth) {
+                throw new NotImplementedException();
+            }
+
+            public override void RestoreFieldsAndProperties(object stateObjectRecord) {
+                throw new NotImplementedException();
+            }
+
+            public override void RestoreStateMachineHierarchy(StateObjectRecord[] stateObjectRecords, int hiearchyDepth) {
+                throw new NotImplementedException();
+            }
+        }
     }
 }
