@@ -36,7 +36,6 @@ public class PlayerController : MonoBehaviour {
     public RootStateMachine rootStateMachine;
 
     private Animator animator;
-    private Dictionary<Type, StateObject> stateObjects;
     private PlayerPerceptionSystem perceptionSystem;
 
 
@@ -47,7 +46,6 @@ public class PlayerController : MonoBehaviour {
         animator = GetComponent<Animator>();
         InputController = GetComponent<InputController>();
         perceptionSystem = GetComponent<PlayerPerceptionSystem>();
-        stateObjects = new Dictionary<Type, StateObject>();
 
         health.Init();
         sword.OnEquipped(this.gameObject);
@@ -82,7 +80,6 @@ public class PlayerController : MonoBehaviour {
         PlayerTimeControlStateMachine timeControlStateMachine = new PlayerTimeControlStateMachine(UpdateMode.UpdateAfterChild, timeControlSettings, 
                                                                                                   aliveStateMachine, deadState);
         rootStateMachine = new RootStateMachine(timeControlStateMachine);
-
         // Create transitions
         // Idle ->
         InputController.Roll.performed += idleState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
@@ -160,23 +157,6 @@ public class PlayerController : MonoBehaviour {
         // Alive ->
         health.Dead += aliveStateMachine.AddEventTransition(deadState);
 
-        // Store them to modify their values after rewinding
-        stateObjects[typeof(IdleState)] = idleState;
-        stateObjects[typeof(MoveState)] = moveState;
-        stateObjects[typeof(JumpState)] = jumpState;
-        stateObjects[typeof(WallRunState)] = wallRunState;
-        stateObjects[typeof(FallState)] = fallState;
-        stateObjects[typeof(LandState)] = landState;
-        stateObjects[typeof(AttackState)] = attackState;
-        stateObjects[typeof(RollState)] = rollState;
-        stateObjects[typeof(BlockState)] = blockState;
-        stateObjects[typeof(ParriedState)] = parriedState;
-        stateObjects[typeof(StrafeState)] = strafeState;
-        stateObjects[typeof(DeadState)] = deadState;
-        stateObjects[typeof(DamagedState)] = damagedState;
-        stateObjects[typeof(AliveStateMachine)] = aliveStateMachine;
-        stateObjects[typeof(PlayerTimeControlStateMachine)] = timeControlStateMachine;
-
     } 
 
     private void InjectHFSMDependencies() {
@@ -196,7 +176,6 @@ public class PlayerController : MonoBehaviour {
         timeControlSettings.Camera = Camera.main;
         timeControlSettings.Animator = animator;
         timeControlSettings.InputController = InputController;
-        timeControlSettings.StateObjects = stateObjects;
         timeControlSettings.CharacterMovement = characterMovement;
         timeControlSettings.Sword = sword;
         timeControlSettings.Health = health;

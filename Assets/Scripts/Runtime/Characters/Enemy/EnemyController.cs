@@ -25,7 +25,6 @@ public class EnemyController : MonoBehaviour{
     [field: SerializeField] private DeadState.DeadSettings deadSettings;
 
     private Animator animator;
-    private Dictionary<Type, StateObject> stateObjects;
     private EnemyPerceptionSystem perceptionSystem;
     private RootStateMachine rootStateMachine;
 
@@ -34,7 +33,6 @@ public class EnemyController : MonoBehaviour{
         characterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
-        stateObjects = new Dictionary<Type, StateObject>();
         
         enemyAI.Init();
         health.Init();
@@ -68,7 +66,6 @@ public class EnemyController : MonoBehaviour{
 
         timeControlSettings.Transform = transform;
         timeControlSettings.Animator = animator;
-        timeControlSettings.StateObjects = stateObjects;
         timeControlSettings.CharacterMovement = characterMovement;
         timeControlSettings.Health = health;
         timeControlSettings.Hurtbox = hurtbox;
@@ -137,15 +134,6 @@ public class EnemyController : MonoBehaviour{
         // Alive ->
         health.Dead += aliveStateMachine.AddEventTransition(deadState);
 
-        stateObjects[typeof(IdleState)] = idleState;
-        stateObjects[typeof(ApproachPlayerState)] = approachPlayerState;
-        stateObjects[typeof(DamagedState)] = damagedState;
-        stateObjects[typeof(BlockState)] = blockState;
-        stateObjects[typeof(ParriedState)] = parriedState;
-        stateObjects[typeof(AIAttackState)] = AIAttackState;
-        stateObjects[typeof(AliveStateMachine)] = aliveStateMachine;
-        stateObjects[typeof(DeadState)] = deadState;
-        stateObjects[typeof(EnemyTimeControlStateMachine)] = enemyTimeControlStateMachine;
     }
 
     private void Update(){

@@ -15,7 +15,6 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		public Transform Transform { get; set; }
 		public CharacterMovement CharacterMovement { get; set; }
 		public Animator Animator { get; set; }
-		public Dictionary<Type, StateObject> StateObjects { get; set; }
 		public Sword Sword { get; set; }
 		public Health Health { get; set; }
 		public Hurtbox Hurtbox { get; set; }
