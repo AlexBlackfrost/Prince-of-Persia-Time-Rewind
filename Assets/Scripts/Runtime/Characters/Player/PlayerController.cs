@@ -37,11 +37,13 @@ public class PlayerController : MonoBehaviour {
 
     private Animator animator;
     private PlayerPerceptionSystem perceptionSystem;
+    private RewindableTransform rewindableTransform;
 
 
 
     private void Awake() {
-        characterMovement.Transform = transform;
+        rewindableTransform = new RewindableTransform(transform);
+        characterMovement.Transform = rewindableTransform;
         characterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         InputController = GetComponent<InputController>();

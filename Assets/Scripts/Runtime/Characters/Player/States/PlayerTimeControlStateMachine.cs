@@ -105,7 +105,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
 
 		// Transform
-		transformTimeControl.OnTimeRewindStop(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		//transformTimeControl.OnTimeRewindStop(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		// Character movement
 		characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
@@ -151,8 +151,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 
 	private void RestorePlayerRecord(PlayerRecord previousRecord, PlayerRecord nextRecord) {
-		transformTimeControl.RestoreTransformRecord(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, 
-													elapsedTimeSinceLastRecord);
+		/*transformTimeControl.RestoreTransformRecord(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, 
+													elapsedTimeSinceLastRecord);*/
 
 		cameraTimeControl.RestoreCameraRecord(previousRecord.cameraRecord, nextRecord.cameraRecord, previousRecord.deltaTime, 
 											  elapsedTimeSinceLastRecord);

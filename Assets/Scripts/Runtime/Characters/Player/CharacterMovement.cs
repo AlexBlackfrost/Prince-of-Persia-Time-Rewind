@@ -9,7 +9,7 @@ using System;
     [SerializeField] private float gravity = -40f;
 
     public CharacterController CharacterController { get; set; }
-    public Transform Transform {get;set;}
+    public RewindableTransform Transform {get;set;}
     public Vector3 Velocity {
         get {
             return velocity;
