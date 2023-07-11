@@ -17,16 +17,18 @@ public class SizeTest : MonoBehaviour{
     }
     private void OnTimeRewindStart() {
         isRewinding = true;
+        RewindController.Instance.OnTimeRewindStart();
     }
 
     private void OnTimeRewindStop() {
         isRewinding = false;
+        RewindController.Instance.OnTimeRewindStop();
     }
     private void Update() {
+            flag.Value *= -1;
         if(timer < 2) {
             timer += Time.deltaTime;
         } else {
-            flag.Value *= -1;
             timer = 0;
         }
     }
@@ -35,7 +37,7 @@ public class SizeTest : MonoBehaviour{
         if (isRewinding) {
             RewindController.Instance.Rewind(Time.deltaTime);
         } else{
-            RewindController.Instance.RecordValues(true);
+            RewindController.Instance.RecordVariables();
         }
     }
 

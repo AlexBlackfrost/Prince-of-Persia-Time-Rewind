@@ -27,9 +27,11 @@ public class EnemyController : MonoBehaviour{
     private Animator animator;
     private EnemyPerceptionSystem perceptionSystem;
     private RootStateMachine rootStateMachine;
+    private RewindableTransform rewindableTransform;
 
     private void Awake() {
-        characterMovement.Transform = new RewindableTransform(transform);
+        rewindableTransform = new RewindableTransform(transform);
+        characterMovement.Transform = rewindableTransform;
         characterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();

@@ -5,29 +5,29 @@ using UnityEngine;
 
 
 public class RewindController {
-    private struct ModifiedData {
-        public object[] modifiedVariables;
-        public BitArray modifiedMask;
+    private struct RecordedData {
+        public object[] recordedVariables;
+        public BitArray mrecordedMask;
         public float deltaTime;
 
-        public ModifiedData(object[] modifiedVariables, BitArray modifiedMask, float deltaTime) {
-            this.modifiedVariables = modifiedVariables;
-            this.modifiedMask = modifiedMask;
+        public RecordedData(object[] recordedVariables, BitArray recordedMask, float deltaTime) {
+            this.recordedVariables = recordedVariables;
+            this.mrecordedMask = recordedMask;
             this.deltaTime = deltaTime;
         }
 
         public bool HasRecordedDataFor(int id) {
-            return modifiedMask != null && modifiedMask[id];
+            return mrecordedMask != null && mrecordedMask[id];
         }
 
         public object GetRecordedDataFor(int id) {
             int index = -1;
             for (int i = 0; i <= id; i++) {
-                if (modifiedMask[i]) {
+                if (mrecordedMask[i]) {
                     index++;
                 }
             }
-            return modifiedVariables[index];
+            return recordedVariables[index];
         }
     }
 
@@ -35,8 +35,11 @@ public class RewindController {
     private List<IRewindable> rewindableVariables;
     private int NUM_FRAMES = 1000;
     private int numModifiedVariablesThisFrame;
-    private CircularStack<ModifiedData> circularStack;
-    private ModifiedData previousModifiedData, nextModifiedData;
+    private int numVariablesNotRecordedAtLeastOnce;
+    private int numOutdatedVariables; // number of rewindable variables that haven't been recorded in a long time
+    private CircularStack<RecordedData> circularStack;
+    private int maxMaxFramesWithoutBeingRecorded;
+    private RecordedData previousRecordedData, nextRecordedData;
     private float elapsedTimeSinceLastRecord;
 
     public static RewindController Instance {
@@ -53,62 +56,108 @@ public class RewindController {
 
     public RewindController() {
         rewindableVariables = new List<IRewindable>();
-        circularStack = new CircularStack<ModifiedData>(NUM_FRAMES);
+        circularStack = new CircularStack<RecordedData>(NUM_FRAMES);
         elapsedTimeSinceLastRecord = 0;
+        numVariablesNotRecordedAtLeastOnce = 0;
+
     }
 
+    public void OnTimeRewindStart() {
+        previousRecordedData = circularStack.Pop();
+        nextRecordedData = circularStack.Peek();
+        elapsedTimeSinceLastRecord = 0;
+        numOutdatedVariables = 0;
+        numOutdatedVariables = 0;
+    }
 
+    public void OnTimeRewindStop() {
+
+    }
 
     public int Register(IRewindable rewindableVariable) {
         rewindableVariables.Add(rewindableVariable);
+        maxMaxFramesWithoutBeingRecorded = Mathf.Max(maxMaxFramesWithoutBeingRecorded, rewindableVariable.MaxFramesWithoutBeingRecorded);
+        numVariablesNotRecordedAtLeastOnce++;
         return rewindableVariables.Count - 1;
     }
 
-    public void IncreaseNumModifiedVariablesByOne() {
+    public void IncreaseNumModifiedVariablesThisFrameBy1() {
         numModifiedVariablesThisFrame++;
     }
 
     // call on late update
-    public void RecordValues(bool onlyModified) {
-        object[] modifiedVariablesThisFrame = new object[numModifiedVariablesThisFrame];
+    public void RecordVariables() {
+        object[] recordedVariablesThisFrame = new object[numModifiedVariablesThisFrame + numOutdatedVariables + numVariablesNotRecordedAtLeastOnce];
         int modifiedIndex = 0;
-        BitArray modifiedVariablesMask = new BitArray(rewindableVariables.Count);
+        BitArray recordedVariablesMask = new BitArray(rewindableVariables.Count, false);
+
         for (int i = 0; i < rewindableVariables.Count; i++) {
             IRewindable rewindableVariable = rewindableVariables[i];
-            if (!onlyModified || (onlyModified && rewindableVariable.IsModified)) {//record all or onlyModified
-                modifiedVariablesThisFrame[modifiedIndex] = rewindableVariable.Record();
+            if (!rewindableVariable.HasBeenRecordedAtLeastOnce) {
+                recordedVariablesThisFrame[modifiedIndex] = rewindableVariable.Record();
                 modifiedIndex++;
+                rewindableVariable.FramesWithoutBeingRecorded = 0;
+                rewindableVariable.HasBeenRecordedAtLeastOnce = true;
+                recordedVariablesMask[i] = true;
+
+            } else if (rewindableVariable.IsModified) {
+                recordedVariablesThisFrame[modifiedIndex] = rewindableVariable.Record();
+                modifiedIndex++;
+                rewindableVariable.FramesWithoutBeingRecorded = 0;
+                recordedVariablesMask[i] = true;
+
+            } else if( rewindableVariable.FramesWithoutBeingRecorded == rewindableVariable.MaxFramesWithoutBeingRecorded ) {
+
+                recordedVariablesThisFrame[modifiedIndex] = rewindableVariable.Record();
+                modifiedIndex++;
+                numOutdatedVariables--;
+                rewindableVariable.FramesWithoutBeingRecorded = 0;
+                recordedVariablesMask[i] = true;
+
+            } else {
+                rewindableVariable.FramesWithoutBeingRecorded++;
+                if(rewindableVariable.FramesWithoutBeingRecorded == rewindableVariable.MaxFramesWithoutBeingRecorded ) {
+                    /* variables that haven't been recorded for (MaxFramesWithoutBeingRecorded - 1) frames will be recorded next frame.
+                     * Count them with numOutdatedVariables.
+                     */
+                    numOutdatedVariables++;
+                }
             }
 
-            modifiedVariablesMask[i] = rewindableVariable.IsModified;
             rewindableVariable.IsModified = false;
         }
-
-        circularStack.Push(new ModifiedData(modifiedVariablesThisFrame, modifiedVariablesMask, Time.deltaTime));
+        
+        circularStack.Push(new RecordedData(recordedVariablesThisFrame, recordedVariablesMask, Time.deltaTime));
         numModifiedVariablesThisFrame = 0;
     }
 
     public void Rewind(float deltaTime) {
-        while (elapsedTimeSinceLastRecord > previousModifiedData.deltaTime && circularStack.Count > 2) {
-            elapsedTimeSinceLastRecord -= previousModifiedData.deltaTime;
-            previousModifiedData = circularStack.Pop();
-            nextModifiedData = circularStack.Peek();
+        /* If a rewindable variable can be X frames without being recorded, we cannot keep rewinding if there are less than X frames left,
+         * since there's a possibility that the last time such variable was recorded was one of those last X frames. Since interpolation is often
+         * performed, we need the last 2 recorded values of a rewindable variable, so we cannot keep rewinding if there are less than 2*maxMaxFramesWithoutBeingRecorded
+         * records left in the circular stack.
+         */
+        while (elapsedTimeSinceLastRecord > previousRecordedData.deltaTime && circularStack.Count > 2 + 2*maxMaxFramesWithoutBeingRecorded) {
+            elapsedTimeSinceLastRecord -= previousRecordedData.deltaTime;
+            previousRecordedData = circularStack.Pop();
+            nextRecordedData = circularStack.Peek();
         }
-        ModifiedData lastFrameModifiedData = circularStack.Pop();
         elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindManager.RewindSpeed;
 
+
         for (int i = 0; i < rewindableVariables.Count; i++) {
-            RewindVariable(i, previousModifiedData, nextModifiedData, elapsedTimeSinceLastRecord);
+            RewindVariable(i, previousRecordedData, nextRecordedData, elapsedTimeSinceLastRecord);
         }
     }
 
-    private void RewindVariable(int id, ModifiedData previousModifiedData, ModifiedData nextModifiedData, float elapsedTimeSinceLastRecord) {
+    private void RewindVariable(int id, RecordedData previousModifiedData, RecordedData nextModifiedData, float elapsedTimeSinceLastRecord) {
         int currentPeekDepth = 0;
-        while (!previousModifiedData.HasRecordedDataFor(id) && currentPeekDepth < circularStack.Count-1) {
+
+        while (!previousModifiedData.HasRecordedDataFor(id) && currentPeekDepth < circularStack.Count-maxMaxFramesWithoutBeingRecorded) {
             previousModifiedData = circularStack.Peek(currentPeekDepth);
             currentPeekDepth++;
         }
-
+        
         nextModifiedData = circularStack.Peek(currentPeekDepth);
         while (!nextModifiedData.HasRecordedDataFor(id) && currentPeekDepth < circularStack.Count) {
             nextModifiedData = circularStack.Peek(currentPeekDepth);

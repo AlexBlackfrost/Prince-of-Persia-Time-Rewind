@@ -39,8 +39,6 @@ public class PlayerController : MonoBehaviour {
     private PlayerPerceptionSystem perceptionSystem;
     private RewindableTransform rewindableTransform;
 
-
-
     private void Awake() {
         rewindableTransform = new RewindableTransform(transform);
         characterMovement.Transform = rewindableTransform;
