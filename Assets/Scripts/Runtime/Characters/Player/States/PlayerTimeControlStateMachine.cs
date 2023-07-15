@@ -69,11 +69,13 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
         if (timeIsRewinding) {
 			RewindPlayerRecord();
+			RewindController.Instance.Rewind(Time.deltaTime);
 			cinemachineBrain.ManualUpdate();
 		} else {
 			cinemachineBrain.ManualUpdate();
 			SavePlayerRecord();
-        }
+			RewindController.Instance.RecordVariables();
+		}
 	}
 
 	private void OnTimeRewindStart() {
@@ -85,7 +87,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		animationTimeControl.OnTimeRewindStart();
 
 		// Camera
-		cameraTimeControl.OnTimeRewindStart();
+		//cameraTimeControl.OnTimeRewindStart();
 
 		// State machine
 		stateMachineTimeControl.OnTimeRewindStart();
@@ -99,7 +101,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		animationTimeControl.OnTimeRewindStop(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		// Camera
-		cameraTimeControl.OnTimeRewindStop();
+		//cameraTimeControl.OnTimeRewindStop();
 
 		// State machine
 		stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
@@ -108,8 +110,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		//transformTimeControl.OnTimeRewindStop(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		// Character movement
-		characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
-													  previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		/*characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
+													  previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/
 		// Sword
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
@@ -154,16 +156,16 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		/*transformTimeControl.RestoreTransformRecord(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, 
 													elapsedTimeSinceLastRecord);*/
 
-		cameraTimeControl.RestoreCameraRecord(previousRecord.cameraRecord, nextRecord.cameraRecord, previousRecord.deltaTime, 
-											  elapsedTimeSinceLastRecord);
+		/*cameraTimeControl.RestoreCameraRecord(previousRecord.cameraRecord, nextRecord.cameraRecord, previousRecord.deltaTime, 
+											  elapsedTimeSinceLastRecord);*/
 
 		animationTimeControl.RestoreAnimationRecord(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, 
 													elapsedTimeSinceLastRecord);
 		animationTimeControl.RestoreAnimatorFloatParameters(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime,
 													elapsedTimeSinceLastRecord);
 
-		characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
-																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		/*characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
+																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/
 
 		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
 											  elapsedTimeSinceLastRecord);

@@ -10,39 +10,42 @@ using System;
 
     public CharacterController CharacterController { get; set; }
     public RewindableTransform Transform {get;set;}
+    private RewindableVariable<Vector3> velocity;
     public Vector3 Velocity {
         get {
-            return velocity;
+            return velocity.Value;
         }
         set {
-            velocity = value;
+            velocity.Value = value;
         }
     }
-    private Vector3 velocity;
+
+    public void Init() {
+         velocity = new RewindableVariable<Vector3>();
+    }
 
     public void Move(Vector3 direction) {
-        velocity += direction.normalized * acceleration * Time.deltaTime;
-        Vector2 clampedVelocity = Vector2.ClampMagnitude(velocity.XZ(), maxSpeed);
-        velocity.x = clampedVelocity.x;
-        velocity.z = clampedVelocity.y;
+        velocity.Value += direction.normalized * acceleration * Time.deltaTime;
+        Vector2 clampedVelocity = Vector2.ClampMagnitude(velocity.Value.XZ(), maxSpeed);
+        velocity.Value = new Vector3(clampedVelocity.x, velocity.Value.y, clampedVelocity.y);
         ApplyGravity();
 
-        CharacterController.Move(velocity * Time.deltaTime);
+        CharacterController.Move(velocity.Value * Time.deltaTime);
 
         if(direction.magnitude> float.Epsilon) {
-            Quaternion targetRotation = Quaternion.LookRotation(new Vector3(velocity.x, 0.0f, velocity.z));
+            Quaternion targetRotation = Quaternion.LookRotation(new Vector3(velocity.Value.x, 0.0f, velocity.Value.z));
             Transform.rotation = Quaternion.Slerp(Transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
 
     public void Move(Vector3 direction, float speed) {
-        velocity = direction * speed;
+        velocity.Value = direction * speed;
         ApplyGravity();
-        CharacterController.Move(velocity * Time.deltaTime);
+        CharacterController.Move(velocity.Value * Time.deltaTime);
     }
 
     public void MoveAmount(Vector3 displacement) {
-        velocity = displacement/Time.deltaTime;
+        velocity.Value = displacement/Time.deltaTime;
         CharacterController.Move(displacement);
     }
 
@@ -57,9 +60,13 @@ using System;
 
     public void ApplyGravity() {
         if (CharacterController.isGrounded) {
-            velocity.y = -0.01f;
+            Vector3 currentVelocity = velocity.Value;
+            currentVelocity.y = -0.01f;
+            velocity.Value = currentVelocity;
         } else {
-            velocity.y += gravity * Time.deltaTime;
+            Vector3 currentVelocity = velocity.Value;
+            currentVelocity.y += gravity * Time.deltaTime;
+            velocity.Value = currentVelocity;
         }
     }
 

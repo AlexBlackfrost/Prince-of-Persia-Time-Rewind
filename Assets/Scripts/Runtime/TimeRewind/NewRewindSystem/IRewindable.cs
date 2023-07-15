@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface IRewindable {
+    public bool LimitMaxFramesWithoutBeingRecorded { get; set; }
     public bool HasBeenRecordedAtLeastOnce { get; set; }
     public int MaxFramesWithoutBeingRecorded { get;}
     public int FramesWithoutBeingRecorded { get; set; }

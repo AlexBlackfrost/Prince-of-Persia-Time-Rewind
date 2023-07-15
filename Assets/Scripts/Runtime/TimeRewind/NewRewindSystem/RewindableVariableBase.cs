@@ -3,12 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class RewindableVariableBase<T> : IRewindable {
-    private T value;
+    protected T value;
+    public virtual T Value {
+        get {
+            return value;
+        }
+        set {
+            if (!EqualityComparer<T>.Default.Equals(this.value, value)) {
+                this.value = value;
+                IsModified = true;
+            }
+        }
+    }
+    public bool LimitMaxFramesWithoutBeingRecorded { get; set; }
     public bool HasBeenRecordedAtLeastOnce { get; set; }
     public int MaxFramesWithoutBeingRecorded { get; private set; }
     public int FramesWithoutBeingRecorded { get; set; }
     private bool isModified;
-    public bool IsModified {
+    public virtual bool IsModified {
         get {
             return isModified;
         }
@@ -23,34 +35,25 @@ public abstract class RewindableVariableBase<T> : IRewindable {
     }
 
 
-    public RewindableVariableBase(T value, int maxFramesWithoutBeingRecorded = 10) {
+    public RewindableVariableBase(T value, int maxFramesWithoutBeingRecorded = 10, bool limitMaxFramesWithoutBeingRecorded = true) {
         this.value = value;
         this.MaxFramesWithoutBeingRecorded = maxFramesWithoutBeingRecorded;
+        this.LimitMaxFramesWithoutBeingRecorded = limitMaxFramesWithoutBeingRecorded;
         IsModified = false;
         HasBeenRecordedAtLeastOnce = false;
         RewindController.Instance.Register(this);
     }
 
-    public RewindableVariableBase(int maxFramesWithoutBeingRecorded = 10) {
+    public RewindableVariableBase(int maxFramesWithoutBeingRecorded = 10, bool limitMaxFramesWithoutBeingRecorded = true) {
         this.value = default(T);
         this.MaxFramesWithoutBeingRecorded = maxFramesWithoutBeingRecorded;
+        this.LimitMaxFramesWithoutBeingRecorded = limitMaxFramesWithoutBeingRecorded;
         IsModified = false;
         HasBeenRecordedAtLeastOnce = false;
         RewindController.Instance.Register(this);
     }
 
 
-    public T Value {
-        get {
-            return value;
-        }
-        set {
-            if (!EqualityComparer<T>.Default.Equals(this.value, value)) {
-                this.value = value;
-                IsModified = true;
-            }
-        }
-    }
 
 
     public abstract object Record();
