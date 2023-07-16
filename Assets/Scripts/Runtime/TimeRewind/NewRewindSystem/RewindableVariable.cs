@@ -9,7 +9,7 @@ public class RewindableVariable<BasicType> : RewindableVariableBase<BasicType> {
         SetInterpolationEnabledDefaultValue();
     }
 
-    public RewindableVariable(BasicType value, bool interpolationEnabled) : base(value) {
+    public RewindableVariable(BasicType value, bool interpolationEnabled, bool onlyExecuteOnRewindStop) : base(value, onlyExecuteOnRewindStop: onlyExecuteOnRewindStop) {
         InterpolationEnabled = interpolationEnabled;
     }
 
@@ -43,6 +43,12 @@ public class RewindableVariable<BasicType> : RewindableVariableBase<BasicType> {
             float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
             Value = (BasicType)Interpolate(previousRecord, nextRecord, lerpAlpha);
         } else {
+            if(previousRecord.GetType() != typeof(BasicType)) {
+                string type1 = previousRecord.GetType().ToString();
+                string type2 = typeof(BasicType).ToString();
+                Debug.Log("Casting different types: " + type1 + " and "+ type2);
+            }
+            
             Value = (BasicType)previousRecord;
         }
     }
@@ -52,6 +58,7 @@ public class RewindableVariable<BasicType> : RewindableVariableBase<BasicType> {
     public override void OnRewindStop(object previousRecord, object nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
         Rewind(previousRecord, nextRecord, previousRecordDeltaTime, elapsedTimeSinceLastRecord);
     }
+
     private object Interpolate(object a, object b, float t) {
         if (a.GetType() != b.GetType()) {
             throw new NotImplementedException();

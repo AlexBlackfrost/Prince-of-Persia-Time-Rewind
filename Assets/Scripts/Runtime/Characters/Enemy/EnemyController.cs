@@ -30,10 +30,10 @@ public class EnemyController : MonoBehaviour{
     private RewindableTransform rewindableTransform;
 
     private void Awake() {
-        rewindableTransform = new RewindableTransform(transform);
+        animator = GetComponent<Animator>();
+        rewindableTransform = new RewindableTransform(transform, animator);
         characterMovement.Transform = rewindableTransform;
         characterMovement.CharacterController = GetComponent<CharacterController>();
-        animator = GetComponent<Animator>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
         
         enemyAI.Init();

@@ -32,7 +32,24 @@ public class RewindableTransform : RewindableVariableBase<Transform> {
             IsModified = true;
         }
     }
-    public RewindableTransform(Transform transform) : base(transform) { }
+
+    public override bool IsModified {
+        get {
+            if (!isModified && animator.applyRootMotion) {
+                isModified = true; 
+            }
+            return isModified;
+        }
+        set {
+            base.IsModified = value;
+        }
+    }
+
+    private Animator animator;
+    
+    public RewindableTransform(Transform transform, Animator animator) : base(transform) {
+        this.animator = animator;
+    }
 
     public override void OnRewindStart() { }
 

@@ -88,10 +88,10 @@ public struct CameraRecord {
 
 public struct AnimationRecord {
     public bool applyRootMotion;
-    public AnimationParameter[] parameters;
+   // public AnimationParameter[] parameters;
     public AnimationLayerRecord[] animationLayerRecords;
-    public AnimationRecord(AnimationParameter[] parameters, AnimationLayerRecord[] animationLayerRecords, bool applyRootMotion) {
-        this.parameters = parameters;
+    public AnimationRecord(/*AnimationParameter[] parameters,*/ AnimationLayerRecord[] animationLayerRecords, bool applyRootMotion) {
+        //this.parameters = parameters;
         this.animationLayerRecords = animationLayerRecords;
         this.applyRootMotion = applyRootMotion;
 

@@ -1,6 +1,7 @@
 using Cinemachine;
 using HFSM;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
@@ -141,7 +142,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 
 	private void RewindPlayerRecord() {
-		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && records.Count > 2) {
+		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && records.Count > 2 + 2 * RewindController.Instance.MaxMaxFramesWithoutBeingRecorded) {
 			elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
 			previousRecord = records.Pop();
 			nextRecord = records.Peek(); 
@@ -161,8 +162,9 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 		animationTimeControl.RestoreAnimationRecord(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, 
 													elapsedTimeSinceLastRecord);
-		animationTimeControl.RestoreAnimatorFloatParameters(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime,
-													elapsedTimeSinceLastRecord);
+		animationTimeControl.RestoreRewindableAnimatorFloatParameters();
+		/*animationTimeControl.RestoreAnimatorFloatParameters(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime,
+													elapsedTimeSinceLastRecord);*/
 
 		/*characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
 																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/

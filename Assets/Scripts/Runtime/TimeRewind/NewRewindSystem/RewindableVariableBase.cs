@@ -15,11 +15,12 @@ public abstract class RewindableVariableBase<T> : IRewindable {
             }
         }
     }
+    public bool OnlyExecuteOnRewindStop { get ; set; }
     public bool LimitMaxFramesWithoutBeingRecorded { get; set; }
-    public bool HasBeenRecordedAtLeastOnce { get; set; }
+    public bool RecordedAtLeastOnce { get; set; }
     public int MaxFramesWithoutBeingRecorded { get; private set; }
     public int FramesWithoutBeingRecorded { get; set; }
-    private bool isModified;
+    protected bool isModified;
     public virtual bool IsModified {
         get {
             return isModified;
@@ -35,21 +36,26 @@ public abstract class RewindableVariableBase<T> : IRewindable {
     }
 
 
-    public RewindableVariableBase(T value, int maxFramesWithoutBeingRecorded = 10, bool limitMaxFramesWithoutBeingRecorded = true) {
+
+    public RewindableVariableBase(T value, int maxFramesWithoutBeingRecorded = 10, bool limitMaxFramesWithoutBeingRecorded = true,
+                                  bool onlyExecuteOnRewindStop = false) {
         this.value = value;
+        this.OnlyExecuteOnRewindStop = onlyExecuteOnRewindStop;
         this.MaxFramesWithoutBeingRecorded = maxFramesWithoutBeingRecorded;
         this.LimitMaxFramesWithoutBeingRecorded = limitMaxFramesWithoutBeingRecorded;
         IsModified = false;
-        HasBeenRecordedAtLeastOnce = false;
+        RecordedAtLeastOnce = false;
         RewindController.Instance.Register(this);
     }
 
-    public RewindableVariableBase(int maxFramesWithoutBeingRecorded = 10, bool limitMaxFramesWithoutBeingRecorded = true) {
+    public RewindableVariableBase(int maxFramesWithoutBeingRecorded = 10, bool limitMaxFramesWithoutBeingRecorded = true,
+                                  bool onlyExecuteOnRewindStop = false) {
         this.value = default(T);
+        this.OnlyExecuteOnRewindStop = onlyExecuteOnRewindStop;
         this.MaxFramesWithoutBeingRecorded = maxFramesWithoutBeingRecorded;
         this.LimitMaxFramesWithoutBeingRecorded = limitMaxFramesWithoutBeingRecorded;
         IsModified = false;
-        HasBeenRecordedAtLeastOnce = false;
+        RecordedAtLeastOnce = false;
         RewindController.Instance.Register(this);
     }
 

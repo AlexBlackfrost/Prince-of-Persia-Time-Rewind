@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public interface IRewindable {
+    public bool OnlyExecuteOnRewindStop { get; set; }
     public bool LimitMaxFramesWithoutBeingRecorded { get; set; }
-    public bool HasBeenRecordedAtLeastOnce { get; set; }
+    public bool RecordedAtLeastOnce { get; set; }
     public int MaxFramesWithoutBeingRecorded { get;}
     public int FramesWithoutBeingRecorded { get; set; }
     public bool IsModified { get; set; }

@@ -7,20 +7,52 @@ public class AnimationTimeControl {
     private AnimationRecord lastAnimationRecord;
     private TransitionRecord[] lastInterruptedTransitionRecordInLayer;
     private Animator animator;
+	private IRewindable[] rewindableAnimatorParameters;
 
 	public AnimationTimeControl(Animator animator) {
 		this.animator = animator;
 		lastInterruptedTransitionRecordInLayer = new TransitionRecord[animator.layerCount];
 		lastAnimationRecord.animationLayerRecords = new AnimationLayerRecord[animator.layerCount];
+		CreateRewindableAnimatorParameters();
+	}
+
+	private void CreateRewindableAnimatorParameters() {
+		rewindableAnimatorParameters = new IRewindable[animator.parameterCount];
+
+		for (int i = 0; i < rewindableAnimatorParameters.Length; i++) {
+			IRewindable rewindableAnimatorParameter = null;
+			AnimatorControllerParameter animatorParameter = animator.parameters[i];
+
+			switch (animatorParameter.type) {
+				case AnimatorControllerParameterType.Float:
+					float floatValue = animator.GetFloat(animatorParameter.nameHash);
+					rewindableAnimatorParameter = new RewindableVariable<float>(floatValue, interpolationEnabled: true, onlyExecuteOnRewindStop: true);
+					break;
+
+				case AnimatorControllerParameterType.Int:
+					int intValue = animator.GetInteger(animatorParameter.nameHash);
+					rewindableAnimatorParameter = new RewindableVariable<int>(intValue, interpolationEnabled: false, onlyExecuteOnRewindStop: true);
+					break;
+
+				case AnimatorControllerParameterType.Bool:
+				case AnimatorControllerParameterType.Trigger:
+					bool boolValue = animator.GetBool(animatorParameter.nameHash);
+					rewindableAnimatorParameter = new RewindableVariable<bool>(boolValue, interpolationEnabled: false, onlyExecuteOnRewindStop: true);
+					break;
+
+			}
+			rewindableAnimatorParameters[i] = rewindableAnimatorParameter;
+		}
 	}
 
     public void OnTimeRewindStart() {
-        animator.speed = 0;
-        animator.enabled = false;
-    }
+		animator.speed = 0;
+        animator.enabled = false; 
+	}
 
     public void OnTimeRewindStop(AnimationRecord previousRecord, AnimationRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
-        RestoreAnimatorParameters(previousRecord); //Restore parameters before restoring animation record or it won't work.
+		//RestoreAnimatorParameters(previousRecord); //Restore parameters before restoring animation record or it won't work.
+		RestoreRewindableAnimatorParameters();
         RestoreAnimationRecord(previousRecord, nextRecord, previousRecordDeltaTime, elapsedTimeSinceLastRecord);
         animator.enabled = true;
         animator.speed = 1;
@@ -28,7 +60,8 @@ public class AnimationTimeControl {
     }
 
 	public AnimationRecord RecordAnimationData() {
-		AnimationParameter[] parameters = RecordAnimatorParameters(animator);
+        //AnimationParameter[] parameters = RecordAnimatorParameters(animator);
+		TryRecordRewindableAnimatorParameters();
 		AnimationLayerRecord[] animationLayerRecords = new AnimationLayerRecord[animator.layerCount];
 
 		for (int layer = 0; layer < animator.layerCount; layer++) {
@@ -61,12 +94,77 @@ public class AnimationTimeControl {
 			Debug.Log(output);
 		}
 
-		AnimationRecord animationRecord = new AnimationRecord(parameters, animationLayerRecords, animator.applyRootMotion);
+		AnimationRecord animationRecord = new AnimationRecord(/*parameters,*/ animationLayerRecords, animator.applyRootMotion);
 		TrackInterruptedTransitions(ref animationRecord, Time.deltaTime);
 		return animationRecord;
 	}
 
-	private static AnimationParameter[] RecordAnimatorParameters(Animator animator) {
+	private void TryRecordRewindableAnimatorParameters() {
+		/* Modifying the the rewindable Value doesn't mean it's going to be recorded; the new value
+		 * needs to be different in order to be recorded (or spend some time without been modified. 
+		 * This is handled in RewindableVariable<T> Value setter.
+		 */
+		for (int i = 0; i < rewindableAnimatorParameters.Length; i++) {
+			AnimatorControllerParameter animatorParameter = animator.parameters[i];
+
+			switch (animatorParameter.type) {
+				case AnimatorControllerParameterType.Float:
+					float floatValue = animator.GetFloat(animatorParameter.nameHash);
+					((RewindableVariable<float>)rewindableAnimatorParameters[i]).Value = floatValue;
+					break;
+
+				case AnimatorControllerParameterType.Int:
+					int intValue = animator.GetInteger(animatorParameter.nameHash);
+					((RewindableVariable<int>)rewindableAnimatorParameters[i]).Value = intValue;
+					break;
+
+				case AnimatorControllerParameterType.Bool:
+				case AnimatorControllerParameterType.Trigger:
+					bool boolValue = animator.GetBool(animatorParameter.nameHash);
+					((RewindableVariable<bool>)rewindableAnimatorParameters[i]).Value = boolValue;
+					break;
+			}
+		}
+	}
+
+	private void RestoreRewindableAnimatorParameters() {
+		for (int i = 0; i < rewindableAnimatorParameters.Length; i++) {
+			AnimatorControllerParameter animatorParameter = animator.parameters[i];
+
+			switch (animatorParameter.type) {
+				case AnimatorControllerParameterType.Float:
+					animator.SetFloat(animatorParameter.nameHash, ((RewindableVariable<float>)rewindableAnimatorParameters[i]).Value);
+					break;
+
+				case AnimatorControllerParameterType.Int:
+					animator.SetInteger(animatorParameter.nameHash, ((RewindableVariable<int>)rewindableAnimatorParameters[i]).Value);
+					break;
+
+				case AnimatorControllerParameterType.Bool:
+					animator.SetBool(animatorParameter.nameHash, ((RewindableVariable<bool>)rewindableAnimatorParameters[i]).Value);
+					break;
+
+				case AnimatorControllerParameterType.Trigger:
+					if (((RewindableVariable<bool>)rewindableAnimatorParameters[i]).Value) {
+						animator.SetTrigger(animatorParameter.nameHash);
+					}
+					break;
+			}
+		}
+	}
+
+	public void RestoreRewindableAnimatorFloatParameters() {
+		for (int i = 0; i < rewindableAnimatorParameters.Length; i++) {
+			AnimatorControllerParameter animatorParameter = animator.parameters[i];
+
+			if (animatorParameter.type == AnimatorControllerParameterType.Float) { 
+				animator.SetFloat(animatorParameter.nameHash, ((RewindableVariable<float>)rewindableAnimatorParameters[i]).Value);
+			}
+		}
+	}
+
+
+	/*private static AnimationParameter[] RecordAnimatorParameters(Animator animator) {
 		AnimationParameter[] parameters = new AnimationParameter[animator.parameterCount];
 		int i = 0;
 		foreach (AnimatorControllerParameter parameter in animator.parameters) {
@@ -89,9 +187,9 @@ public class AnimationTimeControl {
 
 		}
 		return parameters;
-	}
+	}*/
 
-	public void RestoreAnimatorParameters(AnimationRecord previousRecord) {
+	/*public void RestoreAnimatorParameters(AnimationRecord previousRecord) {
 		foreach(AnimationParameter parameter in previousRecord.parameters) {
 			switch (parameter.type) {
 				case AnimatorControllerParameterType.Float:
@@ -113,9 +211,9 @@ public class AnimationTimeControl {
 					break;
 			}
 		}
-	}
+	}*/
 
-	public void RestoreAnimatorFloatParameters(AnimationRecord previousRecord, AnimationRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
+	/*public void RestoreAnimatorFloatParameters(AnimationRecord previousRecord, AnimationRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
 		for (int i = 0; i < previousRecord.parameters.Length; i++) {
 			AnimationParameter parameter = previousRecord.parameters[i];
 			if (parameter.type == AnimatorControllerParameterType.Float) {
@@ -124,7 +222,7 @@ public class AnimationTimeControl {
 				animator.SetFloat(parameter.nameHash, interpolatedValue);
 			}	
 		}
-	}
+	}*/
 
 	public void RestoreAnimationRecord(AnimationRecord previousRecord, AnimationRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
 		for (int layer = 0; layer < animator.layerCount; layer++) {
