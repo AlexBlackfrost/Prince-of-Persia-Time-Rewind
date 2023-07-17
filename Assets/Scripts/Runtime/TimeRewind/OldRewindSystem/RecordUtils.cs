@@ -62,21 +62,7 @@ public struct EnemyRecord {
     }
 }
 
-public struct TransformRecord {
-    public Vector3 position;
-    public Quaternion rotation;
-    public Vector3 localScale;
 
-    public TransformRecord(Vector3 position, Quaternion rotation, Vector3 localScale) {
-        this.position = position;
-        this.rotation = rotation;
-        this.localScale = localScale;
-    }
-
-    public override string ToString() {
-        return "Position: " + position + "\nRotation: " + rotation + "\nScale: " + localScale + "\n";
-    }
-}
 
 public struct CameraRecord {
     public TransformRecord cameraTransform;

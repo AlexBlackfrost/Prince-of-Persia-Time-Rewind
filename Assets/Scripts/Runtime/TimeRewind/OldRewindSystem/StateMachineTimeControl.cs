@@ -12,9 +12,9 @@ public class StateMachineTimeControl {
         noneState = new NoneState();
     }
     public void OnTimeRewindStart() {
-        stateMachine.CurrentStateObject.Exit();
+        stateMachine.CurrentStateObject.Value.Exit();
         // Do not change state using ChangeState() so that OnStateEnter is not triggered after rewind stops.
-        stateMachine.CurrentStateObject = noneState;
+        stateMachine.CurrentStateObject.Value = noneState;
     }
 
     public void OnTimeRewindStop() {

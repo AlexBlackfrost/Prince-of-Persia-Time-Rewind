@@ -105,7 +105,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		//cameraTimeControl.OnTimeRewindStop();
 
 		// State machine
-		stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
+		//stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
 
 		// Transform
 		//transformTimeControl.OnTimeRewindStop(previousRecord.playerTransform, nextRecord.playerTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
@@ -127,7 +127,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		PlayerRecord playerRecord = new PlayerRecord(transformTimeControl.RecordTransformData(),
 													 cameraTimeControl.RecordCameraData(),
 													 animationTimeControl.RecordAnimationData(),
-													 stateMachineTimeControl.RecordStateMachineData(),
+													 default(StateMachineRecord),
 													 characterMovementTimeControl.RecordCharacterMovementData(),
 													 settings.Sword.RecordSwordData(),
 													 healthTimeControl.RecordHealthData(),
@@ -178,7 +178,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 
-		Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.stateObjectRecords[0].stateObject.ToString());
+		//Debug.Log("Rewinding... " + nextRecord.stateMachineRecord.stateObjectRecords[0].stateObject.ToString());
 	}
 
 	public override object RecordFieldsAndProperties() {

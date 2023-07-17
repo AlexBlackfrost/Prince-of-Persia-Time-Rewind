@@ -12,7 +12,7 @@ namespace HFSM {
 	/// </summary>
     public abstract class StateMachine : StateObject {
         public StateObject DefaultStateObject { get; set; }
-        public StateObject CurrentStateObject { get; set; }
+        public RewindableVariable<StateObject> CurrentStateObject { get; set; }
         /// <summary>
         /// A linked list of <see cref="StateMachine"/> starting from the root <see cref="StateMachine"/>. 
         /// </summary>
@@ -69,6 +69,7 @@ namespace HFSM {
             anyState.StateMachine = this;
             initialized = false;
 
+            
             DefaultStateObject = stateObjects[0];
             foreach (StateObject stateObject in stateObjects) {
                 stateObject.StateMachine = this;
@@ -416,7 +417,7 @@ namespace HFSM {
 
             // Check current state object's transitions
             if (availableTransition == null) {
-                availableTransition = CurrentStateObject.GetAvailableTransition();
+                availableTransition = CurrentStateObject.Value.GetAvailableTransition();
             }
 
             foreach (EventTransitionBase anyEventTransition in anyEventTransitions) {
@@ -448,7 +449,7 @@ namespace HFSM {
                 eventTransition.ConsumeEvent();
             }
 
-            CurrentStateObject.ConsumeTransitionsEvents();
+            CurrentStateObject.Value.ConsumeTransitionsEvents();
         }
 
         /// <summary>
@@ -480,7 +481,7 @@ namespace HFSM {
 
             // Check current state object's transitions
             if (availableTransition == null) {
-                availableTransition = CurrentStateObject.GetAvailableTransition();
+                availableTransition = CurrentStateObject.Value.GetAvailableTransition();
             }
 
             return availableTransition;
@@ -504,18 +505,18 @@ namespace HFSM {
                 stateMachine1, stateMachine2
             );
 
-            lowestCommonStateMachine.CurrentStateObject.Exit();
+            lowestCommonStateMachine.CurrentStateObject.Value.Exit();
 
-            targetStateObject.StateMachine.CurrentStateObject = targetStateObject;
+            targetStateObject.StateMachine.CurrentStateObject.Value = targetStateObject;
             StateMachine currentStateMachine = targetStateObject.StateMachine;
             while (currentStateMachine != null && !currentStateMachine.Equals(lowestCommonStateMachine)) {
                 StateMachine parentStateMachine = currentStateMachine.StateMachine;
-                parentStateMachine.CurrentStateObject = currentStateMachine;
+                parentStateMachine.CurrentStateObject.Value = currentStateMachine;
                 currentStateMachine = parentStateMachine;
             }
 
             availableTransition.InvokeTransitionAction();
-            lowestCommonStateMachine.CurrentStateObject.Enter();
+            lowestCommonStateMachine.CurrentStateObject.Value.Enter();
         }
 
         /// <summary>
@@ -558,7 +559,7 @@ namespace HFSM {
             if(updateMode == UpdateMode.UpdateBeforeChild) {
                 OnUpdate();
             }
-            CurrentStateObject.UpdateInternal();
+            CurrentStateObject.Value.UpdateInternal();
             if(updateMode == UpdateMode.UpdateAfterChild) {
                 OnUpdate();
             }
@@ -572,7 +573,7 @@ namespace HFSM {
         public sealed override void FixedUpdate() {
             CheckInitialization();
             OnFixedUpdate();
-            CurrentStateObject.FixedUpdate();
+            CurrentStateObject.Value.FixedUpdate();
         }
 
         /// <summary>
@@ -583,12 +584,12 @@ namespace HFSM {
         public sealed override void LateUpdate() {
             CheckInitialization();
             OnLateUpdate();
-            CurrentStateObject.LateUpdate();
+            CurrentStateObject.Value.LateUpdate();
         }
 
         public sealed override void OnAnimatorMove() {
             OnOnAnimatorMove();
-            CurrentStateObject.OnAnimatorMove();
+            CurrentStateObject.Value.OnAnimatorMove();
         }
 
         /// <summary>
@@ -600,11 +601,12 @@ namespace HFSM {
         public sealed override void Enter() {
             IsActive = true;
             if (CurrentStateObject == null) {
-                CurrentStateObject = DefaultStateObject;
+                CurrentStateObject = new RewindableVariable<StateObject>(DefaultStateObject, interpolationEnabled: false, onlyExecuteOnRewindStop: true);
+                //CurrentStateObject.Value = DefaultStateObject;
             }
 
             OnEnter();
-            CurrentStateObject.Enter();
+            CurrentStateObject.Value.Enter();
         }
 
         /// <summary>
@@ -614,10 +616,10 @@ namespace HFSM {
         /// The hierarchical execution of <see cref="Exit"/> is performed in a bottom-up fashion.
         /// </summary>
         public sealed override void Exit() {
-            CurrentStateObject.Exit();
+            CurrentStateObject.Value.Exit();
             OnExit();
             IsActive = false;
-            CurrentStateObject = null;
+            CurrentStateObject.Value = null;
         }
 
         /// <summary>
@@ -628,30 +630,30 @@ namespace HFSM {
         /// </returns>
         public sealed override string GetCurrentStateName() {
             string name = GetType().ToString() + ".";
-            if (CurrentStateObject == null) {
+            if (CurrentStateObject.Value == null) {
                 name += "None";
             } else {
-                name += CurrentStateObject.GetCurrentStateName();
+                name += CurrentStateObject.Value.GetCurrentStateName();
             }
             return name;
         }
 
         public override StateObject Copy() {
             StateMachine copy = (StateMachine)this.MemberwiseClone();
-            copy.CurrentStateObject = CurrentStateObject?.Copy();
+            copy.CurrentStateObject.Value = CurrentStateObject?.Value.Copy();
             return copy;
         }
 
         public override StateObjectRecord[] RecordStateMachineHierarchy(int hierarchyDepth) {
-            StateObjectRecord[] stateObjectRecords = CurrentStateObject.RecordStateMachineHierarchy(hierarchyDepth+1);
+            StateObjectRecord[] stateObjectRecords = CurrentStateObject.Value.RecordStateMachineHierarchy(hierarchyDepth+1);
             stateObjectRecords[hierarchyDepth - 1] = RecordStateObject();
             return stateObjectRecords;
         }
 
         public override void RestoreStateMachineHierarchy(StateObjectRecord[] stateObjectRecords, int hierarchyDepth) {
             RestoreFieldsAndProperties(stateObjectRecords[hierarchyDepth].fieldsAndProperties);
-            CurrentStateObject = stateObjectRecords[hierarchyDepth+1].stateObject;
-            CurrentStateObject.RestoreStateMachineHierarchy(stateObjectRecords, hierarchyDepth + 1);
+            CurrentStateObject.Value = stateObjectRecords[hierarchyDepth+1].stateObject;
+            CurrentStateObject.Value.RestoreStateMachineHierarchy(stateObjectRecords, hierarchyDepth + 1);
             IsActive = true;
         }
 

@@ -9,7 +9,15 @@ namespace HFSM {
 	/// </summary>
     public abstract class StateObject {
         internal StateMachine StateMachine { get; set; }
-        public bool IsActive { get; set; }
+        public RewindableVariable<bool> isActive;
+        public bool IsActive {
+            get {
+                return isActive.Value;
+            }
+            set {
+                isActive.Value = value;
+            }
+        }
         private protected List<Transition> transitions;
         private protected List<EventTransitionBase> eventTransitions;
 
@@ -19,6 +27,7 @@ namespace HFSM {
         public StateObject() {
             transitions = new List<Transition>();
             eventTransitions = new List<EventTransitionBase>();
+            isActive = new RewindableVariable<bool>(false);
             IsActive = false;
         }
 
