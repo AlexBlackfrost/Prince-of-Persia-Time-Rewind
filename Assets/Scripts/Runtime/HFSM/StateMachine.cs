@@ -604,6 +604,9 @@ namespace HFSM {
                 CurrentStateObject = new RewindableVariable<StateObject>(DefaultStateObject, interpolationEnabled: false, onlyExecuteOnRewindStop: true);
                 //CurrentStateObject.Value = DefaultStateObject;
             }
+            if (CurrentStateObject.Value == null) {
+                CurrentStateObject.Value = DefaultStateObject;
+            }
 
             OnEnter();
             CurrentStateObject.Value.Enter();

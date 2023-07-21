@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class RewindableVariable<BasicType> : RewindableVariableBase<BasicType> {
     public bool InterpolationEnabled { get; set; }
-    public RewindableVariable(BasicType value) : base(value) {
+    public RewindableVariable(BasicType value, bool onlyExecuteOnRewindStop= false) : base(value, onlyExecuteOnRewindStop:onlyExecuteOnRewindStop) {
         SetInterpolationEnabledDefaultValue();
     }
 
@@ -13,11 +13,11 @@ public class RewindableVariable<BasicType> : RewindableVariableBase<BasicType> {
         InterpolationEnabled = interpolationEnabled;
     }
 
-    public RewindableVariable() : base() {
+    public RewindableVariable(bool onlyExecuteOnRewindStop = false) : base( onlyExecuteOnRewindStop : onlyExecuteOnRewindStop) {
         SetInterpolationEnabledDefaultValue();
     }
 
-    public RewindableVariable(bool interpolationEnabled) : base() {
+    public RewindableVariable(bool interpolationEnabled, bool onlyExecuteOnRewindStop = false) : base(onlyExecuteOnRewindStop: onlyExecuteOnRewindStop) {
         InterpolationEnabled = interpolationEnabled;
     }
 

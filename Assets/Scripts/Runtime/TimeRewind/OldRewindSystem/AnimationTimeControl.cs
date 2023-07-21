@@ -101,7 +101,7 @@ public class AnimationTimeControl {
 
 	private void TryRecordRewindableAnimatorParameters() {
 		/* Modifying the the rewindable Value doesn't mean it's going to be recorded; the new value
-		 * needs to be different in order to be recorded (or spend some time without been modified. 
+		 * needs to be different in order to be recorded (or spend some time without been modified). 
 		 * This is handled in RewindableVariable<T> Value setter.
 		 */
 		for (int i = 0; i < rewindableAnimatorParameters.Length; i++) {
@@ -130,7 +130,7 @@ public class AnimationTimeControl {
 	private void RestoreRewindableAnimatorParameters() {
 		for (int i = 0; i < rewindableAnimatorParameters.Length; i++) {
 			AnimatorControllerParameter animatorParameter = animator.parameters[i];
-
+			
 			switch (animatorParameter.type) {
 				case AnimatorControllerParameterType.Float:
 					animator.SetFloat(animatorParameter.nameHash, ((RewindableVariable<float>)rewindableAnimatorParameters[i]).Value);

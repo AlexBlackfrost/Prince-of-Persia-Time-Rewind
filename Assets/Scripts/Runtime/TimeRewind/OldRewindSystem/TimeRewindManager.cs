@@ -41,17 +41,17 @@ public class TimeRewindManager : MonoBehaviour {
 
 
     public static void StartTimeRewind() {
-        IsRewinding = true;
         startRewindTimestamp = DateTime.Now;
         TimeRewindStart.Invoke();
+        IsRewinding = true;
         Debug.Log("Start rewind");
     }
 
     public static void StopTimeRewind() {
-        IsRewinding = false;
         totalElapsedTimeRewinding += DateTime.Now.Subtract(startRewindTimestamp).TotalSeconds;
         totalRewindedTime += DateTime.Now.Subtract(startRewindTimestamp).TotalSeconds * RewindSpeed;
         TimeRewindStop.Invoke();
+        IsRewinding = false;
         Debug.Log("Stop rewind");
     }
 }

@@ -19,10 +19,11 @@ public class RollState : State {
 	}
 
 	private RollSettings settings;
-	private float rollElapsedTime;
+	private RewindableVariable<float> rollElapsedTime;
 
 	public RollState(RollSettings settings) : base() {
 		this.settings = settings;
+		rollElapsedTime = new RewindableVariable<float>(onlyExecuteOnRewindStop: true);
 	}
 
 	protected override void OnUpdate() {
@@ -31,7 +32,7 @@ public class RollState : State {
 		cameraRelativeInputDirection.y = 0;
 		cameraRelativeInputDirection.Normalize();
 		Vector3 rollDirection = settings.Transform.forward;
-		Vector3 moveAmount = rollDirection * settings.rollSpeed.Evaluate(rollElapsedTime) * settings.rollSpeedMultiplier * Time.deltaTime;
+		Vector3 moveAmount = rollDirection * settings.rollSpeed.Evaluate(rollElapsedTime.Value) * settings.rollSpeedMultiplier * Time.deltaTime;
 		settings.CharacterMovement.MoveAmount(moveAmount);
 
 		if(cameraRelativeInputDirection.magnitude > 0) {
@@ -41,7 +42,7 @@ public class RollState : State {
 
 		}
 
-		rollElapsedTime += Time.deltaTime;
+		rollElapsedTime.Value += Time.deltaTime;
 	}
 
 	protected override void OnEnter() {
@@ -49,7 +50,7 @@ public class RollState : State {
 
 		Vector2 inputDirection = settings.InputController.GetMoveDirection();
 		settings.Animator.SetTrigger(AnimatorUtils.rollHash);
-		rollElapsedTime = 0;
+		rollElapsedTime.Value = 0;
 		Vector3 cameraRelativeInputDirection = settings.MainCamera.transform.TransformDirection(new Vector3(inputDirection.x, 0, inputDirection.y));
 		cameraRelativeInputDirection.y = 0;
 		cameraRelativeInputDirection.Normalize();
@@ -66,11 +67,11 @@ public class RollState : State {
 
 	public override void RestoreFieldsAndProperties(object stateObjectRecord) {
 		RollStateRecord record = (RollStateRecord)stateObjectRecord;
-		rollElapsedTime = record.rollElapsedTime;
+		rollElapsedTime.Value = record.rollElapsedTime;
 	}
 
 	public override object RecordFieldsAndProperties() {
-		return new RollStateRecord(rollElapsedTime);
+		return new RollStateRecord(rollElapsedTime.Value);
 	}
 
 }

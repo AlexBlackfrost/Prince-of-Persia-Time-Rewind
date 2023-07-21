@@ -19,8 +19,15 @@ public class StrafeState : State {
 	private StrafeSettings settings;
 	private float strafeSideAnimationVelocity;
 	private float strafeForwardAnimationVelocity;
+	/* Since strafe animation velocities need to be passed by reference, I cannot use the Rewindable variable autoproperty,,
+	*  so I need to have both a rewindable variable and a regular variable
+	*/
+	private RewindableVariable<float> rewindableStrafeSideAnimationVelocity; 
+	private RewindableVariable<float> rewindableStrafeForwardAnimationVelocity;
 	public StrafeState(StrafeSettings settings) : base() {
 		this.settings = settings;
+		this.rewindableStrafeForwardAnimationVelocity = new RewindableVariable<float>(onlyExecuteOnRewindStop : true) ;
+		this.rewindableStrafeSideAnimationVelocity = new RewindableVariable<float>(onlyExecuteOnRewindStop : true);
 	}
 
 	protected override void OnUpdate() {
@@ -88,10 +95,18 @@ public class StrafeState : State {
 		float currentStrafeSideSpeed = settings.Animator.GetFloat(AnimatorUtils.strafeSideHash);
 		float currentStrafeForwardSpeed = settings.Animator.GetFloat(AnimatorUtils.strafeForwardHash);
 
+		// Get the values from the rewindable variables
+		strafeForwardAnimationVelocity = rewindableStrafeForwardAnimationVelocity.Value;
+		strafeSideAnimationVelocity = rewindableStrafeSideAnimationVelocity.Value;
+
 		float targetStrafeSideSpeed = Mathf.SmoothDamp(currentStrafeSideSpeed, discretizedCharacterRelativeDirection.x, 
 													   ref strafeSideAnimationVelocity, settings.StrafeAnimationSmoothTime);
 		float targetStrafeForwardSpeed = Mathf.SmoothDamp(currentStrafeForwardSpeed, discretizedCharacterRelativeDirection.y, 
 														  ref strafeForwardAnimationVelocity, settings.StrafeAnimationSmoothTime);
+		
+		// After passing the values by reference, SmoothDamp has modified them, now update the rewindable variables
+		rewindableStrafeForwardAnimationVelocity.Value = strafeForwardAnimationVelocity;
+		rewindableStrafeSideAnimationVelocity.Value = strafeSideAnimationVelocity;
 		
 		settings.Animator.SetFloat(AnimatorUtils.strafeSideHash, targetStrafeSideSpeed);
 		settings.Animator.SetFloat(AnimatorUtils.strafeForwardHash, targetStrafeForwardSpeed);
@@ -106,11 +121,11 @@ public class StrafeState : State {
 
 	public override void RestoreFieldsAndProperties(object stateObjectRecord) {
 		StrafeStateRecord record = (StrafeStateRecord)stateObjectRecord;
-		strafeSideAnimationVelocity = record.strafeSideAnimationVelocity;
-		strafeForwardAnimationVelocity = record.strafeForwardAnimationVelocity;
+		rewindableStrafeSideAnimationVelocity.Value = record.strafeSideAnimationVelocity;
+		rewindableStrafeForwardAnimationVelocity.Value = record.strafeForwardAnimationVelocity;
 	}
 
 	public override object RecordFieldsAndProperties() {
-		return new StrafeStateRecord(strafeSideAnimationVelocity, strafeForwardAnimationVelocity);
+		return new StrafeStateRecord(rewindableStrafeSideAnimationVelocity.Value, rewindableStrafeForwardAnimationVelocity.Value);
 	}
 }
