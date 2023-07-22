@@ -107,14 +107,15 @@ public class RewindController {
                 rewindableVariable.FramesWithoutBeingRecorded = 0;
                 rewindableVariable.RecordedAtLeastOnce = true;
                 recordedVariablesMask[i] = true;
+                numVariablesNotRecordedAtLeastOnce--;
 
             } else if (rewindableVariable.IsModified) {
-                recordedVariablesThisFrame[modifiedIndex] = rewindableVariable.Record();
+                recordedVariablesThisFrame[modifiedIndex] = rewindableVariable.Record(); 
                 modifiedIndex++;
                 rewindableVariable.FramesWithoutBeingRecorded = 0;
                 recordedVariablesMask[i] = true;
 
-            } else if( rewindableVariable.LimitMaxFramesWithoutBeingRecorded && 
+            } else if( rewindableVariable.MaxFramesWithoutBeingRecordedEnabled && 
                        rewindableVariable.FramesWithoutBeingRecorded == rewindableVariable.MaxFramesWithoutBeingRecorded ) {
 
                 recordedVariablesThisFrame[modifiedIndex] = rewindableVariable.Record();
@@ -124,9 +125,13 @@ public class RewindController {
                 recordedVariablesMask[i] = true;
 
             } else {
-                rewindableVariable.FramesWithoutBeingRecorded++;
                 recordedVariablesMask[i] = false;
-                if(rewindableVariable.LimitMaxFramesWithoutBeingRecorded && 
+                
+                if (rewindableVariable.MaxFramesWithoutBeingRecordedEnabled) {
+                    rewindableVariable.FramesWithoutBeingRecorded++;
+                }
+                
+                if(rewindableVariable.MaxFramesWithoutBeingRecordedEnabled && 
                    rewindableVariable.FramesWithoutBeingRecorded == rewindableVariable.MaxFramesWithoutBeingRecorded ) {
                     /* variables that haven't been recorded for (MaxFramesWithoutBeingRecorded) frames will be recorded next frame.
                      * Count them with numOutdatedVariables.

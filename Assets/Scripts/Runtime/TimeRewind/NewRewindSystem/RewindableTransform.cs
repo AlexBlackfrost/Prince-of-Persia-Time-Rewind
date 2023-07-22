@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public struct TransformRecord {
+public class TransformRecord {
     public Vector3 position;
     public Quaternion rotation;
     public Vector3 localScale;
@@ -12,11 +12,18 @@ public struct TransformRecord {
         this.localScale = localScale;
     }
 
+    public TransformRecord(Transform transform) {
+        this.position = transform.position;
+        this.rotation = transform.rotation;
+        this.localScale = transform.localScale;
+    }
+
     public override string ToString() {
         return "Position: " + position + "\nRotation: " + rotation + "\nScale: " + localScale + "\n";
     }
 }
 public class RewindableTransform : RewindableVariableBase<Transform> {
+
     public Vector3 position {
         get {
             return Value.position;
@@ -47,22 +54,11 @@ public class RewindableTransform : RewindableVariableBase<Transform> {
         }
     }
 
-    public override bool IsModified {
-        get {
-            if (!isModified && animator.applyRootMotion) {
-                isModified = true; 
-            }
-            return isModified;
-        }
-        set {
-            base.IsModified = value;
-        }
-    }
 
-    private Animator animator;
     
-    public RewindableTransform(Transform transform, Animator animator) : base(transform) {
-        this.animator = animator;
+    public RewindableTransform(Transform transform, bool onlyExecuteOnRewindStop = false) : 
+        base(transform, onlyExecuteOnRewindStop:onlyExecuteOnRewindStop) {
+
     }
 
     public override void OnRewindStart() { }
@@ -72,7 +68,11 @@ public class RewindableTransform : RewindableVariableBase<Transform> {
     }
 
     public override object Record() {
-        return new TransformRecord(Value.position, Value.rotation, Value.localScale);
+        TransformRecord recordedTransform = null;
+        if(Value != null) {
+            recordedTransform = new TransformRecord(Value.position, Value.rotation, Value.localScale);
+        }
+        return recordedTransform;
     }
 
     public override void Rewind(object previousRecord, object nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
@@ -81,10 +81,14 @@ public class RewindableTransform : RewindableVariableBase<Transform> {
 
         float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
 
-        Value.position = Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha);
-        Value.rotation = Quaternion.Slerp(previousTransformRecord.rotation, nextTransformRecord.rotation, lerpAlpha);
-        Value.localScale = Vector3.Lerp(previousTransformRecord.localScale, nextTransformRecord.localScale, lerpAlpha);
+        if(previousTransformRecord!= null && nextTransformRecord != null) {
+            Value.position = Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha);
+            Value.rotation = Quaternion.Slerp(previousTransformRecord.rotation, nextTransformRecord.rotation, lerpAlpha);
+            Value.localScale = Vector3.Lerp(previousTransformRecord.localScale, nextTransformRecord.localScale, lerpAlpha);
+        } else {
+            Value = null;
+        }
+        
     }
-
 
 }

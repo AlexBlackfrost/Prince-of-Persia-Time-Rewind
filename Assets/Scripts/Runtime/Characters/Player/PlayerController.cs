@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Awake() {
         animator = GetComponent<Animator>();
-        rewindableTransform = new RewindableTransform(transform, animator);
+        rewindableTransform = new RewindableTransform(transform); 
         rewindableCamera = new RewindableCamera(timeControlSettings.FreeLookCamera, timeControlSettings.timeRewindCamera);
 
         characterMovement.Init();
@@ -334,6 +334,16 @@ public class PlayerController : MonoBehaviour {
 
     public void SetIsShielded(Bool enabled) {
         hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+    }
+
+    public void OnAnimatorMove() {
+        if (animator.applyRootMotion) {
+            animator.ApplyBuiltinRootMotion();
+            rewindableTransform.Value.position = transform.position;
+            rewindableTransform.Value.rotation = transform.rotation;
+            rewindableTransform.Value.localScale = transform.localScale;
+        }
+        
     }
 
     #endregion

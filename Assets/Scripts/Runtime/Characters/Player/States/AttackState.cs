@@ -30,22 +30,24 @@ public class AttackState : State {
     private int nextComboAttackHash;
     private int [] comboAttackNameHashes;
     private AttackInputBuffer attackInputBuffer;
-    private bool comboEnabled;
-    private int attackIndex;
-    private bool followedCombo;
-    private bool rotationEnabled;
     private Camera mainCamera;
-    private HashSet<IHittable> alreadyHitObjects;
-    private Transform closestAttackTarget;
+
+    private RewindableHashSet<IHittable> alreadyHitObjects;
+    private RewindableVariable<bool> comboEnabled;
+    private RewindableVariable<bool> rotationEnabled;
+    private RewindableVariable<bool> followedCombo;
+    private RewindableVariable<int> attackIndex;
+    private RewindableTransform closestAttackTarget;
+    private IRewindable[] rewindableVariables;
 
     public AttackState(AttackSettings settings) : base() {
         this.settings = settings;
         mainCamera = Camera.main;
         settings.Sword.OnSetComboEnabled = SetComboEnabled;
         settings.Sword.OnSetRotationEnabled = SetRotationEnabled;
-        comboEnabled = false;
         attackInputBuffer = new AttackInputBuffer(ATTACK_PRESSED_BUFFER_SIZE);
-        alreadyHitObjects = new HashSet<IHittable>();
+
+        InitRewindableVariables();
 
         attackHash = AnimatorUtils.attackHash;
         nextComboAttackHash = AnimatorUtils.nextComboAttackHash;
@@ -56,24 +58,50 @@ public class AttackState : State {
         AnimatorUtils.AnimationEnded += OnAnimationEnded;
     }
 
+    private void InitRewindableVariables() {
+        comboEnabled = new RewindableVariable<bool>(false, onlyExecuteOnRewindStop: true);
+        rotationEnabled = new RewindableVariable<bool>(false, onlyExecuteOnRewindStop: true);
+        followedCombo = new RewindableVariable<bool>(false, onlyExecuteOnRewindStop: true);
+        attackIndex = new RewindableVariable<int>(onlyExecuteOnRewindStop: true);
+        alreadyHitObjects = new RewindableHashSet<IHittable>(onlyExecuteOnRewindStop: true);
+        closestAttackTarget = new RewindableTransform(null, onlyExecuteOnRewindStop: true);
+        rewindableVariables = new IRewindable[] { comboEnabled, rotationEnabled, followedCombo, attackIndex, alreadyHitObjects, closestAttackTarget };
+
+        foreach(IRewindable rewindableVariable in rewindableVariables) {
+            rewindableVariable.OnlyExecuteOnRewindStop = true;
+            rewindableVariable.MaxFramesWithoutBeingRecordedEnabled = true;
+        }
+    }
+
+    /**
+     * Don't record variables when this state is not active. Enabled MaxFramesWithoutBeingRecorded on Enter
+     * and disbale it on Exit for better memory optimization.
+     */
+    private void SetRecordRewindableVariablesEnabled(bool enabled) {
+        foreach (IRewindable rewindableVariable in rewindableVariables) {
+            rewindableVariable.MaxFramesWithoutBeingRecordedEnabled = enabled;
+        }
+    }
+
     protected override void OnEnter() {
         settings.Sword.SheathingEnabled = false;
         settings.Sword.SetSwordAnimatorLayerEnabled(false);
         
         attackInputBuffer.Clear();
         alreadyHitObjects.Clear();
-        
-        attackIndex = 1;
-        followedCombo = false;
 
-        rotationEnabled = true;
+        SetRecordRewindableVariablesEnabled(true);
+        attackIndex.Value = 1;
+        followedCombo.Value = false;
+
+        rotationEnabled.Value = true;
 
         settings.Animator.applyRootMotion = true;
         settings.Animator.SetBool(attackHash, true);
 
-        closestAttackTarget = null;
+        closestAttackTarget.Value = null;
         if(settings.PerceptionSystem.IsEnemyInsideStrafeDetectionRadius()) {
-            closestAttackTarget = settings.PerceptionSystem.CurrentDetectedEnemies[0].transform;
+            closestAttackTarget.Value = settings.PerceptionSystem.CurrentDetectedEnemies[0].transform;
         }
     }
 
@@ -88,6 +116,8 @@ public class AttackState : State {
         settings.Sword.SetSwordAnimatorLayerEnabled(true);
         settings.Sword.SetHitboxEnabled(Bool.False);
 
+        SetRecordRewindableVariablesEnabled(false);
+
         settings.Animator.SetBool(attackHash, false);
         settings.Animator.applyRootMotion = false;
     }
@@ -97,21 +127,21 @@ public class AttackState : State {
         float now = Time.time;
         attackInputBuffer.Push(new AttackInput(wasAttackPressed, now));
 
-        if (comboEnabled && attackIndex < MAX_ATTACK_COMBO && attackInputBuffer.WasAttackPressedInLastSeconds(settings.AttackPressedBufferTime)) {
-            comboEnabled = false;
+        if (comboEnabled.Value && attackIndex.Value < MAX_ATTACK_COMBO && attackInputBuffer.WasAttackPressedInLastSeconds(settings.AttackPressedBufferTime)) {
+            comboEnabled.Value = false;
             attackInputBuffer.Clear();
             alreadyHitObjects.Clear();
             settings.Animator.SetTrigger(nextComboAttackHash);
-            rotationEnabled = true;
-            attackIndex++;
-            followedCombo = true;
+            rotationEnabled.Value = true;
+            attackIndex.Value++;
+            followedCombo.Value = true;
         }
     }
 
     private void UpdateRotation() {
-        if (rotationEnabled) {
+        if (rotationEnabled.Value) {
             Vector3  moveDirection = Vector3.zero;
-            if (closestAttackTarget == null) { // No target near, use input direction
+            if (closestAttackTarget.Value == null) { // No target near, use input direction
                 Vector2 inputDirection = settings.InputController.GetMoveDirection();
                 moveDirection = mainCamera.transform.TransformDirection(inputDirection.x, 0, inputDirection.y);
                 
@@ -156,24 +186,24 @@ public class AttackState : State {
     }
 
     public void SetComboEnabled(bool enabled) {
-        comboEnabled = enabled;
+        comboEnabled.Value = enabled;
         if (enabled) {
-            followedCombo = false;
+            followedCombo.Value = false;
         } else {
-            if (!followedCombo) {
+            if (!followedCombo.Value) {
                 AttackEnded.Invoke();
             }
         }
     }
 
     public void SetRotationEnabled(bool enabled) {
-        rotationEnabled = enabled; 
+        rotationEnabled.Value = enabled; 
     }
 
     private void OnAnimationEnded(int shortNameHash) {
         if (shortNameHash == comboAttackNameHashes[MAX_ATTACK_COMBO - 1]) { // Last combo attack finished
             AttackEnded.Invoke();
-        } else if (!followedCombo) { // Other combo attacks finished but player didn't keep pressing attack
+        } else if (!followedCombo.Value) { // Other combo attacks finished but player didn't keep pressing attack
             foreach (int comboAttackNameHash in comboAttackNameHashes) {
                 if (comboAttackNameHash == shortNameHash) {
                     AttackEnded.Invoke();
@@ -202,18 +232,18 @@ public class AttackState : State {
         attackInputBuffer.Clear();
 
         AttackStateRecord record = (AttackStateRecord)stateObjectRecord;
-        attackIndex = record.attackIndex;
-        comboEnabled = record.comboEnabled;
-        rotationEnabled = record.rotationEnabled;
-        followedCombo = record.followedCombo;
-        closestAttackTarget = record.closestAttackTarget;
-        alreadyHitObjects = new HashSet<IHittable>(record.alreadyHitObjects);
+        attackIndex.Value = record.attackIndex;
+        comboEnabled.Value = record.comboEnabled;
+        rotationEnabled.Value = record.rotationEnabled;
+        followedCombo.Value = record.followedCombo;
+        closestAttackTarget.Value = record.closestAttackTarget;
+        //alreadyHitObjects = new HashSet<IHittable>(record.alreadyHitObjects);
     }
 
     public override object RecordFieldsAndProperties() {
-        IHittable[] alreadyHitObjects = new IHittable[this.alreadyHitObjects.Count];
-        this.alreadyHitObjects.CopyTo(alreadyHitObjects);
-        return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo, alreadyHitObjects, closestAttackTarget);
+        //IHittable[] alreadyHitObjects = new IHittable[this.alreadyHitObjects.Count];
+        //this.alreadyHitObjects.CopyTo(alreadyHitObjects);
+        return null;// new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo, alreadyHitObjects, closestAttackTarget);
     }
 
     

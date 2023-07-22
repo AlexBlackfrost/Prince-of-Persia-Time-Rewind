@@ -48,8 +48,14 @@ public class RewindableVariable<BasicType> : RewindableVariableBase<BasicType> {
                 string type2 = typeof(BasicType).ToString();
                 Debug.Log("Casting different types: " + type1 + " and "+ type2);
             }
-            
+
+            //try {
+
             Value = (BasicType)previousRecord;
+            //} catch (InvalidCastException e) {
+                //Debug.Log(e.StackTrace);
+            //}
+            
         }
     }
 

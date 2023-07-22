@@ -41,10 +41,15 @@ public class StrafeState : State {
 
 	protected override void OnEnter() {
 		settings.Animator.SetBool(AnimatorUtils.strafeHash, true);
+		rewindableStrafeForwardAnimationVelocity.MaxFramesWithoutBeingRecordedEnabled = true;
+		rewindableStrafeSideAnimationVelocity.MaxFramesWithoutBeingRecordedEnabled = true;
 	}
 
 	protected override void OnExit() {
 		settings.Animator.SetBool(AnimatorUtils.strafeHash, false);
+		// do not record them when the state is inactive
+		rewindableStrafeForwardAnimationVelocity.MaxFramesWithoutBeingRecordedEnabled = false;
+		rewindableStrafeSideAnimationVelocity.MaxFramesWithoutBeingRecordedEnabled = false;
 	}
 
 	private Transform GetClosestEnemyTransform(Vector2 inputDirection) {

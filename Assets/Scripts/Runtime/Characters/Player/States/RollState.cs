@@ -51,6 +51,7 @@ public class RollState : State {
 		Vector2 inputDirection = settings.InputController.GetMoveDirection();
 		settings.Animator.SetTrigger(AnimatorUtils.rollHash);
 		rollElapsedTime.Value = 0;
+		rollElapsedTime.MaxFramesWithoutBeingRecordedEnabled = true; 
 		Vector3 cameraRelativeInputDirection = settings.MainCamera.transform.TransformDirection(new Vector3(inputDirection.x, 0, inputDirection.y));
 		cameraRelativeInputDirection.y = 0;
 		cameraRelativeInputDirection.Normalize();
@@ -63,6 +64,7 @@ public class RollState : State {
 
 	protected override void OnExit() { 
 		settings.Hurtbox.IsInvincible = false;
+		rollElapsedTime.MaxFramesWithoutBeingRecordedEnabled = false; // do not record it, this state it's not going to be active
 	}
 
 	public override void RestoreFieldsAndProperties(object stateObjectRecord) {
