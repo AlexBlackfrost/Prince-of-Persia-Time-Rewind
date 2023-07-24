@@ -28,6 +28,11 @@ public class StrafeState : State {
 		this.settings = settings;
 		this.rewindableStrafeForwardAnimationVelocity = new RewindableVariable<float>(onlyExecuteOnRewindStop : true) ;
 		this.rewindableStrafeSideAnimationVelocity = new RewindableVariable<float>(onlyExecuteOnRewindStop : true);
+
+#if UNITY_EDITOR
+		this.rewindableStrafeForwardAnimationVelocity.Name = "StrafeForwardAnimationVelocity";
+		this.rewindableStrafeSideAnimationVelocity.Name = "StrafeSideAnimationVelocity";
+#endif
 	}
 
 	protected override void OnUpdate() {
@@ -41,15 +46,10 @@ public class StrafeState : State {
 
 	protected override void OnEnter() {
 		settings.Animator.SetBool(AnimatorUtils.strafeHash, true);
-		rewindableStrafeForwardAnimationVelocity.MaxFramesWithoutBeingRecordedEnabled = true;
-		rewindableStrafeSideAnimationVelocity.MaxFramesWithoutBeingRecordedEnabled = true;
 	}
 
 	protected override void OnExit() {
 		settings.Animator.SetBool(AnimatorUtils.strafeHash, false);
-		// do not record them when the state is inactive
-		rewindableStrafeForwardAnimationVelocity.MaxFramesWithoutBeingRecordedEnabled = false;
-		rewindableStrafeSideAnimationVelocity.MaxFramesWithoutBeingRecordedEnabled = false;
 	}
 
 	private Transform GetClosestEnemyTransform(Vector2 inputDirection) {

@@ -603,6 +603,9 @@ namespace HFSM {
             if (CurrentStateObject == null) {
                 CurrentStateObject = new RewindableVariable<StateObject>(DefaultStateObject, interpolationEnabled: false, onlyExecuteOnRewindStop: true);
                 //CurrentStateObject.Value = DefaultStateObject;
+#if UNITY_EDITOR
+                CurrentStateObject.Name = GetType() + "CurrentStateObject";
+#endif
             }
             if (CurrentStateObject.Value == null) {
                 CurrentStateObject.Value = DefaultStateObject;

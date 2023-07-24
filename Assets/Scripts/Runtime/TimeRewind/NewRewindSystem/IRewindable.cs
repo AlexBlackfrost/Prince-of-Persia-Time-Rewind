@@ -4,8 +4,10 @@ using UnityEngine;
 
 
 public interface IRewindable {
+#if UNITY_EDITOR
+    public string Name { get; set; }
+#endif
     public bool OnlyExecuteOnRewindStop { get; set; }
-    public bool MaxFramesWithoutBeingRecordedEnabled { get; set; }
     public bool RecordedAtLeastOnce { get; set; }
     public int MaxFramesWithoutBeingRecorded { get;}
     public int FramesWithoutBeingRecorded { get; set; }

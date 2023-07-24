@@ -27,7 +27,10 @@ namespace HFSM {
         public StateObject() {
             transitions = new List<Transition>();
             eventTransitions = new List<EventTransitionBase>();
-            isActive = new RewindableVariable<bool>(false);
+            isActive = new RewindableVariable<bool>(true);
+#if UNITY_EDITOR
+            isActive.Name = GetType() + "IsActive";
+#endif
             IsActive = false;
         }
 

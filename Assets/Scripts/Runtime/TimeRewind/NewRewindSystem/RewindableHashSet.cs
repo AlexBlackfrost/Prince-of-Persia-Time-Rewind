@@ -14,7 +14,7 @@ public class RewindableHashSet<T> : RewindableVariableBase<HashSet<T>> {
 
     public void Clear() {
         Value.Clear();
-        //IsModified = true;
+        IsModified = true;
     }
 
     public bool Contains(T item) {
@@ -40,9 +40,9 @@ public class RewindableHashSet<T> : RewindableVariableBase<HashSet<T>> {
 
     public override void Rewind(object previousRecord, object nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
         T[] items = (T[])previousRecord;
-        Value.Clear();
+        value.Clear();
         foreach(T item in items) {
-            Value.Add(item);
+            value.Add(item);
         }
     }
 

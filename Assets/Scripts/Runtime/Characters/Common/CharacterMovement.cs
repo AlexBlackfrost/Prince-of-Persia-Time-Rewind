@@ -22,6 +22,9 @@ using System;
 
     public void Init() {
          velocity = new RewindableVariable<Vector3>();
+#if UNITY_EDITOR
+        velocity.Name = "CharacterMovementVelocity";
+#endif
     }
 
     public void Move(Vector3 direction) {

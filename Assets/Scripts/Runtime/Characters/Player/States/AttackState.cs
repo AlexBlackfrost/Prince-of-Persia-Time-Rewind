@@ -67,9 +67,17 @@ public class AttackState : State {
         closestAttackTarget = new RewindableTransform(null, onlyExecuteOnRewindStop: true);
         rewindableVariables = new IRewindable[] { comboEnabled, rotationEnabled, followedCombo, attackIndex, alreadyHitObjects, closestAttackTarget };
 
-        foreach(IRewindable rewindableVariable in rewindableVariables) {
+#if UNITY_EDITOR
+        comboEnabled.Name = "AttackStateComboEnabled";
+        rotationEnabled.Name = "AttackStateRotationEnabled";
+        followedCombo.Name = "AttackStateFollowedCombo";
+        attackIndex.Name = "AttackStateAttackIndex";
+        alreadyHitObjects.Name = "AttackStateAlreadyHitObjects";
+        closestAttackTarget.Name = "AttackStateClosestAttackTarget";
+#endif
+
+        foreach (IRewindable rewindableVariable in rewindableVariables) {
             rewindableVariable.OnlyExecuteOnRewindStop = true;
-            rewindableVariable.MaxFramesWithoutBeingRecordedEnabled = true;
         }
     }
 
@@ -77,11 +85,7 @@ public class AttackState : State {
      * Don't record variables when this state is not active. Enabled MaxFramesWithoutBeingRecorded on Enter
      * and disbale it on Exit for better memory optimization.
      */
-    private void SetRecordRewindableVariablesEnabled(bool enabled) {
-        foreach (IRewindable rewindableVariable in rewindableVariables) {
-            rewindableVariable.MaxFramesWithoutBeingRecordedEnabled = enabled;
-        }
-    }
+    
 
     protected override void OnEnter() {
         settings.Sword.SheathingEnabled = false;
@@ -90,7 +94,6 @@ public class AttackState : State {
         attackInputBuffer.Clear();
         alreadyHitObjects.Clear();
 
-        SetRecordRewindableVariablesEnabled(true);
         attackIndex.Value = 1;
         followedCombo.Value = false;
 
@@ -115,8 +118,6 @@ public class AttackState : State {
         settings.Sword.SheathingEnabled = true;
         settings.Sword.SetSwordAnimatorLayerEnabled(true);
         settings.Sword.SetHitboxEnabled(Bool.False);
-
-        SetRecordRewindableVariablesEnabled(false);
 
         settings.Animator.SetBool(attackHash, false);
         settings.Animator.applyRootMotion = false;

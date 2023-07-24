@@ -82,11 +82,11 @@ public class RewindableTransform : RewindableVariableBase<Transform> {
         float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
 
         if(previousTransformRecord!= null && nextTransformRecord != null) {
-            Value.position = Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha);
-            Value.rotation = Quaternion.Slerp(previousTransformRecord.rotation, nextTransformRecord.rotation, lerpAlpha);
-            Value.localScale = Vector3.Lerp(previousTransformRecord.localScale, nextTransformRecord.localScale, lerpAlpha);
+            value.position = Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha);
+            value.rotation = Quaternion.Slerp(previousTransformRecord.rotation, nextTransformRecord.rotation, lerpAlpha);
+            value.localScale = Vector3.Lerp(previousTransformRecord.localScale, nextTransformRecord.localScale, lerpAlpha);
         } else {
-            Value = null;
+            value = null;
         }
         
     }

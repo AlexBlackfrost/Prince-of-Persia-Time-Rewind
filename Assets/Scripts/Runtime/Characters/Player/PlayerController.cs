@@ -44,6 +44,10 @@ public class PlayerController : MonoBehaviour {
         animator = GetComponent<Animator>();
         rewindableTransform = new RewindableTransform(transform); 
         rewindableCamera = new RewindableCamera(timeControlSettings.FreeLookCamera, timeControlSettings.timeRewindCamera);
+#if UNITY_EDITOR
+        rewindableTransform.Name = "rewindablePlayerTransform";
+        rewindableCamera.Name = "RewindablePlayerCamera";
+#endif
 
         characterMovement.Init();
         characterMovement.CharacterController = GetComponent<CharacterController>();
@@ -339,9 +343,7 @@ public class PlayerController : MonoBehaviour {
     public void OnAnimatorMove() {
         if (animator.applyRootMotion) {
             animator.ApplyBuiltinRootMotion();
-            rewindableTransform.Value.position = transform.position;
-            rewindableTransform.Value.rotation = transform.rotation;
-            rewindableTransform.Value.localScale = transform.localScale;
+            rewindableTransform.IsModified = true;
         }
         
     }

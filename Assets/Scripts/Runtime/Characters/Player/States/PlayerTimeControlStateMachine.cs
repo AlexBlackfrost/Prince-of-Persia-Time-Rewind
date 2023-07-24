@@ -66,8 +66,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		} else if (!timeRewindPressed && timeIsRewinding) {
 			TimeRewindManager.StopTimeRewind();
         }
-		timeIsRewinding = timeRewindPressed;
 
+		timeIsRewinding = timeRewindPressed;
         if (timeIsRewinding) {
 			RewindPlayerRecord();
 			RewindController.Instance.Rewind(Time.deltaTime);
@@ -124,11 +124,11 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	}
 
     private void SavePlayerRecord() {
-		PlayerRecord playerRecord = new PlayerRecord(transformTimeControl.RecordTransformData(),
-													 cameraTimeControl.RecordCameraData(),
+		PlayerRecord playerRecord = new PlayerRecord(default(TransformRecord),
+													 default(CameraRecord),
 													 animationTimeControl.RecordAnimationData(),
 													 default(StateMachineRecord),
-													 characterMovementTimeControl.RecordCharacterMovementData(),
+													 default(CharacterMovementRecord),
 													 settings.Sword.RecordSwordData(),
 													 healthTimeControl.RecordHealthData(),
 													 hurtboxTimeControl.RecordHurtboxData(),

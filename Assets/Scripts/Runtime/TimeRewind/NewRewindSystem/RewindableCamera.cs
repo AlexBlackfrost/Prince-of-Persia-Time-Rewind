@@ -19,9 +19,9 @@ public class RewindableCamera : RewindableVariableBase<TransformRecord> {
 
     public void RecordTransformIfDifferent() {
         if (CameraTransformHasChanged()) {
-            Value.position = camera.transform.position;
-            Value.rotation = camera.transform.rotation;
-            Value.localScale = camera.transform.localScale;
+            value.position = camera.transform.position;
+            value.rotation = camera.transform.rotation;
+            value.localScale = camera.transform.localScale;
             IsModified = true;
         }
     }
@@ -34,7 +34,7 @@ public class RewindableCamera : RewindableVariableBase<TransformRecord> {
 
     public RewindableCamera(CinemachineFreeLook freeLookCamera, CinemachineVirtualCamera timeRewindCamera) : base() {
         camera = Camera.main;
-        Value = new TransformRecord(camera.transform);
+        value = new TransformRecord(camera.transform);
         freeLookCamera.GetComponent<CinemachineTrackCameraTransform>().RewindableCamera = this;
         this.freeLookCamera = freeLookCamera;
         this.timeRewindCamera = timeRewindCamera;
@@ -54,7 +54,7 @@ public class RewindableCamera : RewindableVariableBase<TransformRecord> {
     }
 
     public override object Record() {
-        return Value;
+        return new TransformRecord(camera.transform);
     }
 
     public override void Rewind(object previousRecord, object nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
@@ -66,6 +66,5 @@ public class RewindableCamera : RewindableVariableBase<TransformRecord> {
         timeRewindCamera.transform.position = Vector3.Lerp(previousTransformRecord.position, nextTransformRecord.position, lerpAlpha);
         timeRewindCamera.transform.rotation = Quaternion.Slerp(previousTransformRecord.rotation, nextTransformRecord.rotation, lerpAlpha);
         timeRewindCamera.transform.localScale = Vector3.Lerp(previousTransformRecord.localScale, nextTransformRecord.localScale, lerpAlpha);
-        
     }
 }

@@ -41,21 +41,18 @@ public class RewindableVariable<BasicType> : RewindableVariableBase<BasicType> {
     public override void Rewind(object previousRecord, object nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
         if (InterpolationEnabled) {
             float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
-            Value = (BasicType)Interpolate(previousRecord, nextRecord, lerpAlpha);
+            try {
+                value = (BasicType)Interpolate(previousRecord, nextRecord, lerpAlpha);
+            }catch(InvalidCastException e) {
+                Debug.LogError(e.StackTrace);
+            }
         } else {
             if(previousRecord.GetType() != typeof(BasicType)) {
                 string type1 = previousRecord.GetType().ToString();
                 string type2 = typeof(BasicType).ToString();
                 Debug.Log("Casting different types: " + type1 + " and "+ type2);
             }
-
-            //try {
-
-            Value = (BasicType)previousRecord;
-            //} catch (InvalidCastException e) {
-                //Debug.Log(e.StackTrace);
-            //}
-            
+            value = (BasicType)previousRecord;    
         }
     }
 

@@ -42,6 +42,9 @@ public class AnimationTimeControl {
 
 			}
 			rewindableAnimatorParameters[i] = rewindableAnimatorParameter;
+#if UNITY_EDITOR
+			rewindableAnimatorParameter.Name = "AnimatorParameter" + animatorParameter.name;
+#endif
 		}
 	}
 
