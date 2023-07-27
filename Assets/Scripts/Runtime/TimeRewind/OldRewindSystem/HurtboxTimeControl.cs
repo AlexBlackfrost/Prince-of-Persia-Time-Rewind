@@ -23,12 +23,12 @@ public class HurtboxTimeControl {
         float isDamageableRemainingTime = Mathf.Lerp(previousRecord.isDamageableRemainingTime, nextRecord.isDamageableRemainingTime,
                                                      elapsedTimeSinceLastRecord / previousRecordDeltaTime);
 
-        hurtbox.SetIsShielded(previousRecord.isShielded);
+        hurtbox.IsShielded = previousRecord.isShielded;
         hurtbox.IsDamageableRemainingTime = isDamageableRemainingTime;
         hurtbox.IsInvincible = previousRecord.isInvincible;
     }
 
     public HurtboxRecord RecordHurtboxData() {
-        return new HurtboxRecord(hurtbox.IsDamageableRemainingTime, hurtbox.IsShielded(), hurtbox.IsInvincible);
+        return new HurtboxRecord(hurtbox.IsDamageableRemainingTime, hurtbox.IsShielded, hurtbox.IsInvincible);
     }
 }

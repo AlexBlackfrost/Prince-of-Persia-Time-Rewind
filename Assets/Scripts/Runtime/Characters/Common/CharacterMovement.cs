@@ -23,7 +23,7 @@ using System;
     public void Init() {
          velocity = new RewindableVariable<Vector3>();
 #if UNITY_EDITOR
-        velocity.Name = "CharacterMovementVelocity";
+        velocity.Name = "CharacterMovementVelocity"+Transform.Value.gameObject.name;
 #endif
     }
 

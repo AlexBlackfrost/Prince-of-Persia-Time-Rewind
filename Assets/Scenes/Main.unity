@@ -292,8 +292,8 @@ MonoBehaviour:
     gravity: -40
   hurtbox: {fileID: 964352650}
   health:
-    currentHealth: 0
     <MaxHealth>k__BackingField: 1000
+    serializedCurrentHealth: 1000
   sword: {fileID: 919132149622075204}
   enemyAI:
     recentDamageLookbackTimeTriggerBlock: 2
@@ -1296,7 +1296,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_TagString
@@ -4239,10 +4239,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ecc83a1878396e46b12d6b38719bfec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDamageableCooldown: 0.1
-  <IsInvincible>k__BackingField: 0
-  <IsDamageableRemainingTime>k__BackingField: 0
-  isShielded: 0
+  isDamageableCooldown: 0
+  isShieldedDebugOnly: 0
 --- !u!136 &964352651
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -5538,10 +5536,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ecc83a1878396e46b12d6b38719bfec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDamageableCooldown: 0.5
-  <IsInvincible>k__BackingField: 0
-  <IsDamageableRemainingTime>k__BackingField: 0
-  isShielded: 0
+  isDamageableCooldown: 0
+  isShieldedDebugOnly: 0
 --- !u!136 &1612310791
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -5942,8 +5938,8 @@ MonoBehaviour:
     gravity: -40
   hurtbox: {fileID: 1612310790}
   health:
-    currentHealth: 0
-    <MaxHealth>k__BackingField: 10000
+    <MaxHealth>k__BackingField: 1000
+    serializedCurrentHealth: 1000
   sword: {fileID: 68330440}
   timeControlSettings:
     <FreeLookCamera>k__BackingField: {fileID: 223078464}

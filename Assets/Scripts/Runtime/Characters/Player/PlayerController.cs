@@ -49,9 +49,9 @@ public class PlayerController : MonoBehaviour {
         rewindableCamera.Name = "RewindablePlayerCamera";
 #endif
 
-        characterMovement.Init();
-        characterMovement.CharacterController = GetComponent<CharacterController>();
         characterMovement.Transform = rewindableTransform;
+        characterMovement.CharacterController = GetComponent<CharacterController>();
+        characterMovement.Init();
         InputController = GetComponent<InputController>();
         perceptionSystem = GetComponent<PlayerPerceptionSystem>();
 
@@ -337,7 +337,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void SetIsShielded(Bool enabled) {
-        hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+        hurtbox.IsShielded = Convert.ToBoolean((int)enabled);
     }
 
     public void OnAnimatorMove() {

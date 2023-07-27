@@ -81,12 +81,6 @@ public class AttackState : State {
         }
     }
 
-    /**
-     * Don't record variables when this state is not active. Enabled MaxFramesWithoutBeingRecorded on Enter
-     * and disbale it on Exit for better memory optimization.
-     */
-    
-
     protected override void OnEnter() {
         settings.Sword.SheathingEnabled = false;
         settings.Sword.SetSwordAnimatorLayerEnabled(false);
@@ -230,14 +224,14 @@ public class AttackState : State {
     }
 
     public override void RestoreFieldsAndProperties(object stateObjectRecord) {
-        attackInputBuffer.Clear();
+        /*attackInputBuffer.Clear();
 
         AttackStateRecord record = (AttackStateRecord)stateObjectRecord;
         attackIndex.Value = record.attackIndex;
         comboEnabled.Value = record.comboEnabled;
         rotationEnabled.Value = record.rotationEnabled;
         followedCombo.Value = record.followedCombo;
-        closestAttackTarget.Value = record.closestAttackTarget;
+        closestAttackTarget.Value = record.closestAttackTarget;*/
         //alreadyHitObjects = new HashSet<IHittable>(record.alreadyHitObjects);
     }
 

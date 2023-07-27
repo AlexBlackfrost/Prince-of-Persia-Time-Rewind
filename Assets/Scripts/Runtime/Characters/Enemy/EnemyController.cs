@@ -31,9 +31,15 @@ public class EnemyController : MonoBehaviour{
 
     private void Awake() {
         animator = GetComponent<Animator>();
-        rewindableTransform = new RewindableTransform(transform, animator);
-        characterMovement.Transform = rewindableTransform;
+        rewindableTransform = new RewindableTransform(transform);
+#if UNITY_EDITOR
+        rewindableTransform.Name = "EnemyTransform" + gameObject.name;
+#endif
+
         characterMovement.CharacterController = GetComponent<CharacterController>();
+        characterMovement.Transform = rewindableTransform;
+        characterMovement.Init();
+
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
         
         enemyAI.Init();
@@ -123,7 +129,7 @@ public class EnemyController : MonoBehaviour{
         // Damaged ->
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded);
         hurtbox.DamageReceived += damagedState.AddEventTransition<float>(damagedState);
-        damagedState.AddTransition(blockState, enemyAI.ResetReceivedTooMuchDamageRecently, () => enemyAI.ReceivedTooMuchDamageRecently);
+        damagedState.AddTransition(blockState, enemyAI.ResetReceivedTooMuchDamageRecently, () => enemyAI.ReceivedTooMuchDamageRecently.Value);
 
         // Parried ->
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded);
@@ -177,7 +183,7 @@ public class EnemyController : MonoBehaviour{
     }
 
     private bool HasDetectedPlayer() {
-        return perceptionSystem.IsSeeingPlayer() || enemyAI.HasBeenAttacked;
+        return perceptionSystem.IsSeeingPlayer() || enemyAI.HasBeenAttacked.Value;
     }
 
     #endregion
@@ -207,7 +213,7 @@ public class EnemyController : MonoBehaviour{
     }
 
     public void SetIsShielded(Bool enabled) {
-        hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+        hurtbox.IsShielded = Convert.ToBoolean((int)enabled);
     }
 
     public void SetHurtboxInvincible(Bool invincible) {

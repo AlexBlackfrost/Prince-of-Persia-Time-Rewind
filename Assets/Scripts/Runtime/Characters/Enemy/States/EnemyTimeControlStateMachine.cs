@@ -80,31 +80,26 @@ public class EnemyTimeControlStateMachine : StateMachine {
 
 		animationTimeControl.OnTimeRewindStop(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
-		stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
+		//stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
 
-		transformTimeControl.OnTimeRewindStop(previousRecord.enemyTransform, nextRecord.enemyTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		/*transformTimeControl.OnTimeRewindStop(previousRecord.enemyTransform, nextRecord.enemyTransform, previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/
 
-		characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord,
-													  previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		/*characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord,
+													  previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/
 
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 
 		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 				
-		hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		//hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 
-		settings.EnemyAI.OnTimeRewindStop(previousRecord.enemyAIRecord, nextRecord.enemyAIRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		//settings.EnemyAI.OnTimeRewindStop(previousRecord.enemyAIRecord, nextRecord.enemyAIRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 	}
 
 	private void SaveEnemyRecord() {
-		EnemyRecord enemyRecord = new EnemyRecord(transformTimeControl.RecordTransformData(),
-												  animationTimeControl.RecordAnimationData(),
-												  stateMachineTimeControl.RecordStateMachineData(),
-												  characterMovementTimeControl.RecordCharacterMovementData(),
+		EnemyRecord enemyRecord = new EnemyRecord(animationTimeControl.RecordAnimationData(),
 												  settings.Sword.RecordSwordData(),
 												  healthTimeControl.RecordHealthData(),
-												  hurtboxTimeControl.RecordHurtboxData(),
-												  settings.EnemyAI.RecordEnemyAIData(),
 												  Time.deltaTime);
 
 		// Check for interrupted transitions -- Now it's done inside animationTimeControl
@@ -126,28 +121,28 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	}
 
 	private void RestoreEnemyRecord(EnemyRecord previousRecord, EnemyRecord nextRecord) {
-		transformTimeControl.RestoreTransformRecord(previousRecord.enemyTransform, nextRecord.enemyTransform, previousRecord.deltaTime,
-													elapsedTimeSinceLastRecord);
+		/*transformTimeControl.RestoreTransformRecord(previousRecord.enemyTransform, nextRecord.enemyTransform, previousRecord.deltaTime,
+													elapsedTimeSinceLastRecord);*/
 
 		animationTimeControl.RestoreAnimationRecord(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime,
 													elapsedTimeSinceLastRecord);
 
-		characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord,
-																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		/*characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord,
+																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/
 
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
 											  elapsedTimeSinceLastRecord);
 
-		hurtboxTimeControl.RestoreHurtboxRecord(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime,
-												elapsedTimeSinceLastRecord);
+		/*hurtboxTimeControl.RestoreHurtboxRecord(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime,
+												elapsedTimeSinceLastRecord);*/
 
-		settings.EnemyAI.RestoreEnemyAIRecord(previousRecord.enemyAIRecord, nextRecord.enemyAIRecord, previousRecord.deltaTime, 
-											  elapsedTimeSinceLastRecord);
+		/*settings.EnemyAI.RestoreEnemyAIRecord(previousRecord.enemyAIRecord, nextRecord.enemyAIRecord, previousRecord.deltaTime, 
+											  elapsedTimeSinceLastRecord);*/
 
 
-		Debug.Log("Enemy Rewinding... " + nextRecord.stateMachineRecord.stateObjectRecords[0].stateObject.ToString());
+		//Debug.Log("Enemy Rewinding... " + nextRecord.stateMachineRecord.stateObjectRecords[0].stateObject.ToString());
 	}
 
 	public override object RecordFieldsAndProperties() {

@@ -3,19 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 [Serializable]
 public class Health{
-    [SerializeField] private float currentHealth;
     [field:SerializeField] public float MaxHealth { get; private set; }
+
+    [SerializeField] private float serializedCurrentHealth;
+    private RewindableVariable<float> currentHealth;
     public float CurrentHealth {
         get {
-            return currentHealth;
+            if (currentHealth == null) {
+                currentHealth = new RewindableVariable<float>(value: serializedCurrentHealth);
+            }
+            return currentHealth.Value;
         }
 
         set {
-            float previousHealth = currentHealth;
-            currentHealth = value;
-            HealthChanged?.Invoke(previousHealth, currentHealth);
+            if (currentHealth == null) {
+                currentHealth = new RewindableVariable<float>(value: serializedCurrentHealth);
+            }
+            float previousHealth = currentHealth.Value;
+            currentHealth.Value = value;
+            serializedCurrentHealth = value;
+            HealthChanged?.Invoke(previousHealth, currentHealth.Value);
         } 
     }
 

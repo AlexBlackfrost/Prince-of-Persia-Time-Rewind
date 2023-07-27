@@ -38,18 +38,20 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private int recordFPS = 60;
 	private int recordMaxseconds = 20;
 	private CinemachineBrain cinemachineBrain;
+	private NoneState noneState;
 
 	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
 
+		noneState = new NoneState();
 		animationTimeControl = new AnimationTimeControl(settings.Animator);
-		transformTimeControl = new TransformTimeControl(settings.Transform);
-		cameraTimeControl = new CameraTimeControl(settings.Camera, settings.timeRewindCamera, settings.FreeLookCamera);
-		stateMachineTimeControl = new StateMachineTimeControl(this);
-		characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
+		//transformTimeControl = new TransformTimeControl(settings.Transform);
+		//cameraTimeControl = new CameraTimeControl(settings.Camera, settings.timeRewindCamera, settings.FreeLookCamera);
+		//stateMachineTimeControl = new StateMachineTimeControl(this);
+		//characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
 		healthTimeControl = new HealthTimeControl(settings.Health);
-		hurtboxTimeControl = new HurtboxTimeControl(settings.Hurtbox);
+		//hurtboxTimeControl = new HurtboxTimeControl(settings.Hurtbox);
 
 		cinemachineBrain = settings.Camera.GetComponent<CinemachineBrain>();
 
@@ -91,7 +93,10 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		//cameraTimeControl.OnTimeRewindStart();
 
 		// State machine
-		stateMachineTimeControl.OnTimeRewindStart();
+		//stateMachineTimeControl.OnTimeRewindStart();
+		CurrentStateObject.Value.Exit();
+		// Do not change state using ChangeState() so that OnStateEnter is not triggered after rewind stops.
+		CurrentStateObject.Value = noneState;
 
 		// Sword
 		settings.Sword.OnTimeRewindStart();
@@ -120,18 +125,13 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 		
 		// Hurtbox
-		hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		//hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 	}
 
     private void SavePlayerRecord() {
-		PlayerRecord playerRecord = new PlayerRecord(default(TransformRecord),
-													 default(CameraRecord),
-													 animationTimeControl.RecordAnimationData(),
-													 default(StateMachineRecord),
-													 default(CharacterMovementRecord),
+		PlayerRecord playerRecord = new PlayerRecord(animationTimeControl.RecordAnimationData(),
 													 settings.Sword.RecordSwordData(),
 													 healthTimeControl.RecordHealthData(),
-													 hurtboxTimeControl.RecordHurtboxData(),
 													 Time.deltaTime);
 
 		// Check for interrupted transitions -- Now it's done inside animationTimeControl
@@ -172,8 +172,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
 											  elapsedTimeSinceLastRecord);
 
-		hurtboxTimeControl.RestoreHurtboxRecord(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime,
-												elapsedTimeSinceLastRecord);
+		/*hurtboxTimeControl.RestoreHurtboxRecord(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime,
+												elapsedTimeSinceLastRecord);*/
 
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 

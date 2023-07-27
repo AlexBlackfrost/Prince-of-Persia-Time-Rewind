@@ -20,10 +20,13 @@ public class AIAttackState : State{
     public Action Parried;
 
     private AIAttackSettings settings;
-    private HashSet<IHittable> alreadyHitObjects;
+    private RewindableHashSet<IHittable> alreadyHitObjects;
     public AIAttackState(AIAttackSettings settings) {
         this.settings = settings;
-        alreadyHitObjects = new HashSet<IHittable>();
+        alreadyHitObjects = new RewindableHashSet<IHittable>(onlyExecuteOnRewindStop: true);
+#if UNITY_EDITOR
+        alreadyHitObjects.Name = "AlreadyHitObjects" + settings.Transform.gameObject.name;
+#endif
         AnimatorUtils.AnimationEnded += OnAnimationEnded;
     }
 
@@ -89,14 +92,16 @@ public class AIAttackState : State{
     }
 
     public override void RestoreFieldsAndProperties(object stateObjectRecord) {
-        AIAttackStateRecord record = (AIAttackStateRecord)stateObjectRecord;
-        alreadyHitObjects = new HashSet<IHittable>(record.alreadyHitObjects);
+        /*AIAttackStateRecord record = (AIAttackStateRecord)stateObjectRecord;
+        alreadyHitObjects = new HashSet<IHittable>(record.alreadyHitObjects.Value);*/
     }
 
     public override object RecordFieldsAndProperties() {
+        /*
         IHittable[] alreadyHitObjects = new IHittable[this.alreadyHitObjects.Count];
         this.alreadyHitObjects.CopyTo(alreadyHitObjects);
-        return new AIAttackStateRecord(alreadyHitObjects);
+        return new AIAttackStateRecord(alreadyHitObjects);*/
+        return null;
     }
 
     public void OnAnimationEnded(int shortNameHash) {
@@ -104,7 +109,6 @@ public class AIAttackState : State{
          * exiting this state, that is, while transitioning to a different animation state. Since the event at the end of 
          * the animation won't be fired if the transition ends before, here's where the hitbox is disabled safely */
         if(shortNameHash == AnimatorUtils.AIAttackHash) {
-            Debug.Log("Dark Echion hitbox Enabled code: False");
             settings.Sword.SetHitboxEnabled(Bool.False);
         }
     }

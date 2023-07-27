@@ -12,26 +12,30 @@ public class EnemyAI {
 
     private CircularStack<(float,DateTime)> damagedTimeStamps;
     private const int MAX_DAMAGED_TIMESTAMPS = 15;
-    public bool ReceivedTooMuchDamageRecently { get; private set; }
-    public bool HasBeenAttacked { get; private set; }
+    public RewindableVariable<bool> ReceivedTooMuchDamageRecently { get; private set; }
+    public RewindableVariable<bool> HasBeenAttacked { get; private set; }
 
     public void Init() {
         damagedTimeStamps = new CircularStack<(float,DateTime)>(MAX_DAMAGED_TIMESTAMPS);
-        ReceivedTooMuchDamageRecently = false;
-        HasBeenAttacked = false;
+        ReceivedTooMuchDamageRecently = new RewindableVariable<bool>(value: false);
+        HasBeenAttacked = new RewindableVariable<bool>(value:false);
+#if UNITY_EDITOR
+        ReceivedTooMuchDamageRecently.Name = "ReceivedTooMuchDamageRecently";
+        HasBeenAttacked.Name = "HasBeenAttacked";
+#endif
     }
 
     public void OnDamageReceived(float amount) {
-        HasBeenAttacked = true;
+        HasBeenAttacked.Value = true;
         damagedTimeStamps.Push( (amount,TimeRewindManager.Now) );
         if (HasReceivedTooMuchDamagedRecently()) {
-            ReceivedTooMuchDamageRecently = true;
+            ReceivedTooMuchDamageRecently.Value = true;
         }
 
     }
      
     public void ResetReceivedTooMuchDamageRecently() {
-        ReceivedTooMuchDamageRecently = false;
+        ReceivedTooMuchDamageRecently.Value = false;
     }
 
     public void OnTimeRewindStart() {
@@ -46,12 +50,12 @@ public class EnemyAI {
     }
 
     public EnemyAIRecord RecordEnemyAIData() {
-        return new EnemyAIRecord(HasBeenAttacked, ReceivedTooMuchDamageRecently);
+        return default(EnemyAIRecord);// new EnemyAIRecord(HasBeenAttacked, ReceivedTooMuchDamageRecently);
     }
 
     public void RestoreEnemyAIRecord(EnemyAIRecord previousRecord, EnemyAIRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
-        HasBeenAttacked = previousRecord.hasBeenAttacked;
-        ReceivedTooMuchDamageRecently = previousRecord.receivedTooMuchDamageRecently;
+        //HasBeenAttacked = previousRecord.hasBeenAttacked;
+        //ReceivedTooMuchDamageRecently = previousRecord.receivedTooMuchDamageRecently;
     }
 
     private bool HasReceivedTooMuchDamagedRecently() {

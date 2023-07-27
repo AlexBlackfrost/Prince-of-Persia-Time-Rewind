@@ -22,7 +22,7 @@ public class BlockState : State {
     }
 
     protected override void OnExit() {
-        settings.Hurtbox.SetIsShielded(false);
+        settings.Hurtbox.IsShielded = false;
     }
 
     public override object RecordFieldsAndProperties() {

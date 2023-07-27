@@ -6,58 +6,36 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public struct PlayerRecord {
-    public TransformRecord playerTransform;
-    public CameraRecord cameraRecord;
     public AnimationRecord animationRecord;
-    public StateMachineRecord stateMachineRecord;
-    public CharacterMovementRecord characterMovementRecord;
     public SwordRecord swordRecord;
     public HealthRecord healthRecord;
-    public HurtboxRecord hurtboxRecord;
     public float deltaTime;
 
-    public PlayerRecord(TransformRecord playerTransform, CameraRecord cameraRecord, AnimationRecord animationRecord,
-                        StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
-                        SwordRecord swordRecord, HealthRecord healthRecord, HurtboxRecord hurtboxRecord,
-                        float deltaTime) {
+    public PlayerRecord(AnimationRecord animationRecord, SwordRecord swordRecord, 
+                        HealthRecord healthRecord,  float deltaTime) {
 
-        this.playerTransform = playerTransform;
-        this.cameraRecord = cameraRecord;
+
         this.animationRecord = animationRecord;
-        this.stateMachineRecord = stateMachineRecord;
-        this.characterMovementRecord = characterMovementRecord;
+
         this.swordRecord = swordRecord;
         this.healthRecord = healthRecord;
-        this.hurtboxRecord = hurtboxRecord;
         this.deltaTime = deltaTime;
     }
 }
 
 public struct EnemyRecord {
-    public TransformRecord enemyTransform;
     public AnimationRecord animationRecord;
-
-    public StateMachineRecord stateMachineRecord;
-    public CharacterMovementRecord characterMovementRecord;
     public SwordRecord swordRecord;
     public HealthRecord healthRecord;
-    public HurtboxRecord hurtboxRecord;
-    public EnemyAIRecord enemyAIRecord;
     public float deltaTime;
 
-    public EnemyRecord(TransformRecord enemyTransform, AnimationRecord animationRecord,
-                        StateMachineRecord stateMachineRecord, CharacterMovementRecord characterMovementRecord,
-                        SwordRecord swordRecord, HealthRecord healthRecord, HurtboxRecord hurtboxRecord,
-                        EnemyAIRecord enemyAIRecord, float deltaTime) {
+    public EnemyRecord(AnimationRecord animationRecord, SwordRecord swordRecord, 
+                       HealthRecord healthRecord, float deltaTime) {
 
-        this.enemyTransform = enemyTransform;
+
         this.animationRecord = animationRecord;
-        this.stateMachineRecord = stateMachineRecord;
-        this.characterMovementRecord = characterMovementRecord;
         this.swordRecord = swordRecord;
         this.healthRecord = healthRecord;
-        this.hurtboxRecord = hurtboxRecord;
-        this.enemyAIRecord = enemyAIRecord;
         this.deltaTime = deltaTime;
     }
 }
