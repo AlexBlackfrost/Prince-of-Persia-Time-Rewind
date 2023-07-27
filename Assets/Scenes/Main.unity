@@ -4239,7 +4239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ecc83a1878396e46b12d6b38719bfec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDamageableCooldown: 0
+  isDamageableCooldown: 0.1
   isShieldedDebugOnly: 0
 --- !u!136 &964352651
 CapsuleCollider:
@@ -5536,7 +5536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ecc83a1878396e46b12d6b38719bfec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDamageableCooldown: 0
+  isDamageableCooldown: 0.5
   isShieldedDebugOnly: 0
 --- !u!136 &1612310791
 CapsuleCollider:
