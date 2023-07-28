@@ -8,17 +8,11 @@ using UnityEngine;
 public struct PlayerRecord {
     public AnimationRecord animationRecord;
     public SwordRecord swordRecord;
-    public HealthRecord healthRecord;
     public float deltaTime;
 
-    public PlayerRecord(AnimationRecord animationRecord, SwordRecord swordRecord, 
-                        HealthRecord healthRecord,  float deltaTime) {
-
-
+    public PlayerRecord(AnimationRecord animationRecord, SwordRecord swordRecord, float deltaTime) {
         this.animationRecord = animationRecord;
-
         this.swordRecord = swordRecord;
-        this.healthRecord = healthRecord;
         this.deltaTime = deltaTime;
     }
 }
@@ -26,16 +20,11 @@ public struct PlayerRecord {
 public struct EnemyRecord {
     public AnimationRecord animationRecord;
     public SwordRecord swordRecord;
-    public HealthRecord healthRecord;
     public float deltaTime;
 
-    public EnemyRecord(AnimationRecord animationRecord, SwordRecord swordRecord, 
-                       HealthRecord healthRecord, float deltaTime) {
-
-
+    public EnemyRecord(AnimationRecord animationRecord, SwordRecord swordRecord,float deltaTime) {
         this.animationRecord = animationRecord;
         this.swordRecord = swordRecord;
-        this.healthRecord = healthRecord;
         this.deltaTime = deltaTime;
     }
 }

@@ -9,7 +9,7 @@ public class RewindableVariable<BasicType> : RewindableVariableBase<BasicType> {
         SetInterpolationEnabledDefaultValue();
     }
 
-    public RewindableVariable(BasicType value, bool interpolationEnabled, bool onlyExecuteOnRewindStop) : base(value, onlyExecuteOnRewindStop: onlyExecuteOnRewindStop) {
+    public RewindableVariable(BasicType value, bool interpolationEnabled, bool onlyExecuteOnRewindStop=false) : base(value, onlyExecuteOnRewindStop: onlyExecuteOnRewindStop) {
         InterpolationEnabled = interpolationEnabled;
     }
 

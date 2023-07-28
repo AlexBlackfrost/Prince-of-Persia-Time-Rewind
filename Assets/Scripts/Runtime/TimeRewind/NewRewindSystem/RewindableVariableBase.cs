@@ -6,7 +6,7 @@ public abstract class RewindableVariableBase<T> : IRewindable {
 #if UNITY_EDITOR
     public string Name { get ; set; }
 #endif   
-    protected T value;
+    [SerializeField]protected T value;
     public virtual T Value {
         get {
             return value;
@@ -20,7 +20,7 @@ public abstract class RewindableVariableBase<T> : IRewindable {
     }
     public bool OnlyExecuteOnRewindStop { get ; set; }
     public bool RecordedAtLeastOnce { get; set; }
-    public int MaxFramesWithoutBeingRecorded { get; private set; }
+    public int MaxFramesWithoutBeingRecorded { get; protected set; }
     public int FramesWithoutBeingRecorded { get; set; }
     protected bool isModified;
     public virtual bool IsModified {

@@ -3,36 +3,41 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-[Serializable]
-public class Health{
+[Serializable] public class Health : ISerializationCallbackReceiver{
     [field:SerializeField] public float MaxHealth { get; private set; }
 
     [SerializeField] private float serializedCurrentHealth;
-    private RewindableVariable<float> currentHealth;
+
+    public Action<float, float> HealthChanged;
+    public Action Dead;
+
     public float CurrentHealth {
         get {
-            if (currentHealth == null) {
-                currentHealth = new RewindableVariable<float>(value: serializedCurrentHealth);
-            }
             return currentHealth.Value;
         }
 
         set {
-            if (currentHealth == null) {
-                currentHealth = new RewindableVariable<float>(value: serializedCurrentHealth);
-            }
-            float previousHealth = currentHealth.Value;
+            float previousHealth = CurrentHealth;
             currentHealth.Value = value;
-            serializedCurrentHealth = value;
             HealthChanged?.Invoke(previousHealth, currentHealth.Value);
         } 
     }
 
-    public Action<float, float> HealthChanged;
-    public Action Dead;
+    private RewindableVariable<float> currentHealth;
+    public void OnBeforeSerialize() {
+        if(currentHealth != null) {
+            serializedCurrentHealth = currentHealth.Value;
+        }
+    }
+
+    public void OnAfterDeserialize() {
+        if (currentHealth != null) {
+            currentHealth.Value = serializedCurrentHealth;
+        }
+    }
     
     public void Init() {
+        currentHealth = new RewindableVariable<float>(value: serializedCurrentHealth, interpolationEnabled:false);
         CurrentHealth = MaxHealth;
     }
 
@@ -42,4 +47,6 @@ public class Health{
             Dead?.Invoke();
         }
     }
+
+    
 }

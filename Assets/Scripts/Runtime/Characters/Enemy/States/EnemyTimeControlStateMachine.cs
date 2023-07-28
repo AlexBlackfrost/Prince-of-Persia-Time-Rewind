@@ -89,7 +89,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 
-		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		//healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 				
 		//hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 
@@ -99,7 +99,6 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	private void SaveEnemyRecord() {
 		EnemyRecord enemyRecord = new EnemyRecord(animationTimeControl.RecordAnimationData(),
 												  settings.Sword.RecordSwordData(),
-												  healthTimeControl.RecordHealthData(),
 												  Time.deltaTime);
 
 		// Check for interrupted transitions -- Now it's done inside animationTimeControl
@@ -132,8 +131,8 @@ public class EnemyTimeControlStateMachine : StateMachine {
 
 		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
-		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
-											  elapsedTimeSinceLastRecord);
+		/*healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
+											  elapsedTimeSinceLastRecord);*/
 
 		/*hurtboxTimeControl.RestoreHurtboxRecord(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime,
 												elapsedTimeSinceLastRecord);*/

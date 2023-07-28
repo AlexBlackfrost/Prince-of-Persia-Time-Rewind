@@ -50,7 +50,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		//cameraTimeControl = new CameraTimeControl(settings.Camera, settings.timeRewindCamera, settings.FreeLookCamera);
 		//stateMachineTimeControl = new StateMachineTimeControl(this);
 		//characterMovementTimeControl = new CharacterMovementTimeControl(settings.CharacterMovement);
-		healthTimeControl = new HealthTimeControl(settings.Health);
+		//healthTimeControl = new HealthTimeControl(settings.Health);
 		//hurtboxTimeControl = new HurtboxTimeControl(settings.Hurtbox);
 
 		cinemachineBrain = settings.Camera.GetComponent<CinemachineBrain>();
@@ -122,7 +122,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		// Health
-		healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		//healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 		
 		// Hurtbox
 		//hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
@@ -131,7 +131,6 @@ public class PlayerTimeControlStateMachine : StateMachine {
     private void SavePlayerRecord() {
 		PlayerRecord playerRecord = new PlayerRecord(animationTimeControl.RecordAnimationData(),
 													 settings.Sword.RecordSwordData(),
-													 healthTimeControl.RecordHealthData(),
 													 Time.deltaTime);
 
 		// Check for interrupted transitions -- Now it's done inside animationTimeControl
@@ -169,8 +168,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		/*characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord, 
 																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/
 
-		healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
-											  elapsedTimeSinceLastRecord);
+		/*healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
+											  elapsedTimeSinceLastRecord);*/
 
 		/*hurtboxTimeControl.RestoreHurtboxRecord(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime,
 												elapsedTimeSinceLastRecord);*/

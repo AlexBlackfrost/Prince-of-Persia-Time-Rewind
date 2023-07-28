@@ -352,6 +352,7 @@ public class PlayerController : MonoBehaviour {
     private void Update() {
         rootStateMachine.Update();
         Debug.Log("Current state: " + rootStateMachine.GetCurrentStateName() );
+        Debug.Log("Player health: " + health.CurrentHealth);
     }
 
     private void FixedUpdate() {
