@@ -59,11 +59,11 @@ public class PlayerController : MonoBehaviour {
         sword.OnEquipped(this.gameObject);
 
         SubscribeEvents();
-
         InjectHFSMDependencies();
         BuildHFSM();
         rootStateMachine.Init();
     }
+
 
     private void BuildHFSM() {
         // Create states and state machines
@@ -243,6 +243,8 @@ public class PlayerController : MonoBehaviour {
         InputController.Sheathe.performed += (CallbackContext ctx) => { sword.OnSheathePressed(); };
 
         hurtbox.DamageReceived += health.OnDamageReceived;
+        TimeRewindController.Instance.TimeRewindStart += sword.OnTimeRewindStart;
+        TimeRewindController.Instance.AfterRewindingVariablesOnRewindStop += sword.OnAfterRewindingVariablesOnRewindStop; 
     }
 
     #region Transition conditions
@@ -345,14 +347,12 @@ public class PlayerController : MonoBehaviour {
             animator.ApplyBuiltinRootMotion();
             rewindableTransform.IsModified = true;
         }
-        
     }
 
     #endregion
     private void Update() {
         rootStateMachine.Update();
         Debug.Log("Current state: " + rootStateMachine.GetCurrentStateName() );
-        Debug.Log("Player health: " + health.CurrentHealth);
     }
 
     private void FixedUpdate() {

@@ -76,6 +76,7 @@ public class RewindableTransform : RewindableVariableBase<Transform> {
     }
 
     public override void Rewind(object previousRecord, object nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
+
         TransformRecord previousTransformRecord = (TransformRecord)previousRecord;
         TransformRecord nextTransformRecord = (TransformRecord)nextRecord;
 

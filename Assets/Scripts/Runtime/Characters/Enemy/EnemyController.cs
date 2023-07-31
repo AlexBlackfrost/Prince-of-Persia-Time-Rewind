@@ -44,6 +44,7 @@ public class EnemyController : MonoBehaviour{
         
         enemyAI.Init();
         health.Init();
+        sword.OnEquipped(this.gameObject);
 
         SubscribeEvents();
         InjectDependencies();
@@ -53,8 +54,6 @@ public class EnemyController : MonoBehaviour{
     }
 
     private void Start() {
-        sword.OnEquipped(this.gameObject);
-        
     }
 
     private void InjectDependencies() {

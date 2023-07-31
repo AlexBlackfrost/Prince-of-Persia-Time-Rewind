@@ -14,6 +14,8 @@ public class AnimationTimeControl {
 		lastInterruptedTransitionRecordInLayer = new TransitionRecord[animator.layerCount];
 		lastAnimationRecord.animationLayerRecords = new AnimationLayerRecord[animator.layerCount];
 		CreateRewindableAnimatorParameters();
+		TimeRewindController.Instance.AfterRewindingVariablesOnRewindStop += RestoreRewindableAnimatorParameters;
+		TimeRewindController.Instance.AfterRewindingVariablesOnRewind += RestoreRewindableAnimatorFloatParameters;
 	}
 
 	private void CreateRewindableAnimatorParameters() {
@@ -26,7 +28,7 @@ public class AnimationTimeControl {
 			switch (animatorParameter.type) {
 				case AnimatorControllerParameterType.Float:
 					float floatValue = animator.GetFloat(animatorParameter.nameHash);
-					rewindableAnimatorParameter = new RewindableVariable<float>(floatValue, interpolationEnabled: true, onlyExecuteOnRewindStop: true);
+					rewindableAnimatorParameter = new RewindableVariable<float>(floatValue, interpolationEnabled: true, onlyExecuteOnRewindStop: false);
 					break;
 
 				case AnimatorControllerParameterType.Int:
@@ -55,8 +57,12 @@ public class AnimationTimeControl {
 
     public void OnTimeRewindStop(AnimationRecord previousRecord, AnimationRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
 		//RestoreAnimatorParameters(previousRecord); //Restore parameters before restoring animation record or it won't work.
-		RestoreRewindableAnimatorParameters();
+		//RestoreRewindableAnimatorParameters();
         RestoreAnimationRecord(previousRecord, nextRecord, previousRecordDeltaTime, elapsedTimeSinceLastRecord);
+		/*foreach(AnimationLayerRecord animationLayerRecord in previousRecord.animationLayerRecords) {
+			animator.SetLayerWeight(animationLayerRecord.layer, animationLayerRecord.layerWeight);
+			animator.Play(animationLayerRecord.shortNameHash, animationLayerRecord.layer, animationLayerRecord.normalizedTime);
+        }*/
         animator.enabled = true;
         animator.speed = 1;
         animator.applyRootMotion = previousRecord.applyRootMotion;
@@ -64,7 +70,7 @@ public class AnimationTimeControl {
 
 	public AnimationRecord RecordAnimationData() {
         //AnimationParameter[] parameters = RecordAnimatorParameters(animator);
-		TryRecordRewindableAnimatorParameters();
+		RecordRewindableAnimatorParameters();
 		AnimationLayerRecord[] animationLayerRecords = new AnimationLayerRecord[animator.layerCount];
 
 		for (int layer = 0; layer < animator.layerCount; layer++) {
@@ -97,16 +103,12 @@ public class AnimationTimeControl {
 			Debug.Log(output);
 		}
 
-		AnimationRecord animationRecord = new AnimationRecord(/*parameters,*/ animationLayerRecords, animator.applyRootMotion);
+		AnimationRecord animationRecord = new AnimationRecord(/*parameters,*/ animationLayerRecords, animator.applyRootMotion, Time.deltaTime);
 		TrackInterruptedTransitions(ref animationRecord, Time.deltaTime);
 		return animationRecord;
 	}
 
-	private void TryRecordRewindableAnimatorParameters() {
-		/* Modifying the the rewindable Value doesn't mean it's going to be recorded; the new value
-		 * needs to be different in order to be recorded (or spend some time without been modified). 
-		 * This is handled in RewindableVariable<T> Value setter.
-		 */
+	private void RecordRewindableAnimatorParameters() {
 		for (int i = 0; i < rewindableAnimatorParameters.Length; i++) {
 			AnimatorControllerParameter animatorParameter = animator.parameters[i];
 

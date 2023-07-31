@@ -5,31 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct PlayerRecord {
-    public AnimationRecord animationRecord;
-    public SwordRecord swordRecord;
-    public float deltaTime;
-
-    public PlayerRecord(AnimationRecord animationRecord, SwordRecord swordRecord, float deltaTime) {
-        this.animationRecord = animationRecord;
-        this.swordRecord = swordRecord;
-        this.deltaTime = deltaTime;
-    }
-}
-
-public struct EnemyRecord {
-    public AnimationRecord animationRecord;
-    public SwordRecord swordRecord;
-    public float deltaTime;
-
-    public EnemyRecord(AnimationRecord animationRecord, SwordRecord swordRecord,float deltaTime) {
-        this.animationRecord = animationRecord;
-        this.swordRecord = swordRecord;
-        this.deltaTime = deltaTime;
-    }
-}
-
-
 
 public struct CameraRecord {
     public TransformRecord cameraTransform;
@@ -40,13 +15,15 @@ public struct CameraRecord {
 }
 
 public struct AnimationRecord {
+    public float deltaTime;
     public bool applyRootMotion;
    // public AnimationParameter[] parameters;
     public AnimationLayerRecord[] animationLayerRecords;
-    public AnimationRecord(/*AnimationParameter[] parameters,*/ AnimationLayerRecord[] animationLayerRecords, bool applyRootMotion) {
+    public AnimationRecord(/*AnimationParameter[] parameters,*/ AnimationLayerRecord[] animationLayerRecords, bool applyRootMotion, float deltaTime) {
         //this.parameters = parameters;
         this.animationLayerRecords = animationLayerRecords;
         this.applyRootMotion = applyRootMotion;
+        this.deltaTime = deltaTime;
 
     }
 }

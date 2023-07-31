@@ -31,7 +31,7 @@ public abstract class RewindableVariableBase<T> : IRewindable {
             if(!isModified && value  && FramesWithoutBeingRecorded < MaxFramesWithoutBeingRecorded && RecordedAtLeastOnce ) { 
                 /* rewind controller already takes care of counting variables that haven't been recorded since the last @MaxFramesWithoutBeingRecorded,
                  * so don't increase the number of modified variables or it will be counted twice */
-                RewindController.Instance.IncreaseNumModifiedVariablesThisFrameBy1();
+                TimeRewindController.Instance.IncreaseNumModifiedVariablesThisFrameBy1();
             }
             isModified = value;
         } 
@@ -44,7 +44,7 @@ public abstract class RewindableVariableBase<T> : IRewindable {
         this.MaxFramesWithoutBeingRecorded = maxFramesWithoutBeingRecorded;
         IsModified = false;
         RecordedAtLeastOnce = false;
-        int id = RewindController.Instance.Register(this);
+        int id = TimeRewindController.Instance.Register(this);
  
     }
 
@@ -54,7 +54,7 @@ public abstract class RewindableVariableBase<T> : IRewindable {
         this.MaxFramesWithoutBeingRecorded = maxFramesWithoutBeingRecorded;
         IsModified = false;
         RecordedAtLeastOnce = false;
-        RewindController.Instance.Register(this);
+        TimeRewindController.Instance.Register(this);
     }
 
     public abstract object Record();

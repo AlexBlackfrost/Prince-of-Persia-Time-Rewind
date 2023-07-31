@@ -28,8 +28,8 @@ public class EnemyTimeControlStateMachine : StateMachine {
 
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
-	private EnemyRecord previousRecord, nextRecord;
-	private CircularStack<EnemyRecord> records;
+	private AnimationRecord previousRecord, nextRecord;
+	private CircularStack<AnimationRecord> records;
 	private int recordFPS = 60; 
 	private int recordMaxseconds = 20;
 
@@ -47,17 +47,17 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		healthTimeControl = new HealthTimeControl(settings.Health);
 		hurtboxTimeControl = new HurtboxTimeControl(settings.Hurtbox);
 
-		records = new CircularStack<EnemyRecord>(recordFPS * recordMaxseconds);
+		records = new CircularStack<AnimationRecord>(recordFPS * recordMaxseconds);
 		timeIsRewinding = false;
-		TimeRewindManager.TimeRewindStart += OnTimeRewindStart;
-		TimeRewindManager.TimeRewindStop += OnTimeRewindStop;
+		TimeRewindController.Instance.TimeRewindStart += OnTimeRewindStart;
+		TimeRewindController.Instance.TimeRewindStop += OnTimeRewindStop;
 	}
 
 	protected override void OnLateUpdate() {
 		if (timeIsRewinding) {
 			RewindEnemyRecord();
 		} else {
-			SaveEnemyRecord();
+			SaveAnimationRecord();
 		}
 	}
 
@@ -78,7 +78,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	private void OnTimeRewindStop() {
 		timeIsRewinding = false;
 
-		animationTimeControl.OnTimeRewindStop(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		animationTimeControl.OnTimeRewindStop(previousRecord, nextRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		//stateMachineTimeControl.RestoreStateMachineRecord(previousRecord.stateMachineRecord);
 
@@ -87,7 +87,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		/*characterMovementTimeControl.OnTimeRewindStop(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord,
 													  previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/
 
-		settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
+		//settings.Sword.OnTimeRewindStop(previousRecord.swordRecord, nextRecord.swordRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 
 		//healthTimeControl.OnTimeRewindStop(previousRecord.healthRecord, nextRecord.healthRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 				
@@ -96,14 +96,8 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		//settings.EnemyAI.OnTimeRewindStop(previousRecord.enemyAIRecord, nextRecord.enemyAIRecord, elapsedTimeSinceLastRecord, previousRecord.deltaTime);
 	}
 
-	private void SaveEnemyRecord() {
-		EnemyRecord enemyRecord = new EnemyRecord(animationTimeControl.RecordAnimationData(),
-												  settings.Sword.RecordSwordData(),
-												  Time.deltaTime);
-
-		// Check for interrupted transitions -- Now it's done inside animationTimeControl
-		//animationTimeControl.TrackInterruptedTransitions(ref enemyRecord.animationRecord, enemyRecord.deltaTime);
-
+	private void SaveAnimationRecord() {
+		AnimationRecord enemyRecord = animationTimeControl.RecordAnimationData();
 		records.Push(enemyRecord);
 	}
 
@@ -115,21 +109,21 @@ public class EnemyTimeControlStateMachine : StateMachine {
 			nextRecord = records.Peek();
 		}
 
-		RestoreEnemyRecord(previousRecord, nextRecord);
-		elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindManager.RewindSpeed;
+		RestoreEnemyAnimationRecord(previousRecord, nextRecord);
+		elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindController.Instance.RewindSpeed;
 	}
 
-	private void RestoreEnemyRecord(EnemyRecord previousRecord, EnemyRecord nextRecord) {
+	private void RestoreEnemyAnimationRecord(AnimationRecord previousRecord, AnimationRecord nextRecord) {
 		/*transformTimeControl.RestoreTransformRecord(previousRecord.enemyTransform, nextRecord.enemyTransform, previousRecord.deltaTime,
 													elapsedTimeSinceLastRecord);*/
 
-		animationTimeControl.RestoreAnimationRecord(previousRecord.animationRecord, nextRecord.animationRecord, previousRecord.deltaTime,
+		animationTimeControl.RestoreAnimationRecord(previousRecord, nextRecord, previousRecord.deltaTime,
 													elapsedTimeSinceLastRecord);
 
 		/*characterMovementTimeControl.RestoreCharacterMovementRecord(previousRecord.characterMovementRecord, nextRecord.characterMovementRecord,
 																	previousRecord.deltaTime, elapsedTimeSinceLastRecord);*/
 
-		settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
+		//settings.Sword.RestoreSwordRecord(previousRecord.swordRecord, nextRecord.swordRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
 
 		/*healthTimeControl.RestoreHealthRecord(previousRecord.healthRecord, nextRecord.healthRecord, previousRecord.deltaTime, 
 											  elapsedTimeSinceLastRecord);*/

@@ -16,13 +16,13 @@ public class NotifyAnimationEnded : StateMachineBehaviour {
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (normalizedTimeFireEvent >= 0 && stateInfo.normalizedTime >= normalizedTimeFireEvent && !eventFired &&!TimeRewindManager.IsRewinding ) {
+        if (normalizedTimeFireEvent >= 0 && stateInfo.normalizedTime >= normalizedTimeFireEvent && !eventFired &&!TimeRewindController.Instance.IsRewinding ) {
             animator.NotifyAnimationEnded(stateInfo.shortNameHash);
             eventFired = true;
         }
     }
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (!eventFired && !TimeRewindManager.IsRewinding) {
+        if (!eventFired && !TimeRewindController.Instance.IsRewinding) {
             animator.NotifyAnimationEnded(stateInfo.shortNameHash);
             eventFired = true;
         }
@@ -30,7 +30,7 @@ public class NotifyAnimationEnded : StateMachineBehaviour {
 
     public override void OnStateMachineExit(Animator animator, int stateMachinePathHash) {
         // this only works if transition occurs from a state machine to another state machine.
-        if (normalizedTimeFireEvent >= 0 && !eventFired && !TimeRewindManager.IsRewinding) {
+        if (normalizedTimeFireEvent >= 0 && !eventFired && !TimeRewindController.Instance.IsRewinding) {
             animator.NotifyAnimationEnded(stateMachinePathHash);
         }
     }

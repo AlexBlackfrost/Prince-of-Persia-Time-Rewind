@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TimeRewindManager : MonoBehaviour {
-
+    
     public static DateTime Now {
         get {
             /* Account for the time elapsed while rewinding too, since DateTime won't stop while rewinding.

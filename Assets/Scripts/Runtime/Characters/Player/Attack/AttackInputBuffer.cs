@@ -13,7 +13,7 @@ public struct AttackInput {
 public class AttackInputBuffer : CircularStack<AttackInput>{
 
     public AttackInputBuffer(int size):base(size) {
-        TimeRewindManager.TimeRewindStop += ClearInputBuffer;
+        TimeRewindController.Instance.TimeRewindStop += ClearInputBuffer;
     }
 
     private void ClearInputBuffer() {
