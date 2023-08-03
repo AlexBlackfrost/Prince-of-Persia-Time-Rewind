@@ -34,6 +34,7 @@ using System;
         ApplyGravity();
 
         CharacterController.Move(velocity.Value * Time.deltaTime);
+        Transform.IsModified = true;
 
         if(direction.magnitude> float.Epsilon) {
             Quaternion targetRotation = Quaternion.LookRotation(new Vector3(velocity.Value.x, 0.0f, velocity.Value.z));
@@ -45,16 +46,19 @@ using System;
         velocity.Value = direction * speed;
         ApplyGravity();
         CharacterController.Move(velocity.Value * Time.deltaTime);
+        Transform.IsModified = true;
     }
 
     public void MoveAmount(Vector3 displacement) {
         velocity.Value = displacement/Time.deltaTime;
         CharacterController.Move(displacement);
+        Transform.IsModified = true;
     }
 
     public void SetPosition(Vector3 position) {
         Vector3 delta = position - Transform.position;
         CharacterController.Move(delta);
+        Transform.IsModified = true;
     }
 
     public void SetRotation(Quaternion rotation) {

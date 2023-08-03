@@ -58,7 +58,7 @@ public class RewindableTransform : RewindableVariableBase<Transform> {
     
     public RewindableTransform(Transform transform, bool onlyExecuteOnRewindStop = false) : 
         base(transform, onlyExecuteOnRewindStop:onlyExecuteOnRewindStop) {
-
+ 
     }
 
     public override void OnRewindStart() { }

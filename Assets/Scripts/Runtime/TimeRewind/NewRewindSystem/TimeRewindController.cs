@@ -142,9 +142,6 @@ public partial class TimeRewindController {
         bool[] recordedVariablesMask = new bool[rewindableVariables.Count];
         for (int i = 0; i < rewindableVariables.Count; i++) {
             IRewindable rewindableVariable = rewindableVariables[i];
-            if(rewindableVariable.Name == "rewindablePlayerTransform") {
-                Debug.Log("RewindablePlayerTransformModified: " + rewindableVariable.IsModified);
-            }
 
             if (!rewindableVariable.RecordedAtLeastOnce) {
                 recordedVariablesThisFrame[modifiedIndex] = rewindableVariable.Record();
@@ -193,7 +190,7 @@ public partial class TimeRewindController {
         numModifiedVariablesThisFrame = 0;
     }
 
-    public void Rewind(float deltaTime) {
+    public void Rewind() {
         /* If a rewindable variable can be X frames without being recorded, we cannot keep rewinding if there are less than X frames left,
          * since there's a possibility that the last time such variable was recorded was one of those last X frames. Since interpolation is often
          * performed, we need the last 2 recorded values of a rewindable variable, so we cannot keep rewinding if there are less than 2*maxMaxFramesWithoutBeingRecorded
@@ -225,10 +222,11 @@ public partial class TimeRewindController {
          * to multiply it by 2 (by 3 in previousModifiedData) to account for it and make sure the records
          * are going to be found too in OnRewindStop.
          */
-        int maxPeekDepthPreviousModifiedData = circularStack.Count - 3 * (MaxMaxFramesWithoutBeingRecorded + 1);
-        int maxPeekDepthNextNextModifiedData = circularStack.Count - 2 * (MaxMaxFramesWithoutBeingRecorded + 1);
+        int maxPeekDepthPreviousModifiedData = Math.Max(circularStack.Count - 3 * (MaxMaxFramesWithoutBeingRecorded + 1), circularStack.Count-3);
+        int maxPeekDepthNextNextModifiedData = Math.Max(circularStack.Count - 2 * (MaxMaxFramesWithoutBeingRecorded + 1), circularStack.Count-2);
         (object previousRecord, object nextRecord) = GetPreviousAndNextRecord(id, previousModifiedData, nextModifiedData, 
                                                                               maxPeekDepthPreviousModifiedData, maxPeekDepthNextNextModifiedData);
+
         if(previousRecord!=null && nextRecord != null) {
             rewindableVariables[id].Rewind(previousRecord, nextRecord, previousModifiedData.deltaTime, elapsedTimeSinceLastRecord);
         }
@@ -237,31 +235,28 @@ public partial class TimeRewindController {
     private (object, object) GetPreviousAndNextRecord(int id, RecordedData previousModifiedData, RecordedData nextModifiedData, 
                                                       int maxPeekDepthPreviousModifiedData, int maxPeekDepthNextModifiedData) {
 
+        // Find previous record
         int currentPeekDepth = 0;
         while (!previousModifiedData.HasRecordedDataFor(id) && currentPeekDepth < maxPeekDepthPreviousModifiedData) {
             previousModifiedData = circularStack.Peek(currentPeekDepth);
             nextModifiedData = circularStack.Peek(currentPeekDepth+1);
             currentPeekDepth++;
         }
-        if (!previousModifiedData.HasRecordedDataFor(id)) {
-           // Debug.Log("did not find previous recorded data for id: "+id);
-            return (null, null);
-        }
-
-        /*if (currentPeekDepth != 0) {
-            nextModifiedData = circularStack.Peek(currentPeekDepth);
-        }*/
-        while (!nextModifiedData.HasRecordedDataFor(id) && currentPeekDepth < maxPeekDepthNextModifiedData) {
-            nextModifiedData = circularStack.Peek(currentPeekDepth);
-            currentPeekDepth++;
-        }
-        if (!nextModifiedData.HasRecordedDataFor(id)) {
-            //Debug.LogError("did not find previous recorded data for id: "+id);
-            return (null, null);
-        }
-
         object previousRecord = previousModifiedData.GetRecordedDataFor(id);
-        object nextRecord = nextModifiedData.GetRecordedDataFor(id);
+
+        // Find next record
+        object nextRecord = null;
+        if (currentPeekDepth == 0) {
+            while (!nextModifiedData.HasRecordedDataFor(id) && currentPeekDepth < maxPeekDepthNextModifiedData) {
+                nextModifiedData = circularStack.Peek(currentPeekDepth);
+                currentPeekDepth++;
+            }
+            nextRecord = nextModifiedData.GetRecordedDataFor(id);
+        } else {
+            nextRecord = previousModifiedData.GetRecordedDataFor(id);
+
+        }
+
         return (previousRecord, nextRecord);
     }
 

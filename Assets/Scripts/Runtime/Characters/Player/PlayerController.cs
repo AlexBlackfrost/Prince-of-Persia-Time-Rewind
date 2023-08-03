@@ -343,7 +343,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void OnAnimatorMove() {
-        if (animator.applyRootMotion) {
+        if (!TimeRewindController.Instance.IsRewinding && animator.applyRootMotion) {
             animator.ApplyBuiltinRootMotion();
             rewindableTransform.IsModified = true;
         }

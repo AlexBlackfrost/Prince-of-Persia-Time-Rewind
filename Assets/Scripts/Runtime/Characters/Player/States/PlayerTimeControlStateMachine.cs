@@ -72,7 +72,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		}
 
 		if (timeIsRewinding) {
-			TimeRewindController.Instance.Rewind(Time.deltaTime);
+			TimeRewindController.Instance.Rewind();
 			RewindAnimationRecord();
 			cinemachineBrain.ManualUpdate();
 		} else {
