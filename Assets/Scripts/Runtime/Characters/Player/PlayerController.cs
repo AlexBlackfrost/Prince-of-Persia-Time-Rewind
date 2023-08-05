@@ -269,6 +269,12 @@ public class PlayerController : MonoBehaviour {
     }
 
     private bool RollAnimationEnded(int stateNameHash) {
+        if(AnimatorUtils.rollHash == stateNameHash) {
+        Debug.Log("Roll animation ended");
+
+        } else {
+            Debug.Log("Other animation ended");
+        }
         return AnimatorUtils.rollHash == stateNameHash;
     }
     

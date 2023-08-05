@@ -504,7 +504,6 @@ namespace HFSM {
             StateMachine lowestCommonStateMachine = FindLowestCommonStateMachine(
                 stateMachine1, stateMachine2
             );
-
             lowestCommonStateMachine.CurrentStateObject.Value.Exit();
 
             targetStateObject.StateMachine.CurrentStateObject.Value = targetStateObject;
@@ -517,6 +516,10 @@ namespace HFSM {
 
             availableTransition.InvokeTransitionAction();
             lowestCommonStateMachine.CurrentStateObject.Value.Enter();
+            Debug.Log("Changed State. Previous state was " + 
+                      originStateObject.GetCurrentStateName() + 
+                      " and next state was " + 
+                      targetStateObject.GetCurrentStateName());
         }
 
         /// <summary>
