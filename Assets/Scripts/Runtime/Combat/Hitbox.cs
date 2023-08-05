@@ -11,7 +11,6 @@ public struct HitData {
 }
 
 public class Hitbox : MonoBehaviour {
-
     public enum HitboxType { Capsule }
 
     #region Capsule

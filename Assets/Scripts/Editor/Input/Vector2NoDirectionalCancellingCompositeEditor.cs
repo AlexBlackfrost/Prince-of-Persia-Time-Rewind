@@ -1,13 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Composites;
-
-#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine.InputSystem.Editor;
+
 [InitializeOnLoad]
 internal class Vector2NoDirectionalCancellingCompositeEditor : InputParameterEditor<Vector2NoDirectionalCancellingComposite> {
 
@@ -31,4 +27,4 @@ internal class Vector2NoDirectionalCancellingCompositeEditor : InputParameterEdi
         InputSystem.RegisterBindingComposite<Vector2NoDirectionalCancellingComposite>("2DVectorCompositeNoDirectionalCancelling");
     }
 }
-#endif
+
