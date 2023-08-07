@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 
@@ -98,8 +99,12 @@ public class Stats : MonoBehaviour{
         }
         GUI.Label(new Rect(5, 40, 500, 25), "Average FPS (last " + lastNFPS.Length + " frames): " + Mathf.Round(averageFPSUI));
         //GUI.Label(new Rect(5, 70, 100, 25), "Min FPS: " + Mathf.Round(minFPSUI));
-        GUI.Label(new Rect(5, 70, 500, 25), "Average Record time (last " + lastNRecordTimes.Length + " frames) (ms): " + averageRecordTimeUI);
-        GUI.Label(new Rect(5, 100, 500, 25), "Average Rewind time (last " + lastNRewindTimes.Length + " frames): (ms): " + averageRewindTimeUI);
+
+        GUI.Label(new Rect(5, 70, 500, 25), "Average Record time (last " + lastNRecordTimes.Length + " frames) (ms): " + 
+            averageRecordTimeUI.ToString("F2", CultureInfo.InvariantCulture));
+
+        GUI.Label(new Rect(5, 100, 500, 25), "Average Rewind time (last " + lastNRewindTimes.Length + " frames): (ms): " + 
+            averageRewindTimeUI.ToString("F2", CultureInfo.InvariantCulture));
     }
 
 }
