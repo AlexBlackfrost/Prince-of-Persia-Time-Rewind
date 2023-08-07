@@ -48031,7 +48031,7 @@ GameObject:
   - component: {fileID: 1949259451}
   - component: {fileID: 1949259450}
   m_Layer: 0
-  m_Name: FPSCounter
+  m_Name: Stats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

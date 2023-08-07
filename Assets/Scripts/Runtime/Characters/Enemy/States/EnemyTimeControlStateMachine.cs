@@ -36,6 +36,8 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	private AnimationRecord lastAnimationRecord;
 	private TransitionRecord[] lastInterruptedTransitionRecordInLayer;
 
+	private System.Diagnostics.Stopwatch stopwatch;
+
 	public EnemyTimeControlStateMachine(UpdateMode updateMode, EnemyTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
@@ -51,13 +53,21 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		timeIsRewinding = false;
 		TimeRewindController.Instance.TimeRewindStart += OnTimeRewindStart;
 		TimeRewindController.Instance.TimeRewindStop += OnTimeRewindStop;
+
+		stopwatch = new System.Diagnostics.Stopwatch();
 	}
 
 	protected override void OnLateUpdate() {
 		if (timeIsRewinding) {
-			RewindEnemyRecord();
+			stopwatch.Restart();
+			RewindAnimationRecord();
+			stopwatch.Stop();
+			Stats.AddAccumulatedRewindTime(stopwatch.Elapsed.TotalMilliseconds);
 		} else {
+			stopwatch.Restart();
 			SaveAnimationRecord();
+			stopwatch.Stop();
+			Stats.AddAccumulatedRecordTime(stopwatch.Elapsed.TotalMilliseconds);
 		}
 	}
 
@@ -102,7 +112,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	}
 
 
-	private void RewindEnemyRecord() {
+	private void RewindAnimationRecord() {
 		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && records.Count > 2) {
 			elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
 			previousRecord = records.Pop();

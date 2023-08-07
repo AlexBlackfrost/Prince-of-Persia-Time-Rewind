@@ -40,6 +40,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private CinemachineBrain cinemachineBrain;
 	private NoneState noneState;
 
+	private System.Diagnostics.Stopwatch stopwatch;
+
 	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
@@ -59,6 +61,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		timeIsRewinding = false;
 		TimeRewindController.Instance.TimeRewindStart += OnTimeRewindStart;
 		TimeRewindController.Instance.TimeRewindStop += OnTimeRewindStop;
+
+		stopwatch = new System.Diagnostics.Stopwatch();
 	}
 	 
     protected override void OnLateUpdate() {
@@ -72,13 +76,19 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		}
 
 		if (timeIsRewinding) {
+			stopwatch.Restart();
 			TimeRewindController.Instance.Rewind();
 			RewindAnimationRecord();
+			stopwatch.Stop();
+			Stats.AddAccumulatedRewindTime(stopwatch.Elapsed.TotalMilliseconds);
 			cinemachineBrain.ManualUpdate();
 		} else {
 			cinemachineBrain.ManualUpdate();
+			stopwatch.Restart();
 			SaveAnimationRecord();
+			stopwatch.Stop();
 			TimeRewindController.Instance.RecordVariables();
+			Stats.AddAccumulatedRecordTime(stopwatch.Elapsed.TotalMilliseconds);
 		}
 		timeIsRewinding = timeRewindPressed;
         
