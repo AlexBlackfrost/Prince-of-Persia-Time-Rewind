@@ -65,7 +65,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 			stopwatch.Restart();
 			SaveEnemyRecord();
 			stopwatch.Stop();
-			Stats.AddAccumulatedRewindTime(stopwatch.Elapsed.TotalMilliseconds);
+			Stats.AddAccumulatedRecordTime(stopwatch.Elapsed.TotalMilliseconds);
 		}
 	}
 

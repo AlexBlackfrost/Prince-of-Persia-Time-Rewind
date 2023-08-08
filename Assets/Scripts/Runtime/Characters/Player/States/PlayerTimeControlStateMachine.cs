@@ -69,9 +69,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		timeIsRewinding = timeRewindPressed;
 
         if (timeIsRewinding) {
-
 			stopwatch.Restart();
-			stopwatch.Start();
 			RewindPlayerRecord();
 			stopwatch.Stop();
 			Stats.AddAccumulatedRewindTime(stopwatch.Elapsed.TotalMilliseconds);
