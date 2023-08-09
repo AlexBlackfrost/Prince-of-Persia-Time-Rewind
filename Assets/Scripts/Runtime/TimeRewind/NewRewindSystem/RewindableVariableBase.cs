@@ -38,7 +38,7 @@ public abstract class RewindableVariableBase<T> : IRewindable {
     }
 
 
-    public RewindableVariableBase(T value, int maxFramesWithoutBeingRecorded = 5, bool onlyExecuteOnRewindStop = false) {
+    public RewindableVariableBase(T value, int maxFramesWithoutBeingRecorded = 2, bool onlyExecuteOnRewindStop = false) {
         this.value = value;
         this.OnlyExecuteOnRewindStop = onlyExecuteOnRewindStop;
         this.MaxFramesWithoutBeingRecorded = maxFramesWithoutBeingRecorded;
@@ -48,7 +48,7 @@ public abstract class RewindableVariableBase<T> : IRewindable {
  
     }
 
-    public RewindableVariableBase(int maxFramesWithoutBeingRecorded = 5, bool onlyExecuteOnRewindStop = false) {
+    public RewindableVariableBase(int maxFramesWithoutBeingRecorded = 2, bool onlyExecuteOnRewindStop = false) {
         this.value = default(T);
         this.OnlyExecuteOnRewindStop = onlyExecuteOnRewindStop;
         this.MaxFramesWithoutBeingRecorded = maxFramesWithoutBeingRecorded;
