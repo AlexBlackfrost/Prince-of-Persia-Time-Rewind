@@ -66,12 +66,11 @@ public struct TransformRecord {
     public Vector3 position;
     public Quaternion rotation;
     public Vector3 localScale;
-    public float deltaTime;
+
     public TransformRecord(Vector3 position, Quaternion rotation, Vector3 localScale) {
         this.position = position;
         this.rotation = rotation;
         this.localScale = localScale;
-        deltaTime = 0;
     }
 
     public override string ToString() {
@@ -81,10 +80,9 @@ public struct TransformRecord {
 
 public struct CameraRecord {
     public TransformRecord cameraTransform;
-    public float deltaTime;
+
     public CameraRecord(TransformRecord cameraTransform) {
         this.cameraTransform = cameraTransform;
-        deltaTime = 0;
     }
 }
 
@@ -92,12 +90,11 @@ public struct AnimationRecord {
     public bool applyRootMotion;
     public AnimationParameter[] parameters;
     public AnimationLayerRecord[] animationLayerRecords;
-    public float deltaTime;
     public AnimationRecord(AnimationParameter[] parameters, AnimationLayerRecord[] animationLayerRecords, bool applyRootMotion) {
         this.parameters = parameters;
         this.animationLayerRecords = animationLayerRecords;
         this.applyRootMotion = applyRootMotion;
-        deltaTime = 0;
+
     }
 }
 public struct AnimationLayerRecord {
@@ -201,10 +198,8 @@ public struct RollStateRecord {
 
 public struct CharacterMovementRecord {
     public Vector3 velocity;
-    public float deltaTime;
     public CharacterMovementRecord(Vector3 velocity) {
         this.velocity = velocity;
-        deltaTime = 0;
     }
 }
 
@@ -216,7 +211,6 @@ public struct SwordRecord {
     public Transform swordSocket;
     public bool hitboxEnabled;
     public float attackCooldownRemainingTime;
-    public float deltaTime;
 
     public SwordRecord(bool sheathingEnabled, bool unsheathingEnabled, float animatorSwordLayerTargetWeight, 
                        SwordState swordState, Transform swordSocket, bool hitboxEnabled, float attackCooldownRemainingTime) {
@@ -228,17 +222,14 @@ public struct SwordRecord {
         this.swordSocket = swordSocket;
         this.hitboxEnabled = hitboxEnabled;
         this.attackCooldownRemainingTime = attackCooldownRemainingTime;
-        deltaTime = 0;
     }
 }
 
 public struct HealthRecord {
     public float currentHealth;
-    public float deltaTime;
 
     public HealthRecord(float currentHealth) {
         this.currentHealth = currentHealth;
-        deltaTime = 0;
     }
 }
 
@@ -246,13 +237,11 @@ public struct HurtboxRecord {
     public float isDamageableRemainingTime;
     public bool isShielded;
     public bool isInvincible;
-    public float deltaTime;
 
     public HurtboxRecord(float isDamageableRemainingTime, bool isShielded, bool isInvincible) {
         this.isDamageableRemainingTime = isDamageableRemainingTime;
         this.isShielded = isShielded;
         this.isInvincible = isInvincible;
-        deltaTime = 0;
     }
 }
 
