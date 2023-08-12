@@ -200,6 +200,8 @@ public class Sword : MonoBehaviour {
         swordState = previousSwordRecord.swordState;
         SheathingEnabled = previousSwordRecord.sheathingEnabled;
         UnsheathingEnabled = previousSwordRecord.unsheathingEnabled;
+        unsheatheMotionTime = animator.GetFloat(AnimatorUtils.unsheatheMotionTimeHash);
+        animatorSwordLayerWeight = animator.GetLayerWeight(swordAnimatorLayer);
 
         if (animationCoroutine != null) {//coroutine hadn't ended when time rewind started
             if (previousSwordRecord.swordState == SwordState.Unsheathing) {
@@ -227,23 +229,15 @@ public class Sword : MonoBehaviour {
     }
 
     public SwordRecord RecordSwordData() {
-        return new SwordRecord(SheathingEnabled, UnsheathingEnabled, unsheatheMotionTime, animatorSwordLayerWeight, animatorSwordLayerTargetWeight, 
+        return new SwordRecord(SheathingEnabled, UnsheathingEnabled, animatorSwordLayerTargetWeight, 
                                swordState, transform.parent, hitboxEnabled, attackCooldownRemainingTime);
     }
 
     public void RestoreSwordRecord(SwordRecord previousRecord, SwordRecord nextRecord,float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
         float lerpAlpha = elapsedTimeSinceLastRecord / previousRecordDeltaTime;
 
-        unsheatheMotionTime = Mathf.Lerp(previousRecord.unsheatheMotionTime, nextRecord.unsheatheMotionTime, lerpAlpha);
-        animator.SetFloat(AnimatorUtils.unsheatheMotionTimeHash, unsheatheMotionTime);
-
-        animatorSwordLayerWeight = Mathf.Lerp(previousRecord.animatorSwordLayerWeight, nextRecord.animatorSwordLayerWeight, lerpAlpha);
-        animator.SetLayerWeight(swordAnimatorLayer, animatorSwordLayerWeight);
-
         transform.SetParent(previousRecord.swordSocket, false);
-
         hitboxEnabled = previousRecord.hitboxEnabled;
-
         attackCooldownRemainingTime = Mathf.Lerp(previousRecord.attackCooldownRemainingTime, nextRecord.attackCooldownRemainingTime, lerpAlpha);
     }
 

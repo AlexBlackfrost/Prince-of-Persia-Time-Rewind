@@ -38,7 +38,6 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private int recordFPS = 60;
 	private int recordMaxseconds = 20;
 	private CinemachineBrain cinemachineBrain;
-	private Stopwatch stopwatch = new Stopwatch();
 	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
@@ -69,17 +68,11 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		timeIsRewinding = timeRewindPressed;
 
         if (timeIsRewinding) {
-			stopwatch.Restart();
 			RewindPlayerRecord();
-			stopwatch.Stop();
-			Stats.AddAccumulatedRewindTime(stopwatch.Elapsed.TotalMilliseconds);
 			cinemachineBrain.ManualUpdate();
 		} else {
 			cinemachineBrain.ManualUpdate();
-			stopwatch.Restart();
 			SavePlayerRecord();
-			stopwatch.Stop();
-			Stats.AddAccumulatedRecordTime(stopwatch.Elapsed.TotalMilliseconds);
         }
 	}
 
