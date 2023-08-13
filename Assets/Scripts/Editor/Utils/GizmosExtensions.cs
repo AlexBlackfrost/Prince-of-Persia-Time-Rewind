@@ -28,4 +28,54 @@ public class GizmosExtensions {
 
         }
     }
+
+    public static void DrawLine(Vector3 start, Vector3 end, float thickness, Color color = default(Color)) {
+        Camera camera = Camera.current;
+        if (camera != null && camera.clearFlags != CameraClearFlags.Depth && camera.clearFlags != CameraClearFlags.Nothing) {
+
+            // Only draw the line when it is the closest thing to the camera
+            // (Remove the Z-test code and other objects will not occlude the line.)
+            var prevZTest = Handles.zTest;
+            Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
+
+            Handles.color = color;
+            float cameraDistance = HandleUtility.GetHandleSize((start + end) / 2.0f);
+            Handles.DrawAAPolyLine(EditorGUIUtility.whiteTexture, thickness*(1/cameraDistance) , new Vector3[] { start, end }   );
+
+            Handles.zTest = prevZTest;
+        }
+    }
+
+ 
+    public static void DrawArrow(Vector3 start, Vector3 end) {
+        DrawArrow(start, end, 1);
+    }
+
+    public static void DrawArrow(Vector3 start, Vector3 end, float thickness) {
+        DrawArrow(start, end, thickness, 5);
+    }
+
+    public static void DrawArrow(Vector3 start, Vector3 end, float thickness, float arrowSize) {
+        DrawArrow(start, end, thickness, arrowSize, Color.red);
+    }
+
+    public static void DrawArrow(Vector3 start, Vector3 end, float thickness, float arrowSize, Color color) {
+        float arrowThicknessScale = 10;
+        // Draw arrow body
+        DrawLine(start, end, thickness*arrowThicknessScale, color);
+
+        // Draw arrowhead
+        Vector3 arrowUpVector = Vector3.up;// (Camera.current.transform.position - end).normalized;
+
+        float arrowAngle = 40;
+        Vector3 leftArrowHeadDirection = Quaternion.AngleAxis(arrowAngle, arrowUpVector) * (start-end).normalized ;
+        Vector3 rightArrowHeadDirection = Quaternion.AngleAxis(-arrowAngle, arrowUpVector) * (start-end).normalized;
+
+        float arrowSizeScale = 0.5f;
+        Vector3 leftArrowHeadEnd = end + leftArrowHeadDirection * arrowSize*arrowSizeScale;
+        Vector3 rightArrowHeadEnd = end + rightArrowHeadDirection * arrowSize*arrowSizeScale;
+
+        DrawLine(end, leftArrowHeadEnd, thickness*arrowThicknessScale, color);
+        DrawLine(end, rightArrowHeadEnd, thickness*arrowThicknessScale, color);
+    }
 }

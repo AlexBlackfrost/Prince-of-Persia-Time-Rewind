@@ -23,7 +23,7 @@ public class EnemyAI {
 
     public void OnDamageReceived(float amount) {
         HasBeenAttacked = true;
-        damagedTimeStamps.Push( (amount,TimeRewindManager.Now) );
+        damagedTimeStamps.Push( (amount,TimeRewindManager.Instance.Now) );
         if (HasReceivedTooMuchDamagedRecently()) {
             ReceivedTooMuchDamageRecently = true;
         }
@@ -39,7 +39,7 @@ public class EnemyAI {
     }
 
     public void OnTimeRewindStop(EnemyAIRecord previousRecord, EnemyAIRecord nextRecord, float previousRecordDeltaTime, float elapsedTimeSinceLastRecord) {
-        while(!damagedTimeStamps.IsEmpty() && damagedTimeStamps.Peek().Item2 > TimeRewindManager.Now) {
+        while(!damagedTimeStamps.IsEmpty() && damagedTimeStamps.Peek().Item2 > TimeRewindManager.Instance.Now) {
             damagedTimeStamps.Pop();
         }
         RestoreEnemyAIRecord(previousRecord, nextRecord, previousRecordDeltaTime, elapsedTimeSinceLastRecord);

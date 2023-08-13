@@ -50,8 +50,8 @@ public class EnemyTimeControlStateMachine : StateMachine {
 
 		records = new CircularStack<EnemyRecord>(recordFPS * recordMaxseconds);
 		timeIsRewinding = false;
-		TimeRewindManager.TimeRewindStart += OnTimeRewindStart;
-		TimeRewindManager.TimeRewindStop += OnTimeRewindStop;
+		TimeRewindManager.Instance.TimeRewindStart += OnTimeRewindStart;
+		TimeRewindManager.Instance.TimeRewindStop += OnTimeRewindStop;
 	}
 
 	protected override void OnLateUpdate() {
@@ -123,7 +123,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		}
 
 		RestoreEnemyRecord(previousRecord, nextRecord);
-		elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindManager.RewindSpeed;
+		elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindManager.Instance.RewindSpeed;
 	}
 
 	private void RestoreEnemyRecord(EnemyRecord previousRecord, EnemyRecord nextRecord) {

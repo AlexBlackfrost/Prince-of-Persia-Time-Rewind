@@ -16,7 +16,9 @@ public class IdleState : State {
 	}
 
 	protected override void OnUpdate() {
-		settings.CharacterMovement.ApplyGravity();
+		// CharacterController doesn't take collisions into account if CharacterController.Move() hasn't been called.
+		// Also, gravity needs to do its job, so call Move with zero speed and direction.
+		settings.CharacterMovement.Move(Vector3.zero, 0.0f);
 	}
 
     protected override void OnEnter() {

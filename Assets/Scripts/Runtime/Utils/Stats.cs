@@ -66,7 +66,7 @@ public class Stats : MonoBehaviour{
     }
 
     private void CalculateRecordTime() {
-        if (!TimeRewindManager.IsRewinding) {
+        if (!TimeRewindManager.Instance.IsRewinding) {
             lastNRecordTimes[currentRecordIndex] = accumulatedRecordTime;
             currentRecordIndex = (currentRecordIndex + 1) % lastNRecordTimes.Length;
             averageRecordTime = 0;
@@ -78,7 +78,7 @@ public class Stats : MonoBehaviour{
     }
 
     private void CalculateRewindTime() {
-        if (TimeRewindManager.IsRewinding) {
+        if (TimeRewindManager.Instance.IsRewinding) {
             averageRewindTime = accumulatedRewindTime;
             lastNRewindTimes[currentRewindIndex] = accumulatedRewindTime;
             currentRewindIndex = (currentRewindIndex + 1) % lastNRewindTimes.Length;

@@ -54,16 +54,16 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 		records = new CircularStack<PlayerRecord>(recordFPS * recordMaxseconds);
 		timeIsRewinding = false;
-		TimeRewindManager.TimeRewindStart += OnTimeRewindStart;
-		TimeRewindManager.TimeRewindStop += OnTimeRewindStop;
+		TimeRewindManager.Instance.TimeRewindStart += OnTimeRewindStart;
+		TimeRewindManager.Instance.TimeRewindStop += OnTimeRewindStop;
 	}
 	 
     protected override void OnLateUpdate() {
 		bool timeRewindPressed = settings.InputController.IsTimeRewindPressed();
 		if (timeRewindPressed && !timeIsRewinding) {
-			TimeRewindManager.StartTimeRewind();
+			TimeRewindManager.Instance.StartTimeRewind();
 		} else if (!timeRewindPressed && timeIsRewinding) {
-			TimeRewindManager.StopTimeRewind();
+			TimeRewindManager.Instance.StopTimeRewind();
         }
 		timeIsRewinding = timeRewindPressed;
 
@@ -146,7 +146,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		}
 		
 		RestorePlayerRecord(previousRecord, nextRecord);
-		elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindManager.RewindSpeed;
+		elapsedTimeSinceLastRecord += Time.deltaTime * TimeRewindManager.Instance.RewindSpeed;
 	}
 
 
