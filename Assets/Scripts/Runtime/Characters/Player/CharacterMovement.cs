@@ -33,7 +33,7 @@ using System;
             Quaternion targetRotation = Quaternion.LookRotation(new Vector3(velocity.x, 0.0f, velocity.z));
             Transform.rotation = Quaternion.Slerp(Transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
-    }
+    } 
 
     public void Move(Vector3 direction, float speed) {
         velocity = direction * speed;

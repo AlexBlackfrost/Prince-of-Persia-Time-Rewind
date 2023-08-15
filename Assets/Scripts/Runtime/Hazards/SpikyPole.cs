@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SpikyPole : MonoBehaviour{
     [field: SerializeField] public float Displacement { get; set; } = 3;
-    [SerializeField] private float speed = 6;
+    [field: SerializeField] public float Speed { get; private set; } = 6;
 
     public Vector3 InitialPosition { get; private set; }
 
@@ -36,7 +36,7 @@ public class SpikyPole : MonoBehaviour{
      *   both diplacement and speed everytime we modify just one of them, i.e. if we multiply displacement by 2 but don't modify speed, 
      *   it will take longer to reach the 2 meters offset. y = abs( (time*(Speed/Displacement) + 1)%2 -1) * Displacement
      */
-    private float EvaluateDisplacement(float time) {
-        return Mathf.Abs((time*(speed/Displacement) + 1 )% 2 - 1) * Displacement;
+    public float EvaluateDisplacement(float time) {
+        return Mathf.Abs((time*(Speed/Displacement) + 1 )% 2 - 1) * Displacement;
     }
 }

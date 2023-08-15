@@ -40,7 +40,7 @@ public class GizmosExtensions {
 
             Handles.color = color;
             float cameraDistance = HandleUtility.GetHandleSize((start + end) / 2.0f);
-            Handles.DrawAAPolyLine(EditorGUIUtility.whiteTexture, thickness*(1/cameraDistance) , new Vector3[] { start, end }   );
+            Handles.DrawAAPolyLine(EditorGUIUtility.whiteTexture, thickness/cameraDistance , new Vector3[] { start, end }   );
 
             Handles.zTest = prevZTest;
         }
@@ -77,5 +77,28 @@ public class GizmosExtensions {
 
         DrawLine(end, leftArrowHeadEnd, thickness*arrowThicknessScale, color);
         DrawLine(end, rightArrowHeadEnd, thickness*arrowThicknessScale, color);
+    }
+
+    public static void DrawArrowHead(Vector3 location, Quaternion rotation, float arrowAngle, float length, float thickness, Color color) {
+        float arrowThicknessScale = 10;
+
+        Vector3 start = location - (rotation * Vector3.forward) * length / 2 ;
+        Vector3 end = start + (rotation * Vector3.forward) * length / 2;
+
+        Vector3 arrowUpVector = rotation*Vector3.up;
+
+        Vector3 leftArrowHeadDirection = Quaternion.AngleAxis(arrowAngle, arrowUpVector) * (start - end).normalized;
+        Vector3 rightArrowHeadDirection = Quaternion.AngleAxis(-arrowAngle, arrowUpVector) * (start - end).normalized;
+
+        Vector3 leftArrowHeadStart = end + leftArrowHeadDirection * length;
+        Vector3 rightArrowHeadStart = end + rightArrowHeadDirection * length;
+
+        //This variable should be (thickness * texture.width)/2, but it doesn't work
+        float adjust = 1 / (Handles.lineThickness * EditorGUIUtility.whiteTexture.width * 2.0f);
+        Vector3 leftArrowHeadEnd = end - leftArrowHeadDirection * thickness *  adjust;
+        Vector3 rightArrowHeadEnd = end - rightArrowHeadDirection * thickness * adjust;
+
+        DrawLine(leftArrowHeadStart, leftArrowHeadEnd, thickness * arrowThicknessScale, color);
+        DrawLine(rightArrowHeadStart, rightArrowHeadEnd, thickness * arrowThicknessScale, color);
     }
 }
