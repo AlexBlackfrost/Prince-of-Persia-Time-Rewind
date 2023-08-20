@@ -112,6 +112,7 @@ public class SpikyPoleEditor : Editor {
             startPosition = spikyPole.transform.position;
         }
         startPosition += spikyPole.transform.forward * (renderer.bounds.extents.z + arrowLength);
+        startPosition += new Vector3(0, renderer.bounds.extents.y, 0);
 
         float spikyPoleWidth = renderer.bounds.extents.z * 2;
         int numArrows = (int)Math.Floor( (spikyPole.Displacement - spikyPoleWidth - arrowLength) / (arrowSpacing + arrowLength) );
