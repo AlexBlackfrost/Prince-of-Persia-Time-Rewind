@@ -2095,8 +2095,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84d23160005742747b0321db98a209c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Displacement>k__BackingField: 8.12
-  <Speed>k__BackingField: 2.3
+  <Displacement>k__BackingField: 5.76
+  <Speed>k__BackingField: 1.99
+  <RotationSpeed>k__BackingField: 500
+--- !u!136 &212744780
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212744775}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.44
+  m_Height: 3.67273
+  m_Direction: 1
+  m_Center: {x: -0.0017713015, y: 1.836365, z: -0.05878593}
 --- !u!1 &223078463
 GameObject:
   m_ObjectHideFlags: 0
@@ -4737,7 +4752,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1140635135}
-  m_LocalRotation: {x: 0.006610307, y: 0.99328613, z: -0.07415182, w: 0.08854708}
+  m_LocalRotation: {x: 0.006610308, y: 0.99328613, z: -0.07415182, w: 0.08854708}
   m_LocalPosition: {x: 1.6032362, y: 0, z: -3.2026038}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -4947,6 +4962,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Displacement>k__BackingField: 10.28
   <Speed>k__BackingField: 2.73
+  <RotationSpeed>k__BackingField: 6
 --- !u!136 &1356470565
 CapsuleCollider:
   m_ObjectHideFlags: 0

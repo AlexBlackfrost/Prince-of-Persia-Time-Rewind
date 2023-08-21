@@ -6,16 +6,22 @@ using UnityEngine;
 public class SpikyPole : MonoBehaviour{
     [field: SerializeField] public float Displacement { get; set; } = 3;
     [field: SerializeField] public float Speed { get; private set; } = 6;
+    [field: SerializeField] public float RotationSpeed { get; private set; } = 6;
 
     public Vector3 InitialPosition { get; private set; }
+    public Vector3 MoveDirection { get; private set; }
+    public Quaternion InitialRotation { get; private set; }
 
     private void Awake(){
         InitialPosition = transform.position;
+        InitialRotation = transform.rotation;
+        MoveDirection = transform.forward;
     }
 
     private void Update(){
         float time = (float)TimeRewindManager.Instance.SecondsSinceStart();
-        transform.position = InitialPosition + transform.forward * EvaluateDisplacement(time);
+        transform.position = InitialPosition + MoveDirection * EvaluateDisplacement(time);
+        transform.rotation = Quaternion.Euler(InitialRotation.x, InitialRotation.y + RotationSpeed * time, InitialRotation.z);
     }
 
     /**

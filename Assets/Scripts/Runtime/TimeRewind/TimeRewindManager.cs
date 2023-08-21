@@ -2,6 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class TimeRewindManager : MonoBehaviour {
     public event Action TimeRewindStart;
@@ -13,6 +16,10 @@ public class TimeRewindManager : MonoBehaviour {
     private double totalElapsedTimeRewinding; // Realtime elapsed rewinding (pressing the rewind button)
     private double totalRewindedTime; // Time traveled to the past, accounts for rewindSpeed
     private DateTime gameStartDate;
+#if UNITY_EDITOR
+    private float elapsedEditorPausedTime;
+    private DateTime lastEditorPauseStartDate;
+#endif
 
     private static TimeRewindManager instance;
     public static TimeRewindManager Instance {
@@ -32,7 +39,11 @@ public class TimeRewindManager : MonoBehaviour {
             /* Account for the time elapsed while rewinding too, since DateTime won't stop while rewinding.
              * Since RewindSpeed doesn't need to be 1, it has to be tracked independently
              */
-            return DateTime.Now.AddSeconds(-(totalElapsedTimeRewinding + totalRewindedTime)); 
+            float offsetTime = (float) (totalElapsedTimeRewinding + totalRewindedTime);
+#if UNITY_EDITOR
+            offsetTime += elapsedEditorPausedTime;
+#endif
+            return DateTime.Now.AddSeconds(-offsetTime);
         }
         private set {
             Now = value;
@@ -41,13 +52,28 @@ public class TimeRewindManager : MonoBehaviour {
 
     private void Awake() {
         gameStartDate = DateTime.Now;
+#if UNITY_EDITOR
+        EditorApplication.pauseStateChanged += OnPauseStateChanged;
+        EditorApplication.
+#endif
     }
+
+#if UNITY_EDITOR
+    private void OnPauseStateChanged(PauseState pauseState) {
+        if(pauseState == PauseState.Paused) {
+            lastEditorPauseStartDate = DateTime.Now;
+        }else if(pauseState == PauseState.Unpaused) {
+            elapsedEditorPausedTime += (float)(DateTime.Now - lastEditorPauseStartDate).TotalSeconds;
+        }
+    }
+#endif
 
     private void Update() {
         if (IsRewinding) {
             totalElapsedTimeRewinding += Time.deltaTime;
             totalRewindedTime += Time.deltaTime * RewindSpeed;
         }
+
     }
 
     /// <summary>

@@ -23,7 +23,8 @@ public class SpikyPoleEditor : Editor {
     private bool previewIsPlaying;
     private float spikyPolePreviewScaleFactor = 1.01f;  // Draw previews a little larger to avoid z-fighting.
     private float previewStartTime;
-    GUILayoutOption[] buttonOptions;
+    private Vector3 previewMoveDirection;
+    private GUILayoutOption[] buttonOptions;
 
     private void OnEnable() {
         spikyPole = (SpikyPole)target;
@@ -70,6 +71,7 @@ public class SpikyPoleEditor : Editor {
             previewIsPlaying = !previewIsPlaying;
             if (previewIsPlaying) {
                 buttonText = stopPreviewText;
+                previewMoveDirection = spikyPole.transform.forward;
                 previewStartTime = (float)EditorApplication.timeSinceStartup;
             } else {
                 buttonText = playPreviewText;
@@ -78,27 +80,39 @@ public class SpikyPoleEditor : Editor {
     }
     private void DrawSpikyPoleInitialPosition(SpikyPole spikyPole, Camera camera) {
         Matrix4x4 matrix = Matrix4x4.TRS(spikyPole.InitialPosition, 
-                                         spikyPole.transform.rotation, 
+                                         spikyPole.InitialRotation, 
                                          spikyPole.transform.localScale * spikyPolePreviewScaleFactor);
         Graphics.DrawMesh(mesh, matrix, previewMaterial, 0, camera);
     }
 
     private void DrawSpikyPoleTargetPosition(SpikyPole spikyPole, Camera camera) {
         Vector3 targetPosition = Vector3.zero;
+        Quaternion targetRotation = Quaternion.identity;
+        float time = spikyPole.Displacement / spikyPole.Speed;
         if (Application.isPlaying) {
-            targetPosition = spikyPole.InitialPosition + spikyPole.transform.forward * spikyPole.Displacement;
+            targetPosition = spikyPole.InitialPosition + spikyPole.MoveDirection * spikyPole.Displacement;
+            
+            targetRotation = Quaternion.Euler(spikyPole.InitialRotation.x, 
+                                              spikyPole.InitialRotation.y + spikyPole.RotationSpeed*time, 
+                                              spikyPole.InitialRotation.z);
         } else {
             targetPosition = spikyPole.transform.position + spikyPole.transform.forward * spikyPole.Displacement;
+            targetRotation = Quaternion.Euler(spikyPole.transform.rotation.x,
+                                              spikyPole.transform.rotation.y + spikyPole.RotationSpeed * time,
+                                              spikyPole.transform.rotation.z);
         }
-        Matrix4x4 matrix = Matrix4x4.TRS(targetPosition, spikyPole.transform.rotation, spikyPole.transform.localScale *spikyPolePreviewScaleFactor);
+        Matrix4x4 matrix = Matrix4x4.TRS(targetPosition, targetRotation, spikyPole.transform.localScale *spikyPolePreviewScaleFactor);
         Graphics.DrawMesh(mesh, matrix, previewMaterial, 0, camera);
     }
 
     private void PreviewSpikyPoleMovement(SpikyPole spikyPole, Camera camera) {
         float time = (float)EditorApplication.timeSinceStartup - previewStartTime;
         Vector3 targetPosition = spikyPole.transform.position + 
-                                 spikyPole.transform.forward * spikyPole.EvaluateDisplacement(time);
-        Matrix4x4 matrix = Matrix4x4.TRS(targetPosition, spikyPole.transform.rotation, spikyPole.transform.localScale * spikyPolePreviewScaleFactor);
+                                 previewMoveDirection * spikyPole.EvaluateDisplacement(time);
+        Quaternion targetRotation = Quaternion.Euler(spikyPole.transform.rotation.x, 
+                                    spikyPole.transform.rotation.y + spikyPole.RotationSpeed*time, 
+                                    spikyPole.transform.rotation.z);
+        Matrix4x4 matrix = Matrix4x4.TRS(targetPosition, targetRotation, spikyPole.transform.localScale * spikyPolePreviewScaleFactor);
         Graphics.DrawMesh(mesh, matrix, previewMaterial, 0, camera);
     }
 
