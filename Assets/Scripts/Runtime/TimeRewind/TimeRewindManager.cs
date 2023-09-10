@@ -54,7 +54,6 @@ public class TimeRewindManager : MonoBehaviour {
         gameStartDate = DateTime.Now;
 #if UNITY_EDITOR
         EditorApplication.pauseStateChanged += OnPauseStateChanged;
-        EditorApplication.
 #endif
     }
 
