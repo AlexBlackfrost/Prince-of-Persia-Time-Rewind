@@ -52,12 +52,11 @@ public class SpikyPoleEditor : Editor {
             if(previewIsPlaying) {
                 PreviewSpikyPoleMovement(spikyPole, sceneView.camera);
             }else {
-                if (Application.isPlaying) {
-                    DrawSpikyPoleInitialPosition(spikyPole, sceneView.camera);
-                } else {
+                if (!Application.isPlaying) {
                     DrawSpikyPoleTrajectory(spikyPole, animate:true);
                     HandleUtility.Repaint();
                 }
+                DrawSpikyPoleInitialPosition(spikyPole, sceneView.camera);
                 DrawSpikyPoleTargetPosition(spikyPole, sceneView.camera);
             }
         }
@@ -79,8 +78,18 @@ public class SpikyPoleEditor : Editor {
         }
     }
     private void DrawSpikyPoleInitialPosition(SpikyPole spikyPole, Camera camera) {
-        Matrix4x4 matrix = Matrix4x4.TRS(spikyPole.InitialPosition, 
-                                         spikyPole.InitialRotation, 
+        Vector3 initialPosition = Vector3.zero;
+        Quaternion initialRotation = Quaternion.identity;
+        if (Application.isPlaying) {
+            initialPosition = spikyPole.InitialPosition;
+            initialRotation = spikyPole.InitialRotation;
+        } else {
+            initialPosition = spikyPole.transform.position + 
+                              spikyPole.transform.forward * spikyPole.Displacement * Mathf.Clamp01(spikyPole.InitialOffset);
+            initialRotation = Quaternion.identity;
+        }
+        Matrix4x4 matrix = Matrix4x4.TRS(initialPosition, 
+                                         initialRotation, 
                                          spikyPole.transform.localScale * spikyPolePreviewScaleFactor);
         Graphics.DrawMesh(mesh, matrix, previewMaterial, 0, camera);
     }

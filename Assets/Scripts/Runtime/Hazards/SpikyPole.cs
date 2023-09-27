@@ -12,15 +12,21 @@ public class SpikyPole : MonoBehaviour{
     public Vector3 MoveDirection { get; private set; }
     public Quaternion InitialRotation { get; private set; }
 
+    [field:Tooltip("Range [0,1]. 1 is the maximum displacement")]
+    [field: SerializeField] public float InitialOffset { get; private set; }
+
+    private float initialOffsetTime;
+
     private void Awake(){
-        InitialPosition = transform.position;
-        InitialRotation = transform.rotation;
         MoveDirection = transform.forward;
+        InitialPosition = transform.position;
+        initialOffsetTime =  Displacement/Speed * InitialOffset;
+        InitialRotation = transform.rotation;
     }
 
     private void Update(){
         float time = (float)TimeRewindManager.Instance.SecondsSinceStart();
-        transform.position = InitialPosition + MoveDirection * EvaluateDisplacement(time);
+        transform.position = InitialPosition + MoveDirection * EvaluateDisplacement(time+ initialOffsetTime);
         transform.rotation = Quaternion.Euler(InitialRotation.x, InitialRotation.y + RotationSpeed * time, InitialRotation.z);
     }
 
