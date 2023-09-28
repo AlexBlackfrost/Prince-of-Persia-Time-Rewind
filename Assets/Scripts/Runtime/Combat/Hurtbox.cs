@@ -6,7 +6,7 @@ using UnityEngine;
 public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
 
     [SerializeField] private float isDamageableCooldown = 0.0f;
-    public Action<float> DamageReceived;
+    public Action<float, IDamageSource> DamageReceived;
     public Action HitReceived;
     [field:SerializeField] public bool IsInvincible{ get; set;}
 
@@ -22,8 +22,8 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
         HitReceived?.Invoke();
     }
 
-    public void ReceiveDamage(float amount) {
-        DamageReceived?.Invoke(amount);
+    public void ReceiveDamage(float amount, IDamageSource damageSource) {
+        DamageReceived?.Invoke(amount, damageSource);
         IsDamageableRemainingTime = isDamageableCooldown;
     }
 
@@ -42,4 +42,5 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
     public Transform GetTransform() {
         return transform;
     }
+
 }

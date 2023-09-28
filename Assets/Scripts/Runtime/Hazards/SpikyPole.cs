@@ -7,21 +7,31 @@ public class SpikyPole : MonoBehaviour{
     [field: SerializeField] public float Displacement { get; set; } = 3;
     [field: SerializeField] public float Speed { get; private set; } = 6;
     [field: SerializeField] public float RotationSpeed { get; private set; } = 6;
+    [field: SerializeField] [field: Tooltip("Range [0,1]. 1 is the maximum displacement")] public float InitialOffset { get; private set; }
+
+    [SerializeField] private float damage = 10;
+    [SerializeField] private HazardDamageSource damageSource;
 
     public Vector3 InitialPosition { get; private set; }
     public Vector3 MoveDirection { get; private set; }
     public Quaternion InitialRotation { get; private set; }
 
-    [field:Tooltip("Range [0,1]. 1 is the maximum displacement")]
-    [field: SerializeField] public float InitialOffset { get; private set; }
 
     private float initialOffsetTime;
+    private Collider damageCollider;
+
+    private void OnTriggerEnter(Collider other) {
+        IDamageable damageable = other.gameObject.GetComponentInChildren<IDamageable>();
+        damageable?.ReceiveDamage(damage, damageSource);
+    }
 
     private void Awake(){
         MoveDirection = transform.forward;
         InitialPosition = transform.position;
         initialOffsetTime =  Displacement/Speed * InitialOffset;
         InitialRotation = transform.rotation;
+
+        damageSource.DamageApplier = this.gameObject;
     }
 
     private void Update(){
@@ -51,4 +61,6 @@ public class SpikyPole : MonoBehaviour{
     public float EvaluateDisplacement(float time) {
         return Mathf.Abs((time*(Speed/Displacement) + 1 )% 2 - 1) * Displacement;
     }
+
+
 }

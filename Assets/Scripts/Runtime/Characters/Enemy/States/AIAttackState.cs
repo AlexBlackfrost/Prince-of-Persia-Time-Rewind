@@ -61,7 +61,7 @@ public class AIAttackState : State{
                                 Parried?.Invoke();
                                 
                             } else {
-                                damageableObject.ReceiveDamage(settings.Sword.Damage);
+                                damageableObject.ReceiveDamage(settings.Sword.Damage,settings.Sword.damageSource);
                                 Debug.Log("Damaged");
                             }
                         }

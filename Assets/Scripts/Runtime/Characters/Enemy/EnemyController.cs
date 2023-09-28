@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour{
-    [field: SerializeField] private CharacterMovement characterMovement;
+    [field: SerializeField] public CharacterMovement CharacterMovement { get; set; }
 
     [Header("Combat")]
     [SerializeField] private Hurtbox hurtbox;
@@ -29,8 +29,8 @@ public class EnemyController : MonoBehaviour{
     private RootStateMachine rootStateMachine;
 
     private void Awake() {
-        characterMovement.Transform = transform;
-        characterMovement.CharacterController = GetComponent<CharacterController>();
+        CharacterMovement.Transform = transform;
+        CharacterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
         
@@ -50,23 +50,23 @@ public class EnemyController : MonoBehaviour{
     }
 
     private void InjectDependencies() {
-        idleSettings.CharacterMovement = characterMovement;
+        idleSettings.CharacterMovement = CharacterMovement;
         idleSettings.Animator = animator;
         idleSettings.Sword = sword;
 
-        approachPlayerSettings.CharacterMovement = characterMovement;
+        approachPlayerSettings.CharacterMovement = CharacterMovement;
         approachPlayerSettings.Transform = transform;
         approachPlayerSettings.Animator = animator;
 
         AIAttackSettings.Animator = animator;
         AIAttackSettings.Transform = transform;
-        AIAttackSettings.CharacterMovement = characterMovement;
+        AIAttackSettings.CharacterMovement = CharacterMovement;
         AIAttackSettings.Sword = sword;
         AIAttackSettings.Hurtbox = hurtbox;
 
         timeControlSettings.Transform = transform;
         timeControlSettings.Animator = animator;
-        timeControlSettings.CharacterMovement = characterMovement;
+        timeControlSettings.CharacterMovement = CharacterMovement;
         timeControlSettings.Health = health;
         timeControlSettings.Hurtbox = hurtbox;
         timeControlSettings.Sword = sword;
@@ -78,6 +78,7 @@ public class EnemyController : MonoBehaviour{
         blockSettings.Hurtbox = hurtbox;
 
         damagedSettings.Animator = animator;
+        damagedSettings.CharacterMovement = CharacterMovement;
 
         deadSettings.Animator = animator;
     }
@@ -104,31 +105,31 @@ public class EnemyController : MonoBehaviour{
 
         // Create transitions
         // Idle ->
-        hurtbox.DamageReceived += idleState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += idleState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
         idleState.AddTransition(approachPlayerState, HasDetectedPlayer, ()=> !approachPlayerState.ReachedPlayer());
         idleState.AddTransition(AIAttackState, SetPlayerAsAttackTarget, CanAttackPlayer);
 
         // ApproachPlayer ->
-        hurtbox.DamageReceived += approachPlayerState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += approachPlayerState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
         approachPlayerState.AddTransition(idleState, approachPlayerState.ReachedPlayer);
         approachPlayerState.AddTransition(AIAttackState, SetPlayerAsAttackTarget, CanAttackPlayer);
 
         // AIAttack ->
         AnimatorUtils.AnimationEnded += AIAttackState.AddEventTransition<int>(idleState, AIAttackEnded);
-        hurtbox.DamageReceived += AIAttackState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += AIAttackState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
         AIAttackState.Parried += AIAttackState.AddEventTransition(parriedState);
 
         // Damaged ->
         AnimatorUtils.AnimationEnded += damagedState.AddEventTransition<int>(idleState, DamagedAnimationEnded);
-        hurtbox.DamageReceived += damagedState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += damagedState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
         damagedState.AddTransition(blockState, enemyAI.ResetReceivedTooMuchDamageRecently, () => enemyAI.ReceivedTooMuchDamageRecently);
 
         // Parried ->
         AnimatorUtils.AnimationEnded += parriedState.AddEventTransition<int>(idleState, ParriedAnimationEnded);
-        hurtbox.DamageReceived += parriedState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += parriedState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
 
         // Block ->
-        hurtbox.DamageReceived += blockState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += blockState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
         AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(idleState, BlockAnimationEnded);
 
         // Alive ->
@@ -184,7 +185,9 @@ public class EnemyController : MonoBehaviour{
     private void SetPlayerAsAttackTarget() {
         AIAttackSettings.Target = perceptionSystem.player;
     }
-
+    private void ApplyDamageEffect(float damageAmount, IDamageSource damageSource) {
+        damageSource.ApplyDamageEffect(this.gameObject);
+    }
     #endregion
 
     #region Animation events

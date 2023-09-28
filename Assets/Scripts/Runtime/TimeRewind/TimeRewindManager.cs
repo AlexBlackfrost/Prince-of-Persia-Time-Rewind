@@ -10,7 +10,7 @@ public class TimeRewindManager : MonoBehaviour {
     public event Action TimeRewindStart;
     public event Action TimeRewindStop;
     public bool IsRewinding;
-    public float RewindSpeed = 0.1f;
+    public float RewindSpeed = 1f;
 
     //private DateTime startRewindTimestamp;
     private double totalElapsedTimeRewinding; // Realtime elapsed rewinding (pressing the rewind button)

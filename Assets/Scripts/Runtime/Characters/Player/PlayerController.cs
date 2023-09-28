@@ -8,7 +8,7 @@ using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
 
 public class PlayerController : MonoBehaviour {
-    [field:SerializeField] private CharacterMovement characterMovement;
+    [field: SerializeField] public CharacterMovement CharacterMovement { get; set; }
 
     [Header("Combat")]
     [SerializeField] private Hurtbox hurtbox;
@@ -41,8 +41,8 @@ public class PlayerController : MonoBehaviour {
 
 
     private void Awake() {
-        characterMovement.Transform = transform;
-        characterMovement.CharacterController = GetComponent<CharacterController>();
+        CharacterMovement.Transform = transform;
+        CharacterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         InputController = GetComponent<InputController>();
         perceptionSystem = GetComponent<PlayerPerceptionSystem>();
@@ -85,17 +85,19 @@ public class PlayerController : MonoBehaviour {
         InputController.Roll.performed += idleState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
         InputController.Jump.performed += idleState.AddEventTransition<CallbackContext>(jumpState);
         InputController.Block.performed += idleState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
+        idleState.AddTransition(fallState, NoGroundBelow);
         idleState.AddTransition(strafeState, IsMoving, SwordIsInHand, perceptionSystem.IsEnemyInsideStrafeDetectionRadius);
         idleState.AddTransition(moveState, IsMoving);
-        hurtbox.DamageReceived += idleState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += idleState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
         InputController.Attack.performed += idleState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
          
         // Move ->
         moveState.AddTransition(strafeState, IsMoving, SwordIsInHand, perceptionSystem.IsEnemyInsideStrafeDetectionRadius);
         InputController.Roll.performed += moveState.AddEventTransition<CallbackContext>(rollState, IsGroundAhead);
-        hurtbox.DamageReceived += moveState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += moveState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
         InputController.Jump.performed += moveState.AddEventTransition<CallbackContext>(jumpState);
         InputController.Block.performed += moveState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
+        moveState.AddTransition(fallState, NoGroundBelow);
         moveState.AddTransition(idleState, IsNotMoving);
         moveState.AddTransition(wallRunState, SetWall, InputController.IsWallRunPressed, perceptionSystem.IsRunnableWallNear);
         InputController.Attack.performed += moveState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
@@ -109,13 +111,13 @@ public class PlayerController : MonoBehaviour {
         wallRunState.AddTransition(fallState, IsNotDetectingRunnableWall);
 
         // Fall ->
-        fallState.AddTransition(landState, perceptionSystem.IsGroundNear);
+        fallState.AddTransition(landState, perceptionSystem.IsGroundNearToLand);
 
         // Land ->
         AnimatorUtils.AnimationEnded += landState.AddEventTransition<int>(idleState, LandAnimationEnded);
 
         // Attack ->
-        hurtbox.DamageReceived += attackState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += attackState.AddEventTransition<float, IDamageSource>(damagedState);
         attackState.AttackEnded += attackState.AddEventTransition(idleState, IsNotMoving);
         attackState.AttackEnded += attackState.AddEventTransition(strafeState, IsMoving, perceptionSystem.IsEnemyInsideStrafeIgnoreRadius);
         attackState.AttackEnded += attackState.AddEventTransition(moveState, IsMoving);
@@ -127,7 +129,7 @@ public class PlayerController : MonoBehaviour {
         AnimatorUtils.AnimationEnded += rollState.AddEventTransition<int>(moveState, RollAnimationEnded, (int shortNameHash) => { return IsMoving(); });
 
         // Block ->
-        hurtbox.DamageReceived += blockState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += blockState.AddEventTransition<float, IDamageSource>(damagedState);
         AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(idleState, BlockAnimationEnded, (int shortNameHash) => IsNotMoving() );
         AnimatorUtils.AnimationEnded += blockState.AddEventTransition<int>(strafeState, BlockAnimationEnded, (int shortNameHash) => IsMoving(),
                                                                                                              (int shortNameHash) => perceptionSystem.IsEnemyInsideStrafeIgnoreRadius());
@@ -141,7 +143,7 @@ public class PlayerController : MonoBehaviour {
 
         // Strafe ->
         InputController.Attack.performed += strafeState.AddEventTransition<CallbackContext>(attackState, SwordIsInHand);
-        hurtbox.DamageReceived += strafeState.AddEventTransition<float>(damagedState);
+        hurtbox.DamageReceived += strafeState.AddEventTransition<float, IDamageSource>(damagedState, ApplyDamageEffect);
         strafeState.AddTransition(moveState, () => !perceptionSystem.IsEnemyInsideStrafeIgnoreRadius());
         InputController.Block.performed += strafeState.AddEventTransition<CallbackContext>(blockState, SwordIsInHand);
         strafeState.AddTransition(idleState, IsNotMoving);
@@ -161,10 +163,10 @@ public class PlayerController : MonoBehaviour {
 
     private void InjectHFSMDependencies() {
         idleSettings.Animator = animator;
-        idleSettings.CharacterMovement = characterMovement;
+        idleSettings.CharacterMovement = CharacterMovement;
         idleSettings.Sword = sword;
 
-        moveSettings.CharacterMovement = characterMovement;
+        moveSettings.CharacterMovement = CharacterMovement;
         moveSettings.Animator = animator;
         moveSettings.InputController = InputController;
         moveSettings.Sword = sword;
@@ -176,24 +178,24 @@ public class PlayerController : MonoBehaviour {
         timeControlSettings.Camera = Camera.main;
         timeControlSettings.Animator = animator;
         timeControlSettings.InputController = InputController;
-        timeControlSettings.CharacterMovement = characterMovement;
+        timeControlSettings.CharacterMovement = CharacterMovement;
         timeControlSettings.Sword = sword;
         timeControlSettings.Health = health;
         timeControlSettings.Hurtbox = hurtbox;
 
         wallRunSettings.Animator = animator;
         wallRunSettings.Transform = transform;
-        wallRunSettings.CharacterMovement = characterMovement;
+        wallRunSettings.CharacterMovement = CharacterMovement;
         wallRunSettings.Sword = sword;
 
         fallSettings.Animator = animator;
-        fallSettings.CharacterMovement = characterMovement;
+        fallSettings.CharacterMovement = CharacterMovement;
         fallSettings.InputController = InputController;
         fallSettings.MainCamera = Camera.main;
         fallSettings.Transform = transform;
 
         landSettings.Animator = animator;
-        landSettings.CharacterMovement = characterMovement;
+        landSettings.CharacterMovement = CharacterMovement;
         landSettings.InputController = InputController;
         landSettings.MainCamera = Camera.main;
         landSettings.Transform = transform;
@@ -201,12 +203,12 @@ public class PlayerController : MonoBehaviour {
         attackSettings.Animator = animator;
         attackSettings.Sword = sword;
         attackSettings.InputController = InputController;
-        attackSettings.CharacterMovement = characterMovement;
+        attackSettings.CharacterMovement = CharacterMovement;
         attackSettings.Transform = transform;
         attackSettings.PerceptionSystem = perceptionSystem;
 
         rollSettings.Animator = animator;
-        rollSettings.CharacterMovement = characterMovement;
+        rollSettings.CharacterMovement = CharacterMovement;
         rollSettings.InputController = InputController;
         rollSettings.Transform = transform;
         rollSettings.MainCamera = Camera.main;
@@ -216,6 +218,7 @@ public class PlayerController : MonoBehaviour {
         blockSettings.Hurtbox = hurtbox;
 
         damagedSettings.Animator = animator;
+        damagedSettings.CharacterMovement = CharacterMovement;
 
         parriedSettings.Animator = animator;
 
@@ -224,7 +227,7 @@ public class PlayerController : MonoBehaviour {
         strafeSettings.Transform = transform;
         strafeSettings.MainCamera = Camera.main;
         strafeSettings.PerceptionSystem = perceptionSystem;
-        strafeSettings.CharacterMovement = characterMovement;
+        strafeSettings.CharacterMovement = CharacterMovement;
 
         deadSettings.Animator = animator;
     }
@@ -289,6 +292,10 @@ public class PlayerController : MonoBehaviour {
     private bool IsGroundAhead(CallbackContext ctx) {
         return perceptionSystem.IsGroundAhead();
     }
+
+    private bool NoGroundBelow() {
+        return perceptionSystem.IsGroundFarToFall();
+    }
     #endregion
 
     #region Transition actions
@@ -296,6 +303,11 @@ public class PlayerController : MonoBehaviour {
         wallRunSettings.Wall = perceptionSystem.CurrentWall;
         wallRunSettings.WallSide = perceptionSystem.CurrentWallDirection;
     }
+
+    private void ApplyDamageEffect(float damageAmount, IDamageSource damageSource) {
+        damageSource.ApplyDamageEffect(this.gameObject);
+    }
+
     #endregion
 
 

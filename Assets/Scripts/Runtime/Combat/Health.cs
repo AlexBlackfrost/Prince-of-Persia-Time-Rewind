@@ -26,7 +26,7 @@ public class Health{
         CurrentHealth = MaxHealth;
     }
 
-    public void OnDamageReceived(float damageAmount) {
+    public void OnDamageReceived(float damageAmount, IDamageSource damageSource) {
         CurrentHealth = Math.Max(CurrentHealth - damageAmount, 0);
         if(CurrentHealth == 0) {
             Dead?.Invoke();

@@ -21,7 +21,7 @@ public class EnemyAI {
         HasBeenAttacked = false;
     }
 
-    public void OnDamageReceived(float amount) {
+    public void OnDamageReceived(float amount, IDamageSource damageSource) {
         HasBeenAttacked = true;
         damagedTimeStamps.Push( (amount,TimeRewindManager.Instance.Now) );
         if (HasReceivedTooMuchDamagedRecently()) {

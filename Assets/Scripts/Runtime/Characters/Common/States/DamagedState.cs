@@ -8,11 +8,13 @@ public class DamagedState : State{
     [Serializable]
     public class DamagedSettings {
         public Animator Animator { get; set; }
+        public CharacterMovement CharacterMovement { get; set; }
     }
 
     private DamagedSettings settings;
     public DamagedState(DamagedSettings settings) {
         this.settings = settings;
+
     }
 
     protected override void OnEnter() {
@@ -24,7 +26,7 @@ public class DamagedState : State{
     }
 
     protected override void OnUpdate() {
-
+        settings.CharacterMovement.Move(Vector3.zero);
     }
     public override object RecordFieldsAndProperties() {
         return null;

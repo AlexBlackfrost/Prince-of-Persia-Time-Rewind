@@ -107,7 +107,7 @@ Material:
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _Parallax: 0.0551
+    - _Parallax: 0.0419
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0.726

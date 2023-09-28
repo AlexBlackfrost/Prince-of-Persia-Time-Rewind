@@ -4,6 +4,6 @@ using UnityEngine;
 
 public interface IDamageable {
 
-    public void ReceiveDamage(float amount);
+    public void ReceiveDamage(float amount, IDamageSource damageSource);
     public bool CanBeDamaged();
 }

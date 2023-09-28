@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 477566674567117862}
   - component: {fileID: 5415544354047968223}
   - component: {fileID: 83898377783045418}
+  - component: {fileID: 1464694363692699321}
   m_Layer: 0
   m_Name: SpikyFloor
   m_TagString: Untagged
@@ -149,3 +150,19 @@ MonoBehaviour:
     m_PreInfinity: 1
     m_PostInfinity: 1
     m_RotationOrder: 4
+  damage: 100
+  damageSource:
+    knockback: 10
+--- !u!65 &1464694363692699321
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1003028316901566108}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.6, y: 0.5, z: 1.6}
+  m_Center: {x: 0, y: 0, z: 0}

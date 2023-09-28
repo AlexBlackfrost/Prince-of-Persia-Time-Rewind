@@ -13,6 +13,7 @@ public class PlayerPerceptionSystem : MonoBehaviour {
 
     [Header("Fall")]
     public GameObject groundCheckOrigin;
+    public float startFallGroundDistance = 0.25f;
     public float startLandGroundDistance = 1.25f;
     public LayerMask groundMask;
 
@@ -91,8 +92,12 @@ public class PlayerPerceptionSystem : MonoBehaviour {
         return runnableWallOnLeftSide | runnableWallOnRightSide;
     }
 
-    public bool IsGroundNear() {
+    public bool IsGroundNearToLand() {
         return Physics.Raycast(groundCheckOrigin.transform.position, -groundCheckOrigin.transform.up, startLandGroundDistance, groundMask);
+    }
+
+    public bool IsGroundFarToFall() {
+        return !Physics.Raycast(groundCheckOrigin.transform.position, -groundCheckOrigin.transform.up, startFallGroundDistance, groundMask);
     }
 
     public bool IsGroundAhead() {

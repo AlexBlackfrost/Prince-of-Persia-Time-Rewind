@@ -2815,15 +2815,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -38.33
+      value: -39.78
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.488
+      value: 0.491
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 11.94
+      value: 18.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4289,7 +4289,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5904245597177023598, guid: a8c6dbc67f2cf7f4984ee826290d7506, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a8c6dbc67f2cf7f4984ee826290d7506, type: 3}
 --- !u!4 &496176056 stripped
 Transform:
@@ -5940,8 +5941,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1140635135}
-  m_LocalRotation: {x: 0.059568662, y: -0.64629036, z: 0.050718147, w: 0.7590705}
-  m_LocalPosition: {x: -38.449493, y: 0, z: 8.076456}
+  m_LocalRotation: {x: 0.04997007, y: -0.7391951, z: 0.05518316, w: 0.6693642}
+  m_LocalPosition: {x: -39.85289, y: 0.003000021, z: 16.14014}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 562832941}
@@ -6340,6 +6341,9 @@ MonoBehaviour:
   <Speed>k__BackingField: 2.73
   <RotationSpeed>k__BackingField: 6
   <InitialOffset>k__BackingField: 0
+  damage: 10
+  damageSource:
+    knockback: 10
 --- !u!136 &1356470565
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -8115,15 +8119,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f1e2ec5c8f1d9d46a3b011c454b164f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterMovement:
+  <CharacterMovement>k__BackingField:
     maxSpeed: 8
     rotationSpeed: 12
-    acceleration: 6000
+    acceleration: 500
     gravity: -40
   hurtbox: {fileID: 1612310790}
   health:
     currentHealth: 0
-    <MaxHealth>k__BackingField: 10000
+    <MaxHealth>k__BackingField: 100
   sword: {fileID: 68330440}
   timeControlSettings:
     <FreeLookCamera>k__BackingField: {fileID: 223078464}
@@ -8303,6 +8307,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundCheckOrigin: {fileID: 1602131548}
+  startFallGroundDistance: 0.25
   startLandGroundDistance: 1.5
   groundMask:
     serializedVersion: 2
@@ -8389,7 +8394,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5904245597177023598, guid: a8c6dbc67f2cf7f4984ee826290d7506, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a8c6dbc67f2cf7f4984ee826290d7506, type: 3}
 --- !u!1001 &1943989528
 PrefabInstance:
@@ -9106,6 +9112,10 @@ PrefabInstance:
       propertyPath: <Displacement>k__BackingField
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 8931671711179681309, guid: a8c6dbc67f2cf7f4984ee826290d7506, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8969223652494559740, guid: a8c6dbc67f2cf7f4984ee826290d7506, type: 3}
       propertyPath: m_RootOrder
       value: 11
@@ -9150,5 +9160,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5904245597177023598, guid: a8c6dbc67f2cf7f4984ee826290d7506, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a8c6dbc67f2cf7f4984ee826290d7506, type: 3}

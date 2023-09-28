@@ -14,6 +14,7 @@ public class Sword : MonoBehaviour {
 
     public bool SheathingEnabled { get; set; } = true;
     public bool UnsheathingEnabled { get; set; } = true;
+    [field:SerializeField]public SwordDamageSource damageSource { get; set; }
 
     public Action<bool> OnSetComboEnabled;
     public Action<bool> OnSetRotationEnabled;
