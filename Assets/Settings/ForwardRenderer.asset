@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
   m_Name: ScreenSpaceAmbientOcclusion
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
   m_Settings:
     Downsample: 0
@@ -37,7 +37,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 843104519526316470}
   - {fileID: -2364441270908474656}
-  m_RendererFeatureMap: b679e4f2174fb30be02a3a0331d12fdf
+  - {fileID: 772553785902078349}
+  m_RendererFeatureMap: b679e4f2174fb30be02a3a0331d12fdf8d99933a93a9b80a
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
@@ -60,12 +61,31 @@ MonoBehaviour:
     overrideStencilState: 0
     stencilReference: 0
     stencilCompareFunction: 8
-    passOperation: 0
+    passOperation: 2
     failOperation: 0
     zFailOperation: 0
   m_ShadowTransparentReceive: 1
   m_RenderingMode: 0
   m_AccurateGbufferNormals: 0
+--- !u!114 &772553785902078349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9c5df60d51471e4b87a79bdffad1f06, type: 3}
+  m_Name: DuplicatedEffectFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  duplicateMaterial: {fileID: 2100000, guid: be61b1b4b1493b5458f44498e1aba0f8, type: 2}
+  maskMaterial: {fileID: 2100000, guid: 157ee2587a2666545a4282323ffc879a, type: 2}
+  renderPassEvent: 500
 --- !u!114 &843104519526316470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78,6 +98,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 703cf5dbdce8cae4c814a9c0f1cd00be, type: 3}
   m_Name: DistanceFogFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   distanceFogMaterial: {fileID: 2100000, guid: 0be1d198f1657734594835c2f94f4d03, type: 2}
   renderPassEvent: 550
