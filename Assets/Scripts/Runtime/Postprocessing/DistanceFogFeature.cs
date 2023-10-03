@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -10,27 +11,40 @@ public class DistanceFogFeature : ScriptableRendererFeature{
         private Material material;
         private RenderTargetIdentifier source;
         private RenderTargetHandle tempTexture;
+        private FilteringSettings filteringSettings;
+        private List<ShaderTagId> shaderTagsList = new List<ShaderTagId>();
 
         public CustomRenderPass(Material material) : base() {
             this.material = material;
-            tempTexture.Init("_MainTex");
+            tempTexture.Init("_MainTex"); // Using a name different than _MainTex does not work for some reason
+
+            shaderTagsList.Add(new ShaderTagId("UniversalForward"));
+            shaderTagsList.Add(new ShaderTagId("LightweightForward"));
+            shaderTagsList.Add(new ShaderTagId("SRPDefaultUnlit"));
+
+            filteringSettings = FilteringSettings.defaultValue;
         }
 
         public void SetSource(RenderTargetIdentifier source) {
             this.source = source;
         }
-
+        public override void OnCameraSetup(CommandBuffer commandBuffer, ref RenderingData renderingData) {
+            //Set the background color to black.
+            //ConfigureClear(ClearFlag.All, Color.red); 
+            //ConfigureTarget(source);
+        }
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData){
             CommandBuffer commandBuffer = CommandBufferPool.Get(featureName);
+            context.ExecuteCommandBuffer(commandBuffer);
             commandBuffer.Clear();
 
-            material.SetMatrix("_InverseViewMatrix", renderingData.cameraData.camera.cameraToWorldMatrix);
             //Shader.SetGlobalMatrix("_InverseViewMatrix", renderingData.cameraData.camera.cameraToWorldMatrix);
             RenderTextureDescriptor cameraTextureDesc = renderingData.cameraData.cameraTargetDescriptor;
             cameraTextureDesc.depthBufferBits = 32;
             
             commandBuffer.GetTemporaryRT(tempTexture.id , cameraTextureDesc, FilterMode.Trilinear);
 
+            material.SetMatrix("_InverseViewMatrix", renderingData.cameraData.camera.cameraToWorldMatrix);
             Blit(commandBuffer, source, tempTexture.Identifier(), material, 0);
             Blit(commandBuffer, tempTexture.Identifier(), source);
 

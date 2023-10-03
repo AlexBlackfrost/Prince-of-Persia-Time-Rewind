@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
   m_Name: ScreenSpaceAmbientOcclusion
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
   m_Settings:
     Downsample: 0
     Source: 1
     NormalSamples: 1
-    Intensity: 0.53
+    Intensity: 1.16
     DirectLightingStrength: 0.41
     Radius: 0.5
     SampleCount: 6
@@ -36,9 +36,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RendererFeatures:
   - {fileID: 843104519526316470}
-  - {fileID: -2364441270908474656}
   - {fileID: 772553785902078349}
-  m_RendererFeatureMap: b679e4f2174fb30be02a3a0331d12fdf8d99933a93a9b80a
+  - {fileID: -2364441270908474656}
+  m_RendererFeatureMap: b679e4f2174fb30b8d99933a93a9b80ae02a3a0331d12fdf
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
@@ -77,7 +77,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a9c5df60d51471e4b87a79bdffad1f06, type: 3}
-  m_Name: DuplicatedEffectFeature
+  m_Name: DoubleVisionFeature
   m_EditorClassIdentifier: 
   m_Active: 1
   layerMask:
@@ -100,4 +100,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   distanceFogMaterial: {fileID: 2100000, guid: 0be1d198f1657734594835c2f94f4d03, type: 2}
-  renderPassEvent: 550
+  renderPassEvent: 500

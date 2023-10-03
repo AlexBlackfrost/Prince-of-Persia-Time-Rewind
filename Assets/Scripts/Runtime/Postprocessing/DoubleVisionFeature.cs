@@ -4,7 +4,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class DuplicatedEffectFeature : ScriptableRendererFeature{
+public class DoubleVisionFeature : ScriptableRendererFeature{
 
     /// <summary>
     /// Save color in global texture "_MainTex" so that it can be accessed from 
@@ -12,10 +12,12 @@ public class DuplicatedEffectFeature : ScriptableRendererFeature{
     /// </summary>
     public class SaveColorPass : ScriptableRenderPass {
         private RenderTargetHandle tempTexture;
+        private ProfilingSampler profilingSampler;
 
         public SaveColorPass() : base() {
             // This render target will render to the global shader texture _MainText, which can be accessed from a shader
-            tempTexture.Init("_MainTex");
+            tempTexture.Init("_MainTexDoubleVision");
+            profilingSampler = new ProfilingSampler(featureName + "_SaveColor");
         }
 
 
@@ -30,12 +32,13 @@ public class DuplicatedEffectFeature : ScriptableRendererFeature{
             CommandBuffer commandBuffer = CommandBufferPool.Get();
             // Command buffer shouldn't contain anything, but apparently need to
             // execute so DrawRenderers call is put under profiling scope title correctly
-            context.ExecuteCommandBuffer(commandBuffer);
-            commandBuffer.Clear();
+            using (new ProfilingScope(commandBuffer, profilingSampler)) {
+                context.ExecuteCommandBuffer(commandBuffer);
+                commandBuffer.Clear();
 
-            // Save the current rendered screen into the shader global texture assigned to the temporary render target
-            Blit(commandBuffer, renderingData.cameraData.renderer.cameraColorTarget, tempTexture.Identifier());
-
+                // Save the current rendered screen into the shader global texture assigned to the temporary render target
+                Blit(commandBuffer, renderingData.cameraData.renderer.cameraColorTarget, tempTexture.Identifier());
+            }
             context.ExecuteCommandBuffer(commandBuffer);
             commandBuffer.Clear();
             CommandBufferPool.Release(commandBuffer);
@@ -54,6 +57,7 @@ public class DuplicatedEffectFeature : ScriptableRendererFeature{
         private RenderTargetHandle tempTexture;
         private FilteringSettings filteringSettings;
         private List<ShaderTagId> shaderTagsList = new List<ShaderTagId>();
+        private ProfilingSampler profilingSampler;
 
         /// <summary>
         /// Draw a binary mask to filter objects and then use it to draw a double vision effect on those
@@ -70,6 +74,8 @@ public class DuplicatedEffectFeature : ScriptableRendererFeature{
             shaderTagsList.Add(new ShaderTagId("SRPDefaultUnlit"));
             
             filteringSettings = new FilteringSettings(RenderQueueRange.all, layerMask);
+
+            profilingSampler = new ProfilingSampler(featureName + "_MaskAndRender");
         }
 
         public void SetSource(RenderTargetIdentifier source) {
@@ -85,28 +91,29 @@ public class DuplicatedEffectFeature : ScriptableRendererFeature{
             CommandBuffer commandBuffer = CommandBufferPool.Get();
             // Command buffer shouldn't contain anything, but apparently need to
             // execute so DrawRenderers call is put under profiling scope title correctly
-            context.ExecuteCommandBuffer(commandBuffer);
-            commandBuffer.Clear();
+            using (new ProfilingScope(commandBuffer, profilingSampler)) {
+                context.ExecuteCommandBuffer(commandBuffer);
+                commandBuffer.Clear();
 
-            // Now draw the objects in filtering Settings layerMask in white, generaitng a binary mask
-            SortingCriteria sortingCriteria = renderingData.cameraData.defaultOpaqueSortFlags;
-            DrawingSettings drawingSettings = CreateDrawingSettings(shaderTagsList, ref renderingData, sortingCriteria);
-            drawingSettings.overrideMaterial = maskMaterial;
-            context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref filteringSettings);
+                // Now draw the objects in filtering Settings layerMask in white, generaitng a binary mask
+                SortingCriteria sortingCriteria = renderingData.cameraData.defaultOpaqueSortFlags;
+                DrawingSettings drawingSettings = CreateDrawingSettings(shaderTagsList, ref renderingData, sortingCriteria);
+                drawingSettings.overrideMaterial = maskMaterial;
+                context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref filteringSettings);
 
-            // Pass our custom target to shaders as a Global Texture reference
-            // In the shader graph we can get this image as a Texture2D property with "Exposed" unticked
-            commandBuffer.SetGlobalTexture("_MaskTex", source);
+                // Pass our custom target to shaders as a Global Texture reference
+                // In the shader graph we can get this image as a Texture2D property with "Exposed" unticked
+                commandBuffer.SetGlobalTexture("_MaskTex", source);
 
-            RenderTextureDescriptor cameraTextureDesc = renderingData.cameraData.cameraTargetDescriptor;
-            cameraTextureDesc.depthBufferBits = 0;
-            commandBuffer.GetTemporaryRT(tempTexture.id, cameraTextureDesc, FilterMode.Bilinear);
+                RenderTextureDescriptor cameraTextureDesc = renderingData.cameraData.cameraTargetDescriptor;
+                cameraTextureDesc.depthBufferBits = 0;
+                commandBuffer.GetTemporaryRT(tempTexture.id, cameraTextureDesc, FilterMode.Bilinear);
 
-            // Apply the double vision screen shader and store it in tempTexture render target.
-            Blit(commandBuffer, source, tempTexture.Identifier(), doubleVisionMaterial, 0);
-            // Then draw it to the screen
-            Blit(commandBuffer, tempTexture.Identifier(), source);
-
+                // Apply the double vision screen shader and store it in tempTexture render target.
+                Blit(commandBuffer, source, tempTexture.Identifier(), doubleVisionMaterial, 0);
+                // Then draw it to the screen
+                Blit(commandBuffer, tempTexture.Identifier(), source);
+            }
             context.ExecuteCommandBuffer(commandBuffer);
             commandBuffer.Clear();
             CommandBufferPool.Release(commandBuffer);

@@ -1922,7 +1922,7 @@
     },
     "m_Name": "MainTexture",
     "m_DefaultReferenceName": "Texture2D_876806b9aaf54a07a8c56575c53f91d5",
-    "m_OverrideReferenceName": "_MainTex",
+    "m_OverrideReferenceName": "_MainTexDoubleVision",
     "m_GeneratePropertyBlock": false,
     "m_Precision": 1,
     "overrideHLSLDeclaration": false,
