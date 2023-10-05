@@ -85,6 +85,7 @@ MonoBehaviour:
     m_Bits: 1024
   duplicateMaterial: {fileID: 2100000, guid: f8d25191725b5174e9f78dacd0294bb6, type: 2}
   maskMaterial: {fileID: 2100000, guid: 157ee2587a2666545a4282323ffc879a, type: 2}
+  gaussianBlurMaterial: {fileID: 2100000, guid: e2f9f525fbac8114483ff4523421ec36, type: 2}
   renderPassEvent: 500
 --- !u!114 &843104519526316470
 MonoBehaviour:

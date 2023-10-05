@@ -15,8 +15,8 @@ public class DoubleVisionFeature : ScriptableRendererFeature{
         private ProfilingSampler profilingSampler;
 
         public SaveColorPass() : base() {
-            // This render target will render to the global shader texture _MainText, which can be accessed from a shader
-            tempTexture.Init("_MainTexDoubleVision");
+            // This render target will render to the global shader texture _ColorTexture, which can be accessed from a shader
+            tempTexture.Init("_ColorTexture");
             profilingSampler = new ProfilingSampler(featureName + "_SaveColor");
         }
 
@@ -50,9 +50,10 @@ public class DoubleVisionFeature : ScriptableRendererFeature{
     }
 
 
-    public class MaskPass : ScriptableRenderPass{
+    public class DoubleVisionPass : ScriptableRenderPass{
         private Material maskMaterial;
         private Material doubleVisionMaterial;
+        private Material gaussianBlurMaterial;
         private RenderTargetIdentifier source;
         private RenderTargetHandle tempTexture;
         private FilteringSettings filteringSettings;
@@ -66,9 +67,11 @@ public class DoubleVisionFeature : ScriptableRendererFeature{
         /// <param name="maskMaterial"> Material used to mask the objects we want to render with a double vission effect</param>
         /// <param name="duplicateMaterial"> Material used to apply the double vision effect.</param>
         /// <param name="layerMask"> Layer mask used to filter which objects are going to be masked</param>
-        public MaskPass(Material maskMaterial, Material duplicateMaterial, LayerMask layerMask) : base() {
+        public DoubleVisionPass(Material maskMaterial, Material duplicateMaterial, Material gaussianBlurMaterial, LayerMask layerMask) : base() {
             this.maskMaterial = maskMaterial;
             this.doubleVisionMaterial = duplicateMaterial;
+            this.gaussianBlurMaterial = gaussianBlurMaterial;
+
             shaderTagsList.Add(new ShaderTagId("UniversalForward"));
             shaderTagsList.Add(new ShaderTagId("LightweightForward"));
             shaderTagsList.Add(new ShaderTagId("SRPDefaultUnlit"));
@@ -95,23 +98,26 @@ public class DoubleVisionFeature : ScriptableRendererFeature{
                 context.ExecuteCommandBuffer(commandBuffer);
                 commandBuffer.Clear();
 
-                // Now draw the objects in filtering Settings layerMask in white, generaitng a binary mask
+                // Draw the objects in filtering Settings layerMask in white, generating a binary mask
                 SortingCriteria sortingCriteria = renderingData.cameraData.defaultOpaqueSortFlags;
                 DrawingSettings drawingSettings = CreateDrawingSettings(shaderTagsList, ref renderingData, sortingCriteria);
                 drawingSettings.overrideMaterial = maskMaterial;
                 context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref filteringSettings);
 
-                // Pass our custom target to shaders as a Global Texture reference
-                // In the shader graph we can get this image as a Texture2D property with "Exposed" unticked
-                commandBuffer.SetGlobalTexture("_MaskTex", source);
 
+                // Get an offsetted copy of the player
                 RenderTextureDescriptor cameraTextureDesc = renderingData.cameraData.cameraTargetDescriptor;
                 cameraTextureDesc.depthBufferBits = 0;
-                commandBuffer.GetTemporaryRT(tempTexture.id, cameraTextureDesc, FilterMode.Bilinear);
+                commandBuffer.GetTemporaryRT(tempTexture.id, cameraTextureDesc, FilterMode.Point);
+                Blit(commandBuffer, source, tempTexture.Identifier(), doubleVisionMaterial, 0); 
+                Blit(commandBuffer, tempTexture.Identifier(), source);
 
-                // Apply the double vision screen shader and store it in tempTexture render target.
-                Blit(commandBuffer, source, tempTexture.Identifier(), doubleVisionMaterial, 0);
-                // Then draw it to the screen
+                // Apply horizontal gaussian blur
+                Blit(commandBuffer, source, tempTexture.Identifier(), gaussianBlurMaterial, 0);
+                // Apply vertical gaussian blur
+                Blit(commandBuffer, tempTexture.Identifier(), source, gaussianBlurMaterial, 1);
+                // Combine the background image and the blurred double vision image
+                Blit(commandBuffer, source, tempTexture.Identifier(), gaussianBlurMaterial, 2);
                 Blit(commandBuffer, tempTexture.Identifier(), source);
             }
             context.ExecuteCommandBuffer(commandBuffer);
@@ -128,16 +134,17 @@ public class DoubleVisionFeature : ScriptableRendererFeature{
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private Material duplicateMaterial;
     [SerializeField] private Material maskMaterial;
+    [SerializeField] private Material gaussianBlurMaterial;
     [SerializeField] private RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
     private SaveColorPass saveColorPass;
-    private MaskPass doubleVisionPass;
+    private DoubleVisionPass doubleVisionPass;
 
     public override void Create(){
         saveColorPass = new SaveColorPass();
         saveColorPass.renderPassEvent = renderPassEvent;
 
-        doubleVisionPass = new MaskPass(maskMaterial, duplicateMaterial, layerMask);
+        doubleVisionPass = new DoubleVisionPass(maskMaterial, duplicateMaterial, gaussianBlurMaterial, layerMask);
         doubleVisionPass.renderPassEvent = renderPassEvent;
 
     }
