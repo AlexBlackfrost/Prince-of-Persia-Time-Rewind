@@ -49,6 +49,45 @@ public class DoubleVisionFeature : ScriptableRendererFeature{
         }
     }
 
+    public class ZoomScreenPass : ScriptableRenderPass {
+        private RenderTargetHandle tempTexture;
+        private Material zoomScreenMaterial;
+        private ProfilingSampler profilingSampler;
+
+        public ZoomScreenPass(Material zoomScreenMaterial) : base() {
+            this.zoomScreenMaterial = zoomScreenMaterial;
+            profilingSampler = new ProfilingSampler(featureName + "_ZoomScreen");
+        }
+
+
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData) {
+            RenderTextureDescriptor cameraTextureDesc = renderingData.cameraData.cameraTargetDescriptor;
+            cameraTextureDesc.depthBufferBits = 0;
+
+            cmd.GetTemporaryRT(tempTexture.id, cameraTextureDesc, FilterMode.Point);
+        }
+
+        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData) {
+            CommandBuffer commandBuffer = CommandBufferPool.Get();
+            // Command buffer shouldn't contain anything, but apparently need to
+            // execute so DrawRenderers call is put under profiling scope title correctly
+            using (new ProfilingScope(commandBuffer, profilingSampler)) {
+                context.ExecuteCommandBuffer(commandBuffer);
+                commandBuffer.Clear();
+
+                // Save the current rendered screen into the shader global texture assigned to the temporary render target
+                Blit(commandBuffer, tempTexture.Identifier(), renderingData.cameraData.renderer.cameraColorTarget, zoomScreenMaterial);
+            }
+            context.ExecuteCommandBuffer(commandBuffer);
+            commandBuffer.Clear();
+            CommandBufferPool.Release(commandBuffer);
+        }
+
+        public override void OnCameraCleanup(CommandBuffer cmd) {
+            cmd.ReleaseTemporaryRT(tempTexture.id);
+        }
+    }
+
 
     public class DoubleVisionPass : ScriptableRenderPass{
         private Material maskMaterial;
@@ -135,14 +174,19 @@ public class DoubleVisionFeature : ScriptableRendererFeature{
     [SerializeField] private Material duplicateMaterial;
     [SerializeField] private Material maskMaterial;
     [SerializeField] private Material gaussianBlurMaterial;
+    [SerializeField] private Material zoomScreenMaterial;
     [SerializeField] private RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
     private SaveColorPass saveColorPass;
     private DoubleVisionPass doubleVisionPass;
+    private ZoomScreenPass zoomScreenPass;
 
     public override void Create(){
         saveColorPass = new SaveColorPass();
         saveColorPass.renderPassEvent = renderPassEvent;
+        
+        zoomScreenPass = new ZoomScreenPass(zoomScreenMaterial);
+        zoomScreenPass.renderPassEvent = renderPassEvent;
 
         doubleVisionPass = new DoubleVisionPass(maskMaterial, duplicateMaterial, gaussianBlurMaterial, layerMask);
         doubleVisionPass.renderPassEvent = renderPassEvent;
@@ -151,9 +195,10 @@ public class DoubleVisionFeature : ScriptableRendererFeature{
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData){
         renderer.EnqueuePass(saveColorPass);
+        renderer.EnqueuePass(zoomScreenPass);
 
-        doubleVisionPass.SetSource(renderer.cameraColorTarget);
-        renderer.EnqueuePass(doubleVisionPass);
+        //doubleVisionPass.SetSource(renderer.cameraColorTarget);
+        //renderer.EnqueuePass(doubleVisionPass);
     }
 }
 

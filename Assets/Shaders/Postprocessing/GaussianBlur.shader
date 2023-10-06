@@ -60,8 +60,8 @@ Shader "PostProcessing/GaussianBlur" {
                 float3 color = float3(0, 0, 0);
                 float gridSum = 0.0f;
 
-                int gridWidth = (_GridSize - 1) / 2;
-                for( int x = -gridWidth; x<=gridWidth; x++){
+                int gridHalfWidth = (_GridSize - 1) / 2;
+                for( int x = -gridHalfWidth; x<=gridHalfWidth; x++){
                     float gaussian = gaussianBlur(x);
                     gridSum += gaussian;
                     float2 uv = i.uv + float2(_MainTex_TexelSize.x * x, 0.0f);
@@ -84,8 +84,8 @@ Shader "PostProcessing/GaussianBlur" {
                 float3 color = float3(0, 0, 0);
                 float gridSum = 0.0f;
 
-                int gridHeight = (_GridSize - 1) / 2;
-                for (int y = -gridHeight; y <= gridHeight; y++)
+                int gridHalfHeight = (_GridSize - 1) / 2;
+                for (int y = -gridHalfHeight; y <= gridHalfHeight; y++)
                 {
                     float gaussian = gaussianBlur(y);
                     gridSum += gaussian;

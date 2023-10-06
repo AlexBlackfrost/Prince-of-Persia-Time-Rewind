@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
   m_Name: ScreenSpaceAmbientOcclusion
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   m_Shader: {fileID: 4800000, guid: 0849e84e3d62649e8882e9d6f056a017, type: 3}
   m_Settings:
     Downsample: 0
@@ -86,6 +86,7 @@ MonoBehaviour:
   duplicateMaterial: {fileID: 2100000, guid: f8d25191725b5174e9f78dacd0294bb6, type: 2}
   maskMaterial: {fileID: 2100000, guid: 157ee2587a2666545a4282323ffc879a, type: 2}
   gaussianBlurMaterial: {fileID: 2100000, guid: e2f9f525fbac8114483ff4523421ec36, type: 2}
+  zoomScreenMaterial: {fileID: 2100000, guid: a21799d001f7aa04db62db9c203ac0ac, type: 2}
   renderPassEvent: 500
 --- !u!114 &843104519526316470
 MonoBehaviour:
