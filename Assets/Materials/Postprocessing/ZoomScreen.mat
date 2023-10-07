@@ -77,7 +77,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - Vector1_5b0a61bdb5fa403fa249ff33d1641560: 1.56
-    - Vector1_a4f6fcd2ef9246159692e970cf625642: 0.11
+    - Vector1_a4f6fcd2ef9246159692e970cf625642: 0.06
     - Vector1_bf76d72e4e9c4dc7a7937b4e8c99b2ee: 20.77
     - _AlphaClip: 0
     - _Blend: 0
@@ -102,6 +102,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _Strength: 0
     - _Surface: 0
     - _WorkflowMode: 1
     - _ZWrite: 1

@@ -9,7 +9,7 @@ Shader "PostProcessing/GaussianBlur" {
     
     SubShader{
         Tags { 
-            "RenderType"="Opaque" 
+            "RenderType"="Transparent"
             "RenderPipeline" = "UniversalRenderPipeline"
         }
 
@@ -17,10 +17,13 @@ Shader "PostProcessing/GaussianBlur" {
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         
         sampler2D _MainTex;
-        uniform sampler2D _ColorTexture;
+        uniform sampler2D _ZoomedColorTexture;
+        uniform sampler2D _MaskTexture;
+        
         CBUFFER_START(UnityPerMaterial)
             float4 _MainTex_TexelSize;
-            uniform float4 _ColorTexture_TexelSize;
+            uniform float4 _ZoomedColorTexture_TexelSize;
+            uniform float4 _MaskTexture_TexelSize;
             uint _GridSize;
             float _Spread;
             float _DoubleVisionAlpha;
@@ -57,9 +60,10 @@ Shader "PostProcessing/GaussianBlur" {
             #pragma fragment fragHorizontal
 
             float4 fragHorizontal(v2f i) : SV_Target  {
+                float4 maskTexture = tex2D(_MaskTexture, i.uv);
+                
                 float3 color = float3(0, 0, 0);
                 float gridSum = 0.0f;
-
                 int gridHalfWidth = (_GridSize - 1) / 2;
                 for( int x = -gridHalfWidth; x<=gridHalfWidth; x++){
                     float gaussian = gaussianBlur(x);
@@ -68,8 +72,9 @@ Shader "PostProcessing/GaussianBlur" {
                     color += gaussian * tex2D(_MainTex, uv).rgb;
                 }
                 color /= gridSum;
-                return float4(color, 1.0f);
-            }
+                
+                return float4(color, maskTexture.r);
+}
 
             ENDHLSL
         }
@@ -81,6 +86,8 @@ Shader "PostProcessing/GaussianBlur" {
             #pragma fragment fragVertical
 
             float4 fragVertical(v2f i) : SV_Target {
+                float4 maskTexture = tex2D(_MaskTexture, i.uv);
+    
                 float3 color = float3(0, 0, 0);
                 float gridSum = 0.0f;
 
@@ -93,7 +100,7 @@ Shader "PostProcessing/GaussianBlur" {
                     color += gaussian * tex2D(_MainTex, uv).rgb;
                 }
                 color /= gridSum;
-                return float4(color, 1.0f);
+                return float4(color, maskTexture.r);
             }
 
             ENDHLSL
@@ -105,13 +112,18 @@ Shader "PostProcessing/GaussianBlur" {
             #pragma fragment frag
 
             float4 frag(v2f i) : SV_Target {
-                float4 background =  tex2D(_ColorTexture, i.uv);
+                float4 maskTexture = tex2D(_MaskTexture, i.uv);
+    
+                float4 background =  tex2D(_ZoomedColorTexture, i.uv);
                 float4 doubleVisionBlurred = tex2D(_MainTex, i.uv);
                 float backgroundAlpha = 1.0 - _DoubleVisionAlpha;
-                return float4(saturate(doubleVisionBlurred.r * doubleVisionBlurred.a + background.r * backgroundAlpha),
-                              saturate(doubleVisionBlurred.g * doubleVisionBlurred.a + background.g * backgroundAlpha),
-                              saturate(doubleVisionBlurred.b * doubleVisionBlurred.a + background.b * backgroundAlpha),
+                
+                float alpha = maskTexture.r * _DoubleVisionAlpha;
+                return float4(saturate(doubleVisionBlurred.r * alpha + background.r * (1 - alpha)),
+                              saturate(doubleVisionBlurred.g * alpha + background.g * (1 - alpha)),
+                              saturate(doubleVisionBlurred.b * alpha + background.b * (1 - alpha)),
                               1);
+                
             }
             ENDHLSL
         }

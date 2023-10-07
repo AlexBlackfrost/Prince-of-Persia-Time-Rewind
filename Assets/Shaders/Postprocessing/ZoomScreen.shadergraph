@@ -3995,7 +3995,7 @@
     },
     "m_Name": "Strength",
     "m_DefaultReferenceName": "Vector1_a4f6fcd2ef9246159692e970cf625642",
-    "m_OverrideReferenceName": "",
+    "m_OverrideReferenceName": "_Strength",
     "m_GeneratePropertyBlock": true,
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,

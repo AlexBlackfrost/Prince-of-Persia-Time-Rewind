@@ -35,8 +35,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private float elapsedTimeSinceLastRecord;
 	private PlayerRecord previousRecord, nextRecord;
 	private  CircularStack<PlayerRecord> records;
-	private int recordFPS = 60;
-	private int recordMaxseconds = 20;
+	private int recordFPS = 120;
+	private int recordMaxseconds = 30;
 	private CinemachineBrain cinemachineBrain;
 	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
