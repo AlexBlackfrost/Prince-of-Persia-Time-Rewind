@@ -3,7 +3,7 @@ using UnityEngine.Rendering;
 using UnityEngine;
 /// <summary>
 /// Save color in global texture "_MainTex" so that it can be accessed from 
-/// the double vision screen space shader in the next pass
+/// other screen space shaders in the next renderer passes
 /// </summary>
 public class SaveColorPass : ScriptableRenderPass {
     private RenderTargetHandle tempTexture;

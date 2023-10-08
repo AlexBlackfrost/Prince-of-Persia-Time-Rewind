@@ -6283,7 +6283,67 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   resetBloomDuration: 0.5
-  timeRewindLiftGammaGain: 0.5
+  timeRewindGain: 0.75
+  resetGainDuration: 0.5
+  resetGainEasing:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 3.1430805
+      outSlope: 3.1430805
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.021709494
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.011034248
+      outSlope: 0.011034248
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.070860624
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  startRewindLift: 1
+  startLiftDuration: 0.1
+  startLiftEasing:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: -0.0062341047
+      outSlope: -0.0062341047
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.38400742
+    - serializedVersion: 3
+      time: 0.7525463
+      value: 0.26236495
+      inSlope: 1.0258064
+      outSlope: 1.0258064
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.102440335
+      outWeight: 0.22187969
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2.9809012
+      outSlope: 2.9809012
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!4 &1231343112 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5109416935561249376, guid: 64e21eea820652642b4052305e600684, type: 3}

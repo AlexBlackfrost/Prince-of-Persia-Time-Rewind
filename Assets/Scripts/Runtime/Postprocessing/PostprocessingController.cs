@@ -28,19 +28,33 @@ public class PostprocessingController : MonoBehaviour {
     [SerializeField] AnimationCurve resetBloomEasing;
     [SerializeField] private float resetBloomDuration = 0.5f;
 
-    [Header("Lift Gamma Gain")]
-    [SerializeField] private float timeRewindLiftGammaGain;
+    [Header("Gain")]
+    [SerializeField] private float timeRewindGain = 1.6f;
+    [SerializeField] private float resetGainDuration = 0.5f;
+    [SerializeField] AnimationCurve resetGainEasing;
+
+    [Header("Lift")]
+    [SerializeField] private float startRewindLift = 2;
+    [SerializeField] private float startLiftDuration = 0.1f;
+    [SerializeField] AnimationCurve startLiftEasing;
   
     private float zoomScreenElapsedTime;
-    private Coroutine resetZoomScreenCoroutine;
     
     private Bloom bloom;
     private float previousBloomThreshold;
     private float bloomElapsedTime;
-    private Coroutine resetBloomCoroutine;
     
     private LiftGammaGain liftGammaGain;
-    private Vector4 previousLiftGammaGain;
+    private Vector4 previousGain;
+    private Vector4 previousLift;
+
+    private Dictionary<string, Coroutine> runningTweens;
+    private Dictionary<string, Action> onTweenStoppedCallbacks;
+
+    private const string resetBloomKey = "ResetBloom";
+    private const string resetZoomScreenKey = "ResetZoomScreen";
+    private const string resetGainKey = "ResetGain";
+    private const string liftKey = "Lift";
 
     private void Awake() {
         TimeRewindManager.Instance.TimeRewindStart += OnTimeRewindStart;
@@ -48,6 +62,9 @@ public class PostprocessingController : MonoBehaviour {
 
         postprocessingVolume.profile.TryGet(out liftGammaGain);
         postprocessingVolume.profile.TryGet(out bloom);
+
+        runningTweens = new Dictionary<string, Coroutine>();
+        onTweenStoppedCallbacks = new Dictionary<string, Action>();
     }
 
     private void Update(){
@@ -58,40 +75,42 @@ public class PostprocessingController : MonoBehaviour {
     }
 
     private void OnTimeRewindStart() {
+        StopRunningTweens();
+
         zoomScreenElapsedTime = 0;
+        bloomElapsedTime = 0;
+
         previousBloomThreshold = bloom.threshold.value;
-        previousLiftGammaGain = liftGammaGain.gain.value;
+        previousGain = liftGammaGain.gain.value;
+        previousLift = liftGammaGain.lift.value;
 
         bloom.threshold.value = timeRewindMinBloomThreshold;
-        liftGammaGain.gain.Override(new Vector4(previousLiftGammaGain.x, previousLiftGammaGain.y, previousLiftGammaGain.z, timeRewindLiftGammaGain));
+        
+        StartTween(liftKey, startRewindLift, 0, startLiftDuration, startLiftEasing, UpdateLift);
+        onTweenStoppedCallbacks[liftKey] = () => { UpdateLift(previousLift.w); };
+        
+        liftGammaGain.gain.Override(new Vector4(previousGain.x, previousGain.y, previousGain.z, timeRewindGain));
+        
         timeRewindPostprocessingEffect.SetActive(true);
-
-        if(resetBloomCoroutine != null) {
-            StopCoroutine(resetBloomCoroutine);
-            resetBloomCoroutine = null;
-        }
-
-        if(resetZoomScreenCoroutine != null) {
-            StopCoroutine(resetZoomScreenCoroutine);
-            resetZoomScreenCoroutine = null;
-        }
     }
 
     private void OnTimeRewindStop() {
-        bloom.threshold.value = previousBloomThreshold;
-        liftGammaGain.gain.value = previousLiftGammaGain;
-        //timeRewindPostprocessingEffect.SetActive(false);
-        resetBloomCoroutine = StartCoroutine(ResetBloom());
-        resetBloomCoroutine = StartCoroutine(ResetZoomScreen());
+        onTweenStoppedCallbacks[resetBloomKey] = () => { UpdateBloomThreshold(previousBloomThreshold); };
+        onTweenStoppedCallbacks[resetZoomScreenKey] = () => { UpdateZoomScreenStrength(0); };
+        onTweenStoppedCallbacks[resetGainKey] = () => { UpdateGain(previousGain.w); };
+
+        StartTween(resetBloomKey, bloom.threshold.value, previousBloomThreshold, resetBloomDuration, resetBloomEasing, UpdateBloomThreshold, OnResetTweenerFinished);
+        StartTween(resetZoomScreenKey, zoomScreenMaterial.GetFloat("_Strength"),0, resetZoomScreenDuration, resetZoomScreenEasing, UpdateZoomScreenStrength, OnResetTweenerFinished);
+        StartTween(resetGainKey, liftGammaGain.gain.value.w, previousGain.w, resetGainDuration, resetGainEasing, UpdateGain, OnResetTweenerFinished);
+
     }
 
     private void AnimateZoomScreen() {
-        float strength01 = zoomScreenAnimationCurve.Evaluate(zoomScreenElapsedTime);
-        float zoomScreenStrength = MathUtils.MapRangeClamped(strength01, 0, 1, -zoomScreenMaxStrength, -zoomScreenMinStrength);
+        float zoomScreenStrength01 = zoomScreenAnimationCurve.Evaluate(zoomScreenElapsedTime);
+        float zoomScreenStrength = MathUtils.MapRangeClamped(zoomScreenStrength01, 0, 1, -zoomScreenMaxStrength, -zoomScreenMinStrength);
         zoomScreenMaterial.SetFloat("_Strength", zoomScreenStrength);
         zoomScreenElapsedTime += Time.deltaTime * zoomScreenSpeed;
     }
-
 
     private void AnimateBloom() {
         float bloomThreshold01 = bloomAnimationCurve.Evaluate(bloomElapsedTime);
@@ -100,39 +119,65 @@ public class PostprocessingController : MonoBehaviour {
         bloomElapsedTime += Time.deltaTime * bloomSpeed;
     }
 
-    private IEnumerator ResetBloom() {
-        float resetBloomSpeed = Mathf.Abs(bloom.threshold.value - previousBloomThreshold)/resetBloomDuration;
-        float resetBloomElapsedTime = 0;
-        float initalBloomThreshold = bloom.threshold.value;
+    private void StartTween(string tweenId, float initialValue, float targetValue, float duration, AnimationCurve easing, Action<float> setter, Action<string> onTweenEnd = null) {
+        runningTweens[tweenId] = StartCoroutine(Tween(tweenId, initialValue, targetValue, duration, easing, setter, onTweenEnd ));
+    }
 
-        while (!Mathf.Approximately(bloom.threshold.value,previousBloomThreshold)) {
-            float lerpAlpha = resetBloomEasing.Evaluate(resetBloomElapsedTime);
-            float bloomThreshold = Mathf.Lerp(initalBloomThreshold, previousBloomThreshold, lerpAlpha);
-            bloom.threshold.value = bloomThreshold;
-            resetBloomElapsedTime += Time.deltaTime * resetBloomSpeed;
-            yield return null;
+    private IEnumerator Tween(string tweenId, float initialValue, float targetValue, float duration, AnimationCurve easing, Action<float> setter, Action<string> onTweenEnd = null) {
+        float currentValue = initialValue;
+        float tweenSpeed = Mathf.Abs(targetValue-initialValue) / duration;
+        float elapsedTime = 0;
+        while (!Mathf.Approximately(currentValue, targetValue)) {
+            float lerpAlpha = Mathf.Clamp01(easing.Evaluate(elapsedTime));
+            currentValue = Mathf.Lerp(initialValue, targetValue, lerpAlpha);
+            setter(currentValue);
+            elapsedTime += Time.deltaTime * tweenSpeed;
+            yield return currentValue;
         }
-        resetBloomCoroutine = null;
+        runningTweens.Remove(tweenId);
+        onTweenEnd?.Invoke(tweenId);
+    }
+
+    private void UpdateBloomThreshold(float bloomThreshold) { 
+        bloom.threshold.Override(bloomThreshold);
     }
     
-    private IEnumerator ResetZoomScreen() {
-        float initialZoomScreenStrength = zoomScreenMaterial.GetFloat("_Strength");
-        float targetZoomScreenStrength = 0;
-        float resetZoomScreenSpeed = Mathf.Abs(initialZoomScreenStrength) / resetZoomScreenDuration;
-        float resetZoomScreenElapsedTime = 0;
-
-        float currentZoomScreenStrength = initialZoomScreenStrength;
-        while (!Mathf.Approximately(currentZoomScreenStrength, targetZoomScreenStrength)) {
-            float lerpAlpha = resetZoomScreenEasing.Evaluate(resetZoomScreenElapsedTime);
-            currentZoomScreenStrength = Mathf.Lerp(initialZoomScreenStrength, targetZoomScreenStrength, lerpAlpha);
-            zoomScreenMaterial.SetFloat("_Strength", currentZoomScreenStrength);
-            resetZoomScreenElapsedTime += Time.deltaTime * resetZoomScreenSpeed;
-            yield return null;
-        }
-        zoomScreenMaterial.SetFloat("_Strength", targetZoomScreenStrength);
-        resetZoomScreenCoroutine = null;
-
+    private void UpdateZoomScreenStrength(float zoomScreenStrength) {
+        zoomScreenMaterial.SetFloat("_Strength", zoomScreenStrength);
     }
 
+    private void UpdateGain(float gainW) {
+        Vector4 gainValue = liftGammaGain.gain.value;
+        gainValue.w = gainW;
+        liftGammaGain.gain.Override(gainValue);
+    }
+
+    private void UpdateLift(float liftGammaLiftW) {
+        Vector4 liftValue = liftGammaGain.lift.value;
+        liftValue.w = liftGammaLiftW;
+        liftGammaGain.lift.Override(liftValue);
+    }
+
+    private void OnResetTweenerFinished(string tweenId) {
+        if(runningTweens.Count == 0) { 
+            timeRewindPostprocessingEffect.SetActive(false);
+        }
+    }
+
+    private void StopRunningTweens() {
+        List<string> keysToRemove = new List<string>();
+        foreach (KeyValuePair<string, Coroutine> runningTween in runningTweens) {
+            if (runningTween.Value != null) {
+                StopCoroutine(runningTween.Value);
+                onTweenStoppedCallbacks[runningTween.Key]?.Invoke();
+                keysToRemove.Add(runningTween.Key);
+            }
+        }
+
+        foreach(String key in keysToRemove) {
+            runningTweens.Remove(key);
+            onTweenStoppedCallbacks.Remove(key);
+        }
+    }
 
 }

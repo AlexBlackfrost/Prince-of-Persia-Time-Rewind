@@ -28,7 +28,7 @@ public class ZoomScreenPass : ScriptableRenderPass {
             context.ExecuteCommandBuffer(commandBuffer);
             commandBuffer.Clear();
 
-            // Save the current rendered screen into the shader global texture assigned to the temporary render target
+            // Save the current rendered screen into the shader global texture assigned to the temporary render target (ZoomedColorTexture)
             Blit(commandBuffer, renderingData.cameraData.renderer.cameraColorTarget, tempTexture.Identifier(), zoomScreenMaterial);
 
         }

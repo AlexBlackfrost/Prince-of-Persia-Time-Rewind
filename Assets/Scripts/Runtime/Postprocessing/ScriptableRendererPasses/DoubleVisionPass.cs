@@ -61,14 +61,17 @@ public class DoubleVisionPass : ScriptableRenderPass {
             context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref filteringSettings);
 
 
-            // Get an offsetted copy of the player
             RenderTextureDescriptor cameraTextureDesc = renderingData.cameraData.cameraTargetDescriptor;
             cameraTextureDesc.depthBufferBits = 0;
             commandBuffer.GetTemporaryRT(tempTexture.id, cameraTextureDesc, FilterMode.Point);
             commandBuffer.GetTemporaryRT(maskTexture.id, cameraTextureDesc, FilterMode.Point);
 
             commandBuffer.SetGlobalTexture("_MaskTexture", maskTexture.Identifier());
+
+            // Save the binary mask used to filter the objects we don't want to be affected by the postpro effect
             Blit(commandBuffer, source, maskTexture.Identifier());
+
+            // Applies the binary mask
             Blit(commandBuffer, source, tempTexture.Identifier(), doubleVisionMaterial, 0);
 
             // Apply horizontal gaussian blur
@@ -76,6 +79,7 @@ public class DoubleVisionPass : ScriptableRenderPass {
 
             // Apply vertical gaussian blur
             Blit(commandBuffer, source, tempTexture.Identifier(), gaussianBlurMaterial, 1);
+
             // Blend the background image and the blurred double vision image
             Blit(commandBuffer, tempTexture.Identifier(), source, gaussianBlurMaterial, 2);
 
