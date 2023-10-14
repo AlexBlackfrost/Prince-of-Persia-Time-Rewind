@@ -119,10 +119,14 @@ Shader "PostProcessing/GaussianBlur" {
                 float backgroundAlpha = 1.0 - _DoubleVisionAlpha;
                 
                 float alpha = maskTexture.r * _DoubleVisionAlpha;
-                return float4(saturate(doubleVisionBlurred.r * alpha + background.r * (1 - alpha)),
+                return float4(doubleVisionBlurred.r * alpha + background.r * (1 - alpha),
+                              doubleVisionBlurred.g * alpha + background.g * (1 - alpha),
+                              doubleVisionBlurred.b * alpha + background.b * (1 - alpha),
+                              1);
+                /*return float4(saturate(doubleVisionBlurred.r * alpha + background.r * (1 - alpha)),
                               saturate(doubleVisionBlurred.g * alpha + background.g * (1 - alpha)),
                               saturate(doubleVisionBlurred.b * alpha + background.b * (1 - alpha)),
-                              1);
+                              1);*/
                 
             }
             ENDHLSL
