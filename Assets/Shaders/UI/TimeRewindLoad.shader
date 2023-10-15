@@ -71,57 +71,31 @@ Shader "UI/TimeRewindLoad" {
                     gridSum += gaussian;
                     float2 uv = i.uv + float2(_MainTex_TexelSize.x * x, 0.0f);
                     //float4 texture = tex2D(_MainTex, uv);
-                    //color.rgb += gaussian * tex2D(_MainTex, uv).rgb * tex2D(_MainTex, uv).a;
+                    color.rgb += gaussian * tex2D(_MainTex, uv).rgb * tex2D(_MainTex, uv).a;
                     color.a += tex2D(_MainTex, uv).a * gaussian;
 
                 }
+                color /= gridSum;
                 
+                gridSum = 0.0f;
                 int gridHalfHeight = (_GridSize - 1) / 2;
                 for (int y = -gridHalfHeight; y <= gridHalfHeight; y++) {
                     float gaussian = gaussianBlur(y);
                     gridSum += gaussian;
                     float2 uv = i.uv + float2(0.0f, _MainTex_TexelSize.y * y);
-                                //float4 texture = tex2D(_MainTex, uv);
-                                //color.rgb += gaussian * tex2D(_MainTex, uv).rgb * tex2D(_MainTex, uv).a;
-                    color.a += tex2D(_MainTex, uv).a * gaussian;
+                    float4 tex = tex2D(_MainTex, uv);
+                    color.rgb += gaussian * tex.rgb * tex.a;
+                    color.a += tex.a * gaussian;
 
                 }
                 color /= gridSum;
-                return float4(tex2D(_MainTex, i.uv).rgb, color.a);
+                float4 tex = tex2D(_MainTex, i.uv);
+                return float4(saturate(tex.rgb + color.rgb), saturate(color.a + tex.a));
                 return float4(color.rgb, length(color.rgb));
 }
 
             ENDHLSL
         }
 
-        Pass{
-            Tags { "LightMode"="ShadowCaster" } 
-            Name "Vertical"
-            Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
-            HLSLPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment fragVertical
-
-            float4 fragVertical(v2f i) : SV_Target {
-    
-                float4 color = float4(0, 0, 0, 0);
-                float gridSum = 0.0f;
-
-                int gridHalfHeight = (_GridSize - 1) / 2;
-                for (int y = -gridHalfHeight; y <= gridHalfHeight; y++) {
-                    float gaussian = gaussianBlur(y);
-                    gridSum += gaussian;
-                    float2 uv = i.uv + float2(0.0f, _MainTex_TexelSize.y * y);
-                    //color += gaussian * tex2D(_MainTex, uv).rgb;
-                    color.a += gaussian * tex2D(_MainTex, uv).a;
-                }
-                color /= gridSum; 
-                     return float4(1, 0, 0, 1);
-                return float4(tex2D(_MainTex, i.uv).rgb, color.a);
-            }
-
-            ENDHLSL
-        }
     }
 }
