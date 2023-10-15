@@ -134,12 +134,12 @@ TextureImporter:
       name: HealthBarFilled_0
       rect:
         serializedVersion: 2
-        x: 163
+        x: 170
         y: 939
-        width: 1735
+        width: 1717
         height: 235
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

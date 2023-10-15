@@ -15,14 +15,15 @@ public class Health{
         set {
             float previousHealth = currentHealth;
             currentHealth = value;
-            HealthChanged?.Invoke(previousHealth, currentHealth);
+            HealthChanged01?.Invoke(previousHealth/MaxHealth, currentHealth / MaxHealth);
         } 
     }
 
-    public Action<float, float> HealthChanged;
+    public Action<float, float> HealthChanged01;
     public Action Dead;
     
     public void Init() {
+        HealthChanged01?.Invoke(CurrentHealth/MaxHealth, 1);
         CurrentHealth = MaxHealth;
     }
 

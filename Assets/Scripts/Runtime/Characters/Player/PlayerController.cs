@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
     [Header("Combat")]
     [SerializeField] private Hurtbox hurtbox;
     [SerializeField] private Health health;
+    [SerializeField] private HealthBar healthBar;
     [SerializeField] private Sword sword;
 
     [Header("State machine settings")]
@@ -47,10 +48,10 @@ public class PlayerController : MonoBehaviour {
         InputController = GetComponent<InputController>();
         perceptionSystem = GetComponent<PlayerPerceptionSystem>();
 
-        health.Init();
         sword.OnEquipped(this.gameObject);
 
         SubscribeEvents();
+        health.Init();
 
         InjectHFSMDependencies();
         BuildHFSM();
@@ -238,6 +239,8 @@ public class PlayerController : MonoBehaviour {
         InputController.Sheathe.performed += (CallbackContext ctx) => { sword.OnSheathePressed(); };
 
         hurtbox.DamageReceived += health.OnDamageReceived;
+
+        health.HealthChanged01 += healthBar.OnHealthChanged01;
     }
 
     #region Transition conditions
