@@ -19,6 +19,7 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		public Sword Sword { get; set; }
 		public Health Health { get; set; }
 		public Hurtbox Hurtbox { get; set; }
+		public PlayerTimeRewinder PlayerTimeRewinder { get; set; }
 
 		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
@@ -34,9 +35,6 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
 	private PlayerRecord previousRecord, nextRecord;
-	private  CircularStack<PlayerRecord> records;
-	private int recordFPS = 120;
-	private int recordMaxseconds = 30;
 	private CinemachineBrain cinemachineBrain;
 	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
@@ -52,7 +50,6 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 		cinemachineBrain = settings.Camera.GetComponent<CinemachineBrain>();
 
-		records = new CircularStack<PlayerRecord>(recordFPS * recordMaxseconds);
 		timeIsRewinding = false;
 		TimeRewindManager.Instance.TimeRewindStart += OnTimeRewindStart;
 		TimeRewindManager.Instance.TimeRewindStop += OnTimeRewindStop;
@@ -78,8 +75,8 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 	private void OnTimeRewindStart() {
 		elapsedTimeSinceLastRecord = 0;
-		previousRecord = records.Pop();
-		nextRecord = records.Peek();
+		previousRecord = settings.PlayerTimeRewinder.Pop();
+		nextRecord = settings.PlayerTimeRewinder.Peek();
 
 		// Animation
 		animationTimeControl.OnTimeRewindStart();
@@ -134,15 +131,15 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		// Check for interrupted transitions -- Now it's done inside animationTimeControl
 		//animationTimeControl.TrackInterruptedTransitions(ref playerRecord.animationRecord, playerRecord.deltaTime);
 
-		records.Push(playerRecord);
+		settings.PlayerTimeRewinder.Push(playerRecord);
 	}
 
 
 	private void RewindPlayerRecord() {
-		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && records.Count > 2) {
+		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && settings.PlayerTimeRewinder.Count() > 2) {
 			elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
-			previousRecord = records.Pop();
-			nextRecord = records.Peek(); 
+			previousRecord = settings.PlayerTimeRewinder.Pop();
+			nextRecord = settings.PlayerTimeRewinder.Peek(); 
 		}
 		
 		RestorePlayerRecord(previousRecord, nextRecord);

@@ -4656,6 +4656,54 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 790fb38e982a5ef4faa952ee675ccaa7, type: 3}
+--- !u!1 &636337669
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 636337670}
+  - component: {fileID: 636337671}
+  m_Layer: 5
+  m_Name: PostprocessingVolumeUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &636337670
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636337669}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -158862.23, y: -15422.714, z: 172757.31}
+  m_LocalScale: {x: 12470.766, y: 12470.766, z: 12470.766}
+  m_Children: []
+  m_Father: {fileID: 1704418619}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &636337671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636337669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 50d6ff11ac2d10e4696641e59b7fead7, type: 2}
 --- !u!1001 &640677731
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5568,6 +5616,7 @@ GameObject:
   - component: {fileID: 973585303}
   - component: {fileID: 973585305}
   - component: {fileID: 973585304}
+  - component: {fileID: 973585306}
   m_Layer: 5
   m_Name: TimeRewindLoad
   m_TagString: Untagged
@@ -5587,7 +5636,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1704418619}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5615,7 +5664,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: f33caa21af639e049903184e71741ffb, type: 3}
-  m_Type: 0
+  m_Type: 3
   m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
@@ -5632,6 +5681,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 973585302}
   m_CullTransparentMesh: 1
+--- !u!114 &973585306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 973585302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e7f2d8938aa8c148845795a4e709972, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTimeRewinder: {fileID: 1920022714}
 --- !u!4 &1013143633 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5523872223311915751, guid: 64e21eea820652642b4052305e600684, type: 3}
@@ -6372,8 +6434,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   resetZoomScreenDuration: 0.2
-  timeRewindMinBloomThreshold: 0.5
-  timeRewindMaxBloomThreshold: 1.6
+  timeRewindMinBloomThreshold: 1.4
+  timeRewindMaxBloomThreshold: 2
   bloomAnimationCurve:
     serializedVersion: 2
     m_Curve:
@@ -7053,7 +7115,7 @@ RectTransform:
   - {fileID: 1407507803}
   - {fileID: 817592149}
   m_Father: {fileID: 1704418619}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -7072,6 +7134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c60eae5aed7986645b2cd0030343b005, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerController: {fileID: 1920022715}
   fill: {fileID: 817592150}
   healthChangedColorIntensity: 2.5
   healthChangedAnimationDuration: 1
@@ -7313,7 +7376,7 @@ MonoBehaviour:
   m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 32
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 1
@@ -8601,6 +8664,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
+  - {fileID: 636337670}
   - {fileID: 1368244803}
   - {fileID: 973585303}
   m_Father: {fileID: 0}
@@ -8949,6 +9013,18 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 64e21eea820652642b4052305e600684, type: 3}
   m_PrefabInstance: {fileID: 391207920}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1920022714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1920022710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dccdfb0a49012b48ae7e7303ac06145, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1920022715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8966,11 +9042,10 @@ MonoBehaviour:
     rotationSpeed: 12
     acceleration: 500
     gravity: -40
-  hurtbox: {fileID: 1612310790}
   health:
     currentHealth: 0
     <MaxHealth>k__BackingField: 100
-  healthBar: {fileID: 1368244804}
+  hurtbox: {fileID: 1612310790}
   sword: {fileID: 68330440}
   timeControlSettings:
     <FreeLookCamera>k__BackingField: {fileID: 223078464}

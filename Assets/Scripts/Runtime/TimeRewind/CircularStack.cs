@@ -6,7 +6,8 @@ using UnityEngine;
 public class CircularStack<T>: ICollection, ICloneable {
     protected T[] array;
     protected int index;
-    protected int count; 
+    protected int count;
+    
     public int Count {
         get {
             return count;
@@ -89,6 +90,10 @@ public class CircularStack<T>: ICollection, ICloneable {
 
     public T this[int index] {
         get => array[index];
+    }
+
+    public int Size() {
+        return array.Length;
     }
 
 }

@@ -11,9 +11,8 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] public CharacterMovement CharacterMovement { get; set; }
 
     [Header("Combat")]
+    [SerializeField] public Health health;
     [SerializeField] private Hurtbox hurtbox;
-    [SerializeField] private Health health;
-    [SerializeField] private HealthBar healthBar;
     [SerializeField] private Sword sword;
 
     [Header("State machine settings")]
@@ -38,13 +37,14 @@ public class PlayerController : MonoBehaviour {
 
     private Animator animator;
     private PlayerPerceptionSystem perceptionSystem;
-
+    private PlayerTimeRewinder playerTimeRewinder;
 
 
     private void Awake() {
         CharacterMovement.Transform = transform;
         CharacterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+        playerTimeRewinder = GetComponent<PlayerTimeRewinder>();
         InputController = GetComponent<InputController>();
         perceptionSystem = GetComponent<PlayerPerceptionSystem>();
 
@@ -183,6 +183,7 @@ public class PlayerController : MonoBehaviour {
         timeControlSettings.Sword = sword;
         timeControlSettings.Health = health;
         timeControlSettings.Hurtbox = hurtbox;
+        timeControlSettings.PlayerTimeRewinder = playerTimeRewinder;
 
         wallRunSettings.Animator = animator;
         wallRunSettings.Transform = transform;
@@ -240,7 +241,6 @@ public class PlayerController : MonoBehaviour {
 
         hurtbox.DamageReceived += health.OnDamageReceived;
 
-        health.HealthChanged01 += healthBar.OnHealthChanged01;
     }
 
     #region Transition conditions

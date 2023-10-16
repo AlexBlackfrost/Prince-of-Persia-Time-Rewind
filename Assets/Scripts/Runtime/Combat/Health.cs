@@ -13,9 +13,11 @@ public class Health{
         }
 
         set {
-            float previousHealth = currentHealth;
-            currentHealth = value;
-            HealthChanged01?.Invoke(previousHealth/MaxHealth, currentHealth / MaxHealth);
+            if(value != currentHealth) { 
+                float previousHealth = currentHealth;
+                currentHealth = value;
+                HealthChanged01?.Invoke(previousHealth/MaxHealth, currentHealth / MaxHealth);
+            }
         } 
     }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour{
+    [SerializeField] private PlayerController playerController;
     [SerializeField] private Image fill;
 
     [Header("Glow animation")]
@@ -25,6 +26,7 @@ public class HealthBar : MonoBehaviour{
 
     private void Awake(){
         material = fill.material;
+        playerController.health.HealthChanged01 += OnHealthChanged01;
     }
 
     

@@ -128,10 +128,10 @@ public class PostprocessingController : MonoBehaviour {
         float tweenSpeed = Mathf.Abs(targetValue-initialValue) / duration;
         float elapsedTime = 0;
         while (!Mathf.Approximately(currentValue, targetValue)) {
-            float lerpAlpha = Mathf.Clamp01(easing.Evaluate(elapsedTime));
+            float lerpAlpha = Mathf.Clamp01(easing.Evaluate(elapsedTime * tweenSpeed));
             currentValue = Mathf.Lerp(initialValue, targetValue, lerpAlpha);
             setter(currentValue);
-            elapsedTime += Time.deltaTime * tweenSpeed;
+            elapsedTime += Time.deltaTime;
             yield return currentValue;
         }
         runningTweens.Remove(tweenId);
