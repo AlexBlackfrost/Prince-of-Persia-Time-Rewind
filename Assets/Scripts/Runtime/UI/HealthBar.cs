@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class HealthBar : MonoBehaviour{
     [SerializeField] private Image fill;
 
     [Header("Glow animation")]
+    [SerializeField][ColorUsage(true, true)] private Color initialColor;
     [SerializeField] private float healthChangedColorIntensity=1.2f;
     [SerializeField] private float healthChangedAnimationDuration = 1;
     [SerializeField] private AnimationCurve healthChangedGlowAnimation;
@@ -15,6 +17,8 @@ public class HealthBar : MonoBehaviour{
     [Header("Bar animation")]
     [SerializeField] private float barAnimationDuration = 1;
     [SerializeField] private AnimationCurve barAnimation;
+
+    public Action<float, Vector3> BarAnimationEnded { get; set; }
 
     private const byte MAX_BYTE_FOR_OVEREXPOSED_COLOR = 191;
 
@@ -26,6 +30,7 @@ public class HealthBar : MonoBehaviour{
 
     private void Awake(){
         material = fill.material;
+        material.color = initialColor;
         playerController.health.HealthChanged01 += OnHealthChanged01;
     }
 
@@ -84,7 +89,21 @@ public class HealthBar : MonoBehaviour{
         }
 
         material.SetFloat("_Fill", currentHealth01);
-        animateHealthBarCoroutine = null;  
+        animateHealthBarCoroutine = null;
+
+        BarAnimationEnded.Invoke(currentHealth01, TransformRatioToPosition(currentHealth01));
     } 
+
+    private Vector3 TransformRatioToPosition(float ratio) {
+        Vector3[] healthBarCornerWorldPositions = new Vector3[4];
+        fill.rectTransform.GetWorldCorners(healthBarCornerWorldPositions);
+
+        Vector3 startPosition = (healthBarCornerWorldPositions[0] + healthBarCornerWorldPositions[1]) /2.0f;
+        Vector3 endPosition = (healthBarCornerWorldPositions[2] + healthBarCornerWorldPositions[3]) / 2.0f;
+
+        Vector3 position = Vector3.Lerp(startPosition, endPosition, ratio);
+        
+        return position;
+    }
 
 }
