@@ -7095,7 +7095,6 @@ GameObject:
   - component: {fileID: 1367312622}
   - component: {fileID: 1367312624}
   - component: {fileID: 1367312623}
-  - component: {fileID: 1367312625}
   m_Layer: 0
   m_Name: HealthBarSpark
   m_TagString: Untagged
@@ -7112,7 +7111,7 @@ RectTransform:
   m_GameObject: {fileID: 1367312621}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 1368244803}
   m_RootOrder: 2
@@ -7134,7 +7133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 305708782364d8347963bda274044516, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -7150,7 +7149,7 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
-  m_UseSpriteMesh: 0
+  m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
 --- !u!222 &1367312624
 CanvasRenderer:
@@ -7160,59 +7159,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1367312621}
   m_CullTransparentMesh: 1
---- !u!114 &1367312625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1367312621}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cada0ee0843e84449b6682c54285d03f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healthBar: {fileID: 1368244804}
-  minHealthPercentVisibility: 0.3
-  maxHealthPercentVisibility: 1
-  horizontalOffset: 0
-  verticalOffset: 0
-  scaleAnimationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.4
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.10836755
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  scaleAnimationDuration: 1.5
-  startScale: 0
-  endScale: 0
 --- !u!1 &1368244802
 GameObject:
   m_ObjectHideFlags: 0
@@ -7327,6 +7273,116 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  spark: {fileID: 1367312623}
+  minHealthPercentVisibility: 0.3
+  maxHealthPercentVisibility: 1
+  horizontalOffset: 0
+  verticalOffset: 0
+  sparkScaleAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.15
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.3
+      value: 1
+      inSlope: -0.015544749
+      outSlope: -0.015544749
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.10787785
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  sparkScaleAnimationDuration: 1.25
+  startScale: 0.15
+  maxScale: 1.5
+  sparkPositionAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  sparkPositionAnimationDuration: 0.35
+  sparkGlowAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 7.8239474
+      outSlope: 7.8239474
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.024005484
+    - serializedVersion: 3
+      time: 0.3
+      value: 1
+      inSlope: 0.06844655
+      outSlope: 0.06844655
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.11480046
+    - serializedVersion: 3
+      time: 0.8
+      value: 1
+      inSlope: -0.012455568
+      outSlope: -0.012455568
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.3141284
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -13.378906
+      outSlope: -13.378906
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.037723184
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  sparkMaxColorIntensity: 3
+  sparkGlowAnimationDuration: 1.25
 --- !u!1001 &1385349083
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7717,7 +7773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: eb43058bd2884de489a35977a2c0f32b, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 0.8509804}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -10111,6 +10167,10 @@ PrefabInstance:
     - target: {fileID: 5051892676281105162, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
       propertyPath: attackCooldown
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5051892676281105162, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
+      propertyPath: <Damage>k__BackingField
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5421577037422279278, guid: f7df0ce2aeb8fe94c859b56cceed28c8, type: 3}
       propertyPath: <Height>k__BackingField

@@ -18,43 +18,93 @@ public class HealthBar : MonoBehaviour{
     [SerializeField] private float barAnimationDuration = 1;
     [SerializeField] private AnimationCurve barAnimation;
 
-    public Action<float, Vector3> BarAnimationEnded { get; set; }
+    [Header("Spark animation")]
+    [SerializeField] private Image spark;
+    [SerializeField] private float minHealthPercentVisibility = 0.3f;
+    [SerializeField] private float maxHealthPercentVisibility = 1.0f;
+    [SerializeField] private float horizontalOffset = 0.0f;
+    [SerializeField] private float verticalOffset = -0.2f;
+    [SerializeField] private AnimationCurve sparkScaleAnimationCurve;
+    [SerializeField] private float sparkScaleAnimationDuration;
+    [SerializeField] private float startScale = 0.0f;
+    [SerializeField] private float maxScale = 1.5f;
+    [SerializeField] private AnimationCurve sparkPositionAnimationCurve;
+    [SerializeField] private float sparkPositionAnimationDuration = 1;
+    [SerializeField] private AnimationCurve sparkGlowAnimationCurve;
+    [SerializeField] private float sparkMaxColorIntensity=1.2f;
+    [SerializeField] private float sparkGlowAnimationDuration = 1;
 
     private const byte MAX_BYTE_FOR_OVEREXPOSED_COLOR = 191;
 
-    private Material material;
+    private Material fillBarMaterial;
     private Coroutine animateGlowCoroutine;
-    private float currentColorIntensity;
 
     private Coroutine animateHealthBarCoroutine;
 
+    private Material sparkMaterial;
+    private Coroutine animateSparkScaleCoroutine;
+    private Coroutine animateSparkPositionCoroutine;
+    private Coroutine animateSparkGlowCoroutine;
+
+
     private void Awake(){
-        material = fill.material;
-        material.color = initialColor;
+        fillBarMaterial = fill.material;
+        fillBarMaterial.color = initialColor;
+
+        sparkMaterial = spark.material;
         playerController.health.HealthChanged01 += OnHealthChanged01;
     }
 
     
     public void OnHealthChanged01(float previousHealth01, float currentHealth01) {
+        // Glow
         if(animateGlowCoroutine != null) {
             StopCoroutine(animateGlowCoroutine);
             animateGlowCoroutine = null;
         }
         animateGlowCoroutine = StartCoroutine(AnimateGlow());
 
+        // Bar fill
         if (animateHealthBarCoroutine != null) {
             StopCoroutine(animateHealthBarCoroutine);
             animateHealthBarCoroutine = null;
         }
         animateHealthBarCoroutine = StartCoroutine(AnimateHealthBar(previousHealth01, currentHealth01));
+
+        // Spark
+
+        if (TimeRewindManager.Instance.IsRewinding && previousHealth01 >= minHealthPercentVisibility &&
+                                                      previousHealth01 >= minHealthPercentVisibility && 
+                                                      previousHealth01 <= maxHealthPercentVisibility &&
+                                                      currentHealth01 <= maxHealthPercentVisibility) {
+            if (animateSparkScaleCoroutine != null) {
+                StopCoroutine(animateSparkScaleCoroutine);
+                animateSparkScaleCoroutine = null;
+            }
+            animateSparkScaleCoroutine = StartCoroutine(AnimateSparkScale());
+
+            if (animateSparkPositionCoroutine != null) {
+                StopCoroutine(animateSparkPositionCoroutine);
+                animateSparkPositionCoroutine = null;
+            }
+            animateSparkPositionCoroutine = StartCoroutine(AnimateSparkPosition(previousHealth01, currentHealth01));
+
+            if (animateSparkGlowCoroutine != null) {
+                StopCoroutine(animateSparkGlowCoroutine);
+                animateSparkGlowCoroutine = null;
+            }
+            animateSparkGlowCoroutine = StartCoroutine(AnimateSparkGlow());
+        }
+        
     }
 
+
     private IEnumerator AnimateGlow() {
-        float maxColorComponent = material.color.maxColorComponent;
+        float maxColorComponent = fillBarMaterial.color.maxColorComponent;
         float scaleFactor = MAX_BYTE_FOR_OVEREXPOSED_COLOR / maxColorComponent;
         float previousColorIntensity = Mathf.Log(255f / scaleFactor) / Mathf.Log(2f);
-        Color color = material.color;
-        currentColorIntensity = previousColorIntensity;
+        Color color = fillBarMaterial.color;
+        float currentColorIntensity = previousColorIntensity;
 
         float glowAnimationElapsedTime = 0;
         float changeGlowSpeed = Mathf.Abs(healthChangedColorIntensity - previousColorIntensity) / healthChangedAnimationDuration;
@@ -65,11 +115,11 @@ public class HealthBar : MonoBehaviour{
                                                                previousColorIntensity, healthChangedColorIntensity);
 
             glowAnimationElapsedTime += Time.deltaTime*changeGlowSpeed;
-            material.color = color * currentColorIntensity;
+            fillBarMaterial.color = color * currentColorIntensity;
             yield return null;
         }
 
-        material.color = color * previousColorIntensity;
+        fillBarMaterial.color = color * previousColorIntensity;
         animateGlowCoroutine = null;
     }
 
@@ -77,33 +127,88 @@ public class HealthBar : MonoBehaviour{
         float distance = Mathf.Abs(currentHealth01 - previousHealth01);
         float speed = distance/barAnimationDuration;
         float elapsedTime = 0;
-        material.SetFloat("_Fill", previousHealth01);
+        fillBarMaterial.SetFloat("_Fill", previousHealth01);
 
         while (elapsedTime < barAnimationDuration) {
             float lerpAlpha = barAnimation.Evaluate(elapsedTime*speed)/distance;
             float fill = Mathf.Lerp(previousHealth01, currentHealth01, lerpAlpha);
 
-            material.SetFloat("_Fill", fill);
+            fillBarMaterial.SetFloat("_Fill", fill);
             elapsedTime += Time.deltaTime;
             yield return fill;
         }
 
-        material.SetFloat("_Fill", currentHealth01);
+        fillBarMaterial.SetFloat("_Fill", currentHealth01);
         animateHealthBarCoroutine = null;
 
-        BarAnimationEnded.Invoke(currentHealth01, TransformRatioToPosition(currentHealth01));
     } 
 
-    private Vector3 TransformRatioToPosition(float ratio) {
-        Vector3[] healthBarCornerWorldPositions = new Vector3[4];
-        fill.rectTransform.GetWorldCorners(healthBarCornerWorldPositions);
 
-        Vector3 startPosition = (healthBarCornerWorldPositions[0] + healthBarCornerWorldPositions[1]) /2.0f;
-        Vector3 endPosition = (healthBarCornerWorldPositions[2] + healthBarCornerWorldPositions[3]) / 2.0f;
 
-        Vector3 position = Vector3.Lerp(startPosition, endPosition, ratio);
-        
-        return position;
+    private IEnumerator AnimateSparkScale() {
+        float speed = (maxScale - startScale) / sparkScaleAnimationDuration;
+        float elapsedTime = 0;
+
+        spark.transform.localScale = new Vector3(startScale, startScale, startScale);
+
+        while (elapsedTime < sparkScaleAnimationDuration) {
+            float scale = sparkScaleAnimationCurve.Evaluate(elapsedTime * speed) * maxScale;
+            spark.transform.localScale = new Vector3(scale, scale, scale);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        spark.transform.localScale = Vector3.zero;
+    }
+
+    private IEnumerator AnimateSparkPosition(float previousHealth01, float currentHealth01) {
+        Vector3[] cornersWorldPosition = new Vector3[4];
+        fill.rectTransform.GetWorldCorners(cornersWorldPosition);
+        float positionX = (cornersWorldPosition[0] + (cornersWorldPosition[3] - cornersWorldPosition[0]) * previousHealth01).x;
+        spark.rectTransform.position = new Vector3(positionX + horizontalOffset, spark.rectTransform.position.y + verticalOffset, fill.rectTransform.position.z);
+
+        float distance = Mathf.Abs(currentHealth01 - previousHealth01);
+        float speed = distance / sparkPositionAnimationDuration;
+        float elapsedTime = 0;
+
+        while (elapsedTime < sparkPositionAnimationDuration) {
+            float lerpAlpha = sparkPositionAnimationCurve.Evaluate(elapsedTime * speed) / distance;
+            float healthRatio01 = Mathf.Lerp(previousHealth01, currentHealth01, lerpAlpha);
+
+            positionX = (cornersWorldPosition[0] + (cornersWorldPosition[3] - cornersWorldPosition[0]) * healthRatio01).x;
+            spark.rectTransform.position = new Vector3( positionX + horizontalOffset,spark.rectTransform.position.y, spark.rectTransform.position.z);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        positionX = (cornersWorldPosition[0] + (cornersWorldPosition[3] - cornersWorldPosition[0]) * currentHealth01).x;
+        spark.rectTransform.position = new Vector3(positionX + horizontalOffset, spark.rectTransform.position.y, spark.rectTransform.position.z);
+        animateHealthBarCoroutine = null;
+    }
+
+    private IEnumerator AnimateSparkGlow() {
+        float maxColorComponent = sparkMaterial.color.maxColorComponent;
+        float scaleFactor = MAX_BYTE_FOR_OVEREXPOSED_COLOR / maxColorComponent;
+        float previousColorIntensity = Mathf.Log(255f / scaleFactor) / Mathf.Log(2f);
+        Color color = sparkMaterial.color;
+        float currentColorIntensity = previousColorIntensity;
+
+        float glowAnimationElapsedTime = 0;
+        float changeGlowSpeed = Mathf.Abs(sparkMaxColorIntensity - previousColorIntensity) / sparkGlowAnimationDuration;
+
+        while (glowAnimationElapsedTime < sparkGlowAnimationDuration) {
+            currentColorIntensity = MathUtils.MapRangeClamped(sparkGlowAnimationCurve.Evaluate(glowAnimationElapsedTime),
+                                                               0, 1,
+                                                               previousColorIntensity, sparkMaxColorIntensity);
+
+            glowAnimationElapsedTime += Time.deltaTime * changeGlowSpeed;
+            sparkMaterial.color = color * currentColorIntensity;
+            yield return null;
+        }
+
+        sparkMaterial.color = color * previousColorIntensity;
+        animateSparkGlowCoroutine = null;
     }
 
 }

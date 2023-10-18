@@ -21,7 +21,6 @@ public class HealthSpark : MonoBehaviour{
 
     private void Awake() {
         spark = GetComponent<Image>();
-        healthBar.BarAnimationEnded += OnHealthBarAnimationEnded;
     }
 
 
