@@ -96,7 +96,7 @@ public class PostprocessingController : MonoBehaviour {
 
     private void OnTimeRewindStop() {
         onTweenStoppedCallbacks[resetBloomKey] = () => { UpdateBloomThreshold(previousBloomThreshold); };
-        onTweenStoppedCallbacks[resetZoomScreenKey] = () => { UpdateZoomScreenStrength(0); };
+        onTweenStoppedCallbacks[resetZoomScreenKey] =  () => { UpdateZoomScreenStrength(0); };
         onTweenStoppedCallbacks[resetGainKey] = () => { UpdateGain(previousGain.w); };
 
         StartTween(resetBloomKey, bloom.threshold.value, previousBloomThreshold, resetBloomDuration, resetBloomEasing, UpdateBloomThreshold, OnResetTweenerFinished);
@@ -104,6 +104,7 @@ public class PostprocessingController : MonoBehaviour {
         StartTween(resetGainKey, liftGammaGain.gain.value.w, previousGain.w, resetGainDuration, resetGainEasing, UpdateGain, OnResetTweenerFinished);
 
     }
+
 
     private void AnimateZoomScreen() {
         float zoomScreenStrength01 = zoomScreenAnimationCurve.Evaluate(zoomScreenElapsedTime);
@@ -127,13 +128,14 @@ public class PostprocessingController : MonoBehaviour {
         float currentValue = initialValue;
         float tweenSpeed = Mathf.Abs(targetValue-initialValue) / duration;
         float elapsedTime = 0;
-        while (!Mathf.Approximately(currentValue, targetValue)) {
-            float lerpAlpha = Mathf.Clamp01(easing.Evaluate(elapsedTime * tweenSpeed));
+        while (elapsedTime < duration) {
+            float lerpAlpha = easing.Evaluate(elapsedTime*tweenSpeed);
             currentValue = Mathf.Lerp(initialValue, targetValue, lerpAlpha);
             setter(currentValue);
             elapsedTime += Time.deltaTime;
-            yield return currentValue;
+            yield return currentValue; 
         }
+        setter(targetValue);
         runningTweens.Remove(tweenId);
         onTweenEnd?.Invoke(tweenId);
     }

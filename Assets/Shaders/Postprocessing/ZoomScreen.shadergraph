@@ -104,6 +104,9 @@
         },
         {
             "m_Id": "46298688bba84326af2861f54da93bc8"
+        },
+        {
+            "m_Id": "05d0ecaf07f349dd9c32924a13dcf5b3"
         }
     ],
     "m_GroupDatas": [],
@@ -116,6 +119,9 @@
         },
         {
             "m_Id": "786146d5c5cc4808a69a4ae67ebe9262"
+        },
+        {
+            "m_Id": "f0c4fdb45f3a4d5aabaf010e9a66fb3d"
         }
     ],
     "m_Edges": [
@@ -145,6 +151,20 @@
                     "m_Id": "c8f9088c762f43f697b38c12af612b5c"
                 },
                 "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "05d0ecaf07f349dd9c32924a13dcf5b3"
+                },
+                "m_SlotId": 2
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "c8f9088c762f43f697b38c12af612b5c"
+                },
+                "m_SlotId": 1
             }
         },
         {
@@ -268,9 +288,9 @@
             },
             "m_InputSlot": {
                 "m_Node": {
-                    "m_Id": "c8f9088c762f43f697b38c12af612b5c"
+                    "m_Id": "05d0ecaf07f349dd9c32924a13dcf5b3"
                 },
-                "m_SlotId": 1
+                "m_SlotId": 0
             }
         },
         {
@@ -652,8 +672,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -1072.0,
-            "y": 1818.0,
+            "x": -1202.0,
+            "y": 1801.0,
             "width": 208.0,
             "height": 278.0
         }
@@ -669,6 +689,44 @@
     "synonyms": [],
     "m_Precision": 0,
     "m_PreviewExpanded": true,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.DivideNode",
+    "m_ObjectId": "05d0ecaf07f349dd9c32924a13dcf5b3",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Divide",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -842.0000610351563,
+            "y": 1961.0001220703125,
+            "width": 126.0,
+            "height": 118.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "0ec9d2e5cf5c4556a8108512af1a671d"
+        },
+        {
+            "m_Id": "34c42be9440449378cb212b37bb24784"
+        },
+        {
+            "m_Id": "768bbc9b12d641f29356240f1189a337"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": false,
     "m_PreviewMode": 0,
     "m_CustomColors": {
         "m_SerializableColors": []
@@ -756,6 +814,30 @@
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
+    "m_ObjectId": "0ec9d2e5cf5c4556a8108512af1a671d",
+    "m_Id": 0,
+    "m_DisplayName": "A",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "A",
     "m_StageCapability": 3,
     "m_Value": {
         "x": 0.0,
@@ -1442,8 +1524,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -864.0000610351563,
-            "y": 1904.0,
+            "x": -994.0000610351563,
+            "y": 1974.0001220703125,
             "width": 121.0,
             "height": 34.0
         }
@@ -1462,6 +1544,30 @@
     },
     "m_Property": {
         "m_Id": "a4f6fcd2ef9246159692e970cf625642"
+    }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
+    "m_ObjectId": "34c42be9440449378cb212b37bb24784",
+    "m_Id": 1,
+    "m_DisplayName": "B",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "B",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 10.0,
+        "y": 2.0,
+        "z": 2.0,
+        "w": 2.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
     }
 }
 
@@ -1903,6 +2009,30 @@
     "m_PreviewMode": 0,
     "m_CustomColors": {
         "m_SerializableColors": []
+    }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
+    "m_ObjectId": "768bbc9b12d641f29356240f1189a337",
+    "m_Id": 2,
+    "m_DisplayName": "Out",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
     }
 }
 
@@ -3265,6 +3395,26 @@
         "y": 0.0,
         "z": 0.0,
         "w": 0.0
+    }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.StickyNoteData",
+    "m_ObjectId": "f0c4fdb45f3a4d5aabaf010e9a66fb3d",
+    "m_Title": "Divide by 10",
+    "m_Content": "So that we don't have to use very small values in code/inspector (and we can use greater numbers in code), since tweening between small values usually doesn't work very accurately.",
+    "m_TextSize": 0,
+    "m_Theme": 0,
+    "m_Position": {
+        "serializedVersion": "2",
+        "x": -911.0,
+        "y": 2102.0,
+        "width": 200.0,
+        "height": 160.0
+    },
+    "m_Group": {
+        "m_Id": ""
     }
 }
 

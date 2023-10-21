@@ -57,12 +57,15 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	 
     protected override void OnLateUpdate() {
 		bool timeRewindPressed = settings.InputController.IsTimeRewindPressed();
-		if (timeRewindPressed && !timeIsRewinding) {
+		if (settings.PlayerTimeRewinder.HasSandTanks() && timeRewindPressed && !timeIsRewinding) {
+			settings.PlayerTimeRewinder.ConsumeSandTank();
 			TimeRewindManager.Instance.StartTimeRewind();
+			timeIsRewinding = true;
+
 		} else if (!timeRewindPressed && timeIsRewinding) {
 			TimeRewindManager.Instance.StopTimeRewind();
+			timeIsRewinding = false;
         }
-		timeIsRewinding = timeRewindPressed;
 
         if (timeIsRewinding) {
 			RewindPlayerRecord();
