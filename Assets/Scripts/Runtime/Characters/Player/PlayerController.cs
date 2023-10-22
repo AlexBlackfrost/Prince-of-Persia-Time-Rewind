@@ -32,6 +32,10 @@ public class PlayerController : MonoBehaviour {
     [field: SerializeField] private AliveStateMachine.AliveSettings aliveSettings;
     [field: SerializeField] private DeadState.DeadSettings deadSettings;
 
+    [Header("VFX")]
+    [SerializeField] private ParticleSystem leftFootstepSmokeVFX;
+    [SerializeField] private ParticleSystem rightFootstepSmokeVFX;
+
     public InputController InputController { get; private set; }
     public RootStateMachine rootStateMachine;
 
@@ -345,6 +349,15 @@ public class PlayerController : MonoBehaviour {
 
     public void SetIsShielded(Bool enabled) {
         hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+    }
+
+    public void PlayFootstepSmokeVFX(Direction foot) {
+        if(foot == Direction.Left) {
+            leftFootstepSmokeVFX.Play();
+
+        }else if(foot == Direction.Right) {
+            rightFootstepSmokeVFX.Play();
+        }
     }
 
     #endregion
