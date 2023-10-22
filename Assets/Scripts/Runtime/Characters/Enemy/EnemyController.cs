@@ -76,6 +76,7 @@ public class EnemyController : MonoBehaviour{
         timeControlSettings.EnemyAI = enemyAI;
 
         parriedSettings.Animator = animator;
+        parriedSettings.Sword = sword;
 
         blockSettings.Animator = animator;
         blockSettings.Hurtbox = hurtbox;

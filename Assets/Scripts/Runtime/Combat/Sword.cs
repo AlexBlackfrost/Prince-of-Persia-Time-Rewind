@@ -7,6 +7,7 @@ using UnityEngine;
 public class Sword : MonoBehaviour {
     [SerializeField] private Transform backSocket;
     [SerializeField] private Transform handSocket;
+    [SerializeField] private ParticleSystem swordClash;
     [SerializeField] private float attackCooldown = 0;
     [SerializeField, ReadOnly] private bool hitboxEnabled;
     [SerializeField, ReadOnly] private float attackCooldownRemainingTime;
@@ -272,5 +273,9 @@ public class Sword : MonoBehaviour {
 
     public bool CooldownFinished() {
         return attackCooldownRemainingTime <= 0;
+    }
+
+    public void PlaySwordClashVFX() {
+        swordClash.Play();
     }
 }

@@ -8,6 +8,7 @@ public class ParriedState : State{
     [Serializable]
     public class ParriedSettings {
         public Animator Animator { get; set; }
+        public Sword Sword {get;set; }
     }
 
     private ParriedSettings settings;
@@ -17,6 +18,7 @@ public class ParriedState : State{
 
     protected override void OnEnter() {
         settings.Animator.SetBool(AnimatorUtils.parriedHash, true);
+        settings.Sword.PlaySwordClashVFX();
     }
 
     protected override void OnExit() {

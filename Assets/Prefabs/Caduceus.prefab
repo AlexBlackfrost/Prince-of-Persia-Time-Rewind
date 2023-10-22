@@ -118,6 +118,7 @@ Transform:
   - {fileID: 8975296839903240656}
   - {fileID: 1492752279128260824}
   - {fileID: 761512256558384536}
+  - {fileID: 1340088019673626039}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -185,6 +186,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backSocket: {fileID: 0}
   handSocket: {fileID: 0}
+  swordClash: {fileID: 1340088019673626036}
+  attackCooldown: 0
+  hitboxEnabled: 0
+  attackCooldownRemainingTime: 0
+  <Damage>k__BackingField: 10
 --- !u!114 &5421577037422279278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,3 +537,70 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &8162645890225823133
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 61462102241682365}
+    m_Modifications:
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.835
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7196604615072245807, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+      propertyPath: m_Name
+      value: SwordClash
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+--- !u!4 &1340088019673626039 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7196604615072245802, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+  m_PrefabInstance: {fileID: 8162645890225823133}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &1340088019673626036 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7196604615072245801, guid: 6dbc60ab1bd04124194f76e188f868c7, type: 3}
+  m_PrefabInstance: {fileID: 8162645890225823133}
+  m_PrefabAsset: {fileID: 0}

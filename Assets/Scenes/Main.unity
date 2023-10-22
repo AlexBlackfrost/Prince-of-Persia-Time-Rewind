@@ -10125,10 +10125,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Blood
       objectReference: {fileID: 0}
-    - target: {fileID: 2588619450212311460, guid: 9795c1b212fdec44db3d6c0ad39a9ad4, type: 3}
-      propertyPath: InitialModule.startSize.scalar
-      value: 0.25
-      objectReference: {fileID: 0}
     - target: {fileID: 2588619450212311463, guid: 9795c1b212fdec44db3d6c0ad39a9ad4, type: 3}
       propertyPath: m_RootOrder
       value: 9
