@@ -15,6 +15,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		public Health Health { get; set; }
 		public Hurtbox Hurtbox { get; set; }
 		public EnemyAI EnemyAI { get; set; }
+		public EnemyTimeRewinder TimeRewinder { get; set; }
 		//[field:SerializeField] public int MaxFPS { get; private set; } = 144;
 	}
 
@@ -29,9 +30,6 @@ public class EnemyTimeControlStateMachine : StateMachine {
 	private bool timeIsRewinding;
 	private float elapsedTimeSinceLastRecord;
 	private EnemyRecord previousRecord, nextRecord;
-	private CircularStack<EnemyRecord> records;
-	private int recordFPS = 60; 
-	private int recordMaxseconds = 20;
 
 	private AnimationRecord lastAnimationRecord;
 	private TransitionRecord[] lastInterruptedTransitionRecordInLayer;
@@ -48,7 +46,7 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		healthTimeControl = new HealthTimeControl(settings.Health);
 		hurtboxTimeControl = new HurtboxTimeControl(settings.Hurtbox);
 
-		records = new CircularStack<EnemyRecord>(recordFPS * recordMaxseconds);
+
 		timeIsRewinding = false;
 		TimeRewindManager.Instance.TimeRewindStart += OnTimeRewindStart;
 		TimeRewindManager.Instance.TimeRewindStop += OnTimeRewindStop;
@@ -67,8 +65,8 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		timeIsRewinding = true;
 
 		elapsedTimeSinceLastRecord = 0;
-		previousRecord = records.Pop();
-		nextRecord = records.Peek();
+		previousRecord = settings.TimeRewinder.Pop();
+		nextRecord = settings.TimeRewinder.Peek();
 
 		animationTimeControl.OnTimeRewindStart();
 		stateMachineTimeControl.OnTimeRewindStart();
@@ -111,15 +109,15 @@ public class EnemyTimeControlStateMachine : StateMachine {
 		// Check for interrupted transitions -- Now it's done inside animationTimeControl
 		//animationTimeControl.TrackInterruptedTransitions(ref enemyRecord.animationRecord, enemyRecord.deltaTime);
 
-		records.Push(enemyRecord);
+		settings.TimeRewinder.Push(enemyRecord);
 	}
 
 
 	private void RewindEnemyRecord() {
-		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && records.Count > 2) {
+		while (elapsedTimeSinceLastRecord > previousRecord.deltaTime && settings.TimeRewinder.Count() > 2) {
 			elapsedTimeSinceLastRecord -= previousRecord.deltaTime;
-			previousRecord = records.Pop();
-			nextRecord = records.Peek();
+			previousRecord = settings.TimeRewinder.Pop();
+			nextRecord = settings.TimeRewinder.Peek();
 		}
 
 		RestoreEnemyRecord(previousRecord, nextRecord);

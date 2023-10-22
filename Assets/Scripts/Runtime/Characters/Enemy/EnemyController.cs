@@ -30,12 +30,14 @@ public class EnemyController : MonoBehaviour{
     private Animator animator;
     private EnemyPerceptionSystem perceptionSystem;
     private RootStateMachine rootStateMachine;
+    private EnemyTimeRewinder timeRewinder;
 
     private void Awake() {
         CharacterMovement.Transform = transform;
         CharacterMovement.CharacterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         perceptionSystem = GetComponent<EnemyPerceptionSystem>();
+        timeRewinder = GetComponent<EnemyTimeRewinder>();
         
         enemyAI.Init();
         health.Init();
@@ -74,6 +76,7 @@ public class EnemyController : MonoBehaviour{
         timeControlSettings.Hurtbox = hurtbox;
         timeControlSettings.Sword = sword;
         timeControlSettings.EnemyAI = enemyAI;
+        timeControlSettings.TimeRewinder = timeRewinder;
 
         parriedSettings.Animator = animator;
 
@@ -203,7 +206,21 @@ public class EnemyController : MonoBehaviour{
     }
 
     public void SetIsShielded(Bool enabled) {
-        hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+
+        int blockLayerIndex = 0;
+        /* Don't enable IsShielded when the animation event is fired during an animation transitions whose source state is BlockState.
+         * When state changes from block to damaged the logic fsm can exit block state before the IsShielded(true) animation event is fired,
+         * so while animation state is transitioning from block to damaged, the isShielded(true) event could be triggered.
+         */
+        if (animator.IsInTransition(blockLayerIndex)) {
+            AnimatorStateInfo currentStateInfo = animator.GetCurrentAnimatorStateInfo(blockLayerIndex);
+            if (enabled == Bool.False || (currentStateInfo.shortNameHash != AnimatorUtils.blockHash)) {
+                 hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+                
+            }
+        } else {
+            hurtbox.SetIsShielded(Convert.ToBoolean((int)enabled));
+        }
     }
 
     public void SetHurtboxInvincible(Bool invincible) {
