@@ -248,6 +248,8 @@ public class PlayerController : MonoBehaviour {
         hurtbox.DamageReceived += health.OnDamageReceived;
         hurtbox.DamageReceived += PlayBloodVFX;
 
+        hurtbox.Parry += OnParry;
+
     }
 
     #region Transition conditions
@@ -366,6 +368,10 @@ public class PlayerController : MonoBehaviour {
     private void PlayBloodVFX(float damageAmount, IDamageSource damageSource) {
         Vector3 damageDirection = (transform.position - damageSource.DamageApplier.transform.position).normalized;
         blood.transform.rotation = Quaternion.LookRotation(damageDirection);
+    }
+
+    private void OnParry(GameObject parriedCharacter) {
+        sword.PlaySwordClashVFX();
     }
 
     #endregion

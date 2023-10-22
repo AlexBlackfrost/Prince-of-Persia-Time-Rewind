@@ -76,7 +76,6 @@ public class EnemyController : MonoBehaviour{
         timeControlSettings.EnemyAI = enemyAI;
 
         parriedSettings.Animator = animator;
-        parriedSettings.Sword = sword;
 
         blockSettings.Animator = animator;
         blockSettings.Hurtbox = hurtbox;
@@ -92,6 +91,7 @@ public class EnemyController : MonoBehaviour{
         hurtbox.DamageReceived += health.OnDamageReceived;
         hurtbox.DamageReceived += enemyAI.OnDamageReceived;
         hurtbox.DamageReceived += PlayBloodVFX;
+        hurtbox.Parry += OnParry;
     }
 
     private void BuildHFSM() {
@@ -215,6 +215,10 @@ public class EnemyController : MonoBehaviour{
     private void PlayBloodVFX(float damageAmount, IDamageSource damageSource) {
         Vector3 damageDirection = (transform.position - damageSource.DamageApplier.transform.position).normalized;
         blood.transform.rotation = Quaternion.LookRotation(damageDirection);
+    }
+
+    private void OnParry(GameObject parriedCharacter) {
+        sword.PlaySwordClashVFX();
     }
 
 }

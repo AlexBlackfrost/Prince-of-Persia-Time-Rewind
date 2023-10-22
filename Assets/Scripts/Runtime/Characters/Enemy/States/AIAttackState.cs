@@ -58,8 +58,8 @@ public class AIAttackState : State{
                         IDamageable damageableObject = (IDamageable)hittableObject;
                         if (damageableObject.CanBeDamaged()) {
                             if (damageableObject is IShieldable && ((IShieldable)damageableObject).IsShielded() && HittableObjectIsFacingAttacker(hitData.hittableObject)) {
+                                ((IShieldable)damageableObject)?.Parry.Invoke(settings.Transform.gameObject);
                                 Parried?.Invoke();
-                                
                             } else {
                                 damageableObject.ReceiveDamage(settings.Sword.Damage,settings.Sword.damageSource);
                                 Debug.Log("Damaged");

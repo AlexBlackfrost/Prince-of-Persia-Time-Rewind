@@ -11,7 +11,11 @@ public class Hurtbox : MonoBehaviour, IDamageable, IHittable, IShieldable {
     [field:SerializeField] public bool IsInvincible{ get; set;}
 
     [field:SerializeField, ReadOnly] public float IsDamageableRemainingTime { get; set; }
+
+    public Action<GameObject> Parry { get; set; }
+
     [SerializeField, ReadOnly]private bool isShielded = false;
+
 
 
     public void Update() {

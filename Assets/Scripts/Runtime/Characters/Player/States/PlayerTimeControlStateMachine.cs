@@ -36,6 +36,9 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	private float elapsedTimeSinceLastRecord;
 	private PlayerRecord previousRecord, nextRecord;
 	private CinemachineBrain cinemachineBrain;
+	private bool timeRewindPressedLastFrame = false;
+	private bool timeRewindIsPressed = false;
+
 	public PlayerTimeControlStateMachine(UpdateMode updateMode, PlayerTimeControlSettings settings, params StateObject[] states) : base(updateMode, states) {
 		//Application.targetFrameRate = settings.MaxFPS;
 		this.settings = settings;
@@ -56,15 +59,25 @@ public class PlayerTimeControlStateMachine : StateMachine {
 	}
 	 
     protected override void OnLateUpdate() {
-		bool timeRewindPressed = settings.InputController.IsTimeRewindPressed();
-		if (settings.PlayerTimeRewinder.HasSandTanks() && timeRewindPressed && !timeIsRewinding) {
+		bool timeRewindPressedThisFrame = settings.InputController.IsTimeRewindPressed();
+
+		if(timeRewindPressedThisFrame && !timeRewindPressedLastFrame) {
+			timeRewindIsPressed = true;
+		}else if(!timeRewindPressedThisFrame && timeRewindPressedLastFrame) {
+			timeRewindIsPressed = false;
+		}
+
+		timeRewindPressedLastFrame = timeRewindPressedThisFrame;
+
+		if (settings.PlayerTimeRewinder.HasSandTanks() && timeRewindIsPressed && !timeIsRewinding) {
 			settings.PlayerTimeRewinder.ConsumeSandTank();
 			TimeRewindManager.Instance.StartTimeRewind();
 			timeIsRewinding = true;
 
-		} else if (!timeRewindPressed && timeIsRewinding) {
+		} else if ((!timeRewindIsPressed && timeIsRewinding) || (timeIsRewinding && settings.PlayerTimeRewinder.Count()<=2)) {
 			TimeRewindManager.Instance.StopTimeRewind();
 			timeIsRewinding = false;
+			timeRewindIsPressed = false;
         }
 
         if (timeIsRewinding) {
