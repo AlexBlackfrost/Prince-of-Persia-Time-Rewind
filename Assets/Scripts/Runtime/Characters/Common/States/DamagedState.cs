@@ -9,6 +9,7 @@ public class DamagedState : State{
     public class DamagedSettings {
         public Animator Animator { get; set; }
         public CharacterMovement CharacterMovement { get; set; }
+        public ParticleSystem Blood{ get; set; }
     }
 
     private DamagedSettings settings;
@@ -19,6 +20,7 @@ public class DamagedState : State{
 
     protected override void OnEnter() {
         settings.Animator.SetTrigger(AnimatorUtils.damagedHash);
+        settings.Blood.Play();
     }
 
     protected override void OnExit() {

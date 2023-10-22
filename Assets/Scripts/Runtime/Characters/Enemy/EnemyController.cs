@@ -24,6 +24,9 @@ public class EnemyController : MonoBehaviour{
     [field: SerializeField] private AliveStateMachine.AliveSettings aliveSettings;
     [field: SerializeField] private DeadState.DeadSettings deadSettings;
 
+    [Header("VFX")]
+    [SerializeField] private ParticleSystem blood;
+
     private Animator animator;
     private EnemyPerceptionSystem perceptionSystem;
     private RootStateMachine rootStateMachine;
@@ -79,6 +82,7 @@ public class EnemyController : MonoBehaviour{
 
         damagedSettings.Animator = animator;
         damagedSettings.CharacterMovement = CharacterMovement;
+        damagedSettings.Blood = blood;
 
         deadSettings.Animator = animator;
     }
@@ -86,6 +90,7 @@ public class EnemyController : MonoBehaviour{
     private void SubscribeEvents() {
         hurtbox.DamageReceived += health.OnDamageReceived;
         hurtbox.DamageReceived += enemyAI.OnDamageReceived;
+        hurtbox.DamageReceived += PlayBloodVFX;
     }
 
     private void BuildHFSM() {
@@ -185,6 +190,7 @@ public class EnemyController : MonoBehaviour{
     private void SetPlayerAsAttackTarget() {
         AIAttackSettings.Target = perceptionSystem.player;
     }
+
     private void ApplyDamageEffect(float damageAmount, IDamageSource damageSource) {
         damageSource.ApplyDamageEffect(this.gameObject);
     }
@@ -193,18 +199,6 @@ public class EnemyController : MonoBehaviour{
     #region Animation events
     public void SetHitboxEnabled(Bool enabled) {
         sword.SetHitboxEnabled(enabled);
-       
-        /*
-        int AIAttackLayerIndex = 0;
-        // Don't enable hitbox when the animation event is fired during an animation transitions whose source state is AIAttack.
-        if (animator.IsInTransition(AIAttackLayerIndex)) {
-            AnimatorStateInfo currentStateInfo = animator.GetCurrentAnimatorStateInfo(AIAttackLayerIndex);
-            if((currentStateInfo.shortNameHash != AnimatorUtils.AIAttackHash) || enabled == Bool.False) {
-                sword.SetHitboxEnabled(enabled);
-            }
-        } else {
-            sword.SetHitboxEnabled(enabled);
-        }*/
     }
 
     public void SetIsShielded(Bool enabled) {
@@ -216,5 +210,10 @@ public class EnemyController : MonoBehaviour{
     }
 
     #endregion
+
+    private void PlayBloodVFX(float damageAmount, IDamageSource damageSource) {
+        Vector3 damageDirection = (transform.position - damageSource.DamageApplier.transform.position).normalized;
+        blood.transform.rotation = Quaternion.LookRotation(damageDirection);
+    }
 
 }

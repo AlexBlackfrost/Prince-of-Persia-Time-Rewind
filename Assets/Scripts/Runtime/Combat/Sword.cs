@@ -54,6 +54,8 @@ public class Sword : MonoBehaviour {
         swordState = SwordState.InBack;
 
         attackCooldownRemainingTime = 0;
+
+        damageSource.DamageApplier = this.owner;
     }
 
     public void SheatheIfPossible() {

@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour {
     [Header("VFX")]
     [SerializeField] private ParticleSystem leftFootstepSmokeVFX;
     [SerializeField] private ParticleSystem rightFootstepSmokeVFX;
+    [SerializeField] private ParticleSystem blood;
 
     public InputController InputController { get; private set; }
     public RootStateMachine rootStateMachine;
@@ -225,6 +226,7 @@ public class PlayerController : MonoBehaviour {
 
         damagedSettings.Animator = animator;
         damagedSettings.CharacterMovement = CharacterMovement;
+        damagedSettings.Blood = blood;
 
         parriedSettings.Animator = animator;
 
@@ -244,6 +246,7 @@ public class PlayerController : MonoBehaviour {
         InputController.Sheathe.performed += (CallbackContext ctx) => { sword.OnSheathePressed(); };
 
         hurtbox.DamageReceived += health.OnDamageReceived;
+        hurtbox.DamageReceived += PlayBloodVFX;
 
     }
 
@@ -358,6 +361,11 @@ public class PlayerController : MonoBehaviour {
         }else if(foot == Direction.Right) {
             rightFootstepSmokeVFX.Play();
         }
+    }
+
+    private void PlayBloodVFX(float damageAmount, IDamageSource damageSource) {
+        Vector3 damageDirection = (transform.position - damageSource.DamageApplier.transform.position).normalized;
+        blood.transform.rotation = Quaternion.LookRotation(damageDirection);
     }
 
     #endregion
