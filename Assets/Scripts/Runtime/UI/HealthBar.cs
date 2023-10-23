@@ -10,7 +10,7 @@ public class HealthBar : MonoBehaviour{
 
     [Header("Glow animation")]
     [SerializeField][ColorUsage(true, true)] private Color initialColor;
-    [SerializeField] private float healthChangedColorIntensity=1.2f;
+    [SerializeField][ColorUsage(true, true)] private Color glowColor;
     [SerializeField] private float healthChangedAnimationDuration = 1;
     [SerializeField] private AnimationCurve healthChangedGlowAnimation;
 
@@ -100,26 +100,18 @@ public class HealthBar : MonoBehaviour{
 
 
     private IEnumerator AnimateGlow() {
-        float maxColorComponent = fillBarMaterial.color.maxColorComponent;
-        float scaleFactor = MAX_BYTE_FOR_OVEREXPOSED_COLOR / maxColorComponent;
-        float previousColorIntensity = Mathf.Log(255f / scaleFactor) / Mathf.Log(2f);
-        Color color = fillBarMaterial.color;
-        float currentColorIntensity = previousColorIntensity;
-
-        float glowAnimationElapsedTime = 0;
-        float changeGlowSpeed = Mathf.Abs(healthChangedColorIntensity - previousColorIntensity) / healthChangedAnimationDuration;
+        float changeGlowSpeed = 1 / healthChangedAnimationDuration;
         
+        float glowAnimationElapsedTime = 0;
         while (glowAnimationElapsedTime < healthChangedAnimationDuration) {
-            currentColorIntensity = MathUtils.MapRangeClamped( healthChangedGlowAnimation.Evaluate(glowAnimationElapsedTime),
-                                                               0,1,
-                                                               previousColorIntensity, healthChangedColorIntensity);
 
-            glowAnimationElapsedTime += Time.deltaTime*changeGlowSpeed;
-            fillBarMaterial.color = color * currentColorIntensity;
+            float lerpAlpha = healthChangedGlowAnimation.Evaluate(glowAnimationElapsedTime * changeGlowSpeed);
+            fillBarMaterial.color = Color.Lerp(initialColor, glowColor, lerpAlpha);
+            glowAnimationElapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        fillBarMaterial.color = color * previousColorIntensity;
+        fillBarMaterial.color = initialColor;
         animateGlowCoroutine = null;
     }
 
