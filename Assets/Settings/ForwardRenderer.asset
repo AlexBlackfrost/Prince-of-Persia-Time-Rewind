@@ -102,4 +102,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   distanceFogMaterial: {fileID: 2100000, guid: 0be1d198f1657734594835c2f94f4d03, type: 2}
-  renderPassEvent: 500
+  renderPassEvent: 450
