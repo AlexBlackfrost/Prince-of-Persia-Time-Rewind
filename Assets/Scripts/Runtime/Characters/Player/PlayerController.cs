@@ -37,6 +37,11 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private ParticleSystem rightFootstepSmokeVFX;
     [SerializeField] private ParticleSystem blood;
 
+    [Header("SFX")]
+    [SerializeField] private AudioSource footstep;
+    [SerializeField] private float footstepMinPitch;
+    [SerializeField] private float footstepMaxPitch;
+
     public InputController InputController { get; private set; }
     public RootStateMachine rootStateMachine;
 
@@ -372,6 +377,17 @@ public class PlayerController : MonoBehaviour {
 
     private void OnParry(GameObject parriedCharacter) {
         sword.PlaySwordClashVFX();
+    }
+
+    public void PlayFootstepAudio() {
+        int locomotionLayerIndex = 0;
+        if (!animator.IsInTransition(locomotionLayerIndex) || 
+            (animator.IsInTransition(locomotionLayerIndex) && animator.GetNextAnimatorStateInfo(locomotionLayerIndex).shortNameHash == AnimatorUtils.runHash) ) {
+
+            footstep.pitch = UnityEngine.Random.Range(footstepMinPitch, footstepMaxPitch);
+            footstep.Play();
+        }
+        
     }
 
     #endregion
