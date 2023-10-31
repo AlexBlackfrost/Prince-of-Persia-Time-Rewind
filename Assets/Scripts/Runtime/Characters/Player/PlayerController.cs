@@ -39,8 +39,12 @@ public class PlayerController : MonoBehaviour {
 
     [Header("SFX")]
     [SerializeField] private AudioSource footstep;
+    [SerializeField] private AudioSource land;
     [SerializeField] private float footstepMinPitch;
     [SerializeField] private float footstepMaxPitch;
+    [SerializeField] private float wallRunFootstepMinPitch = 1.2f;
+    [SerializeField] private float wallRunFootstepMaxPitch = 1.4f;
+
 
     public InputController InputController { get; private set; }
     public RootStateMachine rootStateMachine;
@@ -48,6 +52,7 @@ public class PlayerController : MonoBehaviour {
     private Animator animator;
     private PlayerPerceptionSystem perceptionSystem;
     private PlayerTimeRewinder playerTimeRewinder;
+
 
 
     private void Awake() {
@@ -387,8 +392,17 @@ public class PlayerController : MonoBehaviour {
             footstep.pitch = UnityEngine.Random.Range(footstepMinPitch, footstepMaxPitch);
             footstep.Play();
         }
-        
     }
+
+    public void PlayWallFootstepAudio() {
+        footstep.pitch = UnityEngine.Random.Range(wallRunFootstepMinPitch, wallRunFootstepMaxPitch);
+        footstep.Play();
+    }
+
+    public void PlayLandAudio() {
+        land.Play();
+    }
+
 
     #endregion
     private void Update() {
