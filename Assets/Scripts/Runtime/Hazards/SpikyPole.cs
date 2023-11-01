@@ -12,6 +12,9 @@ public class SpikyPole : MonoBehaviour{
     [SerializeField] private float damage = 10;
     [SerializeField] private HazardDamageSource damageSource;
 
+    [SerializeField] private AudioSource sound;
+    [SerializeField] private float startSoundDelay = 0.0f;
+
     public Vector3 InitialPosition { get; private set; }
     public Vector3 MoveDirection { get; private set; }
     public Quaternion InitialRotation { get; private set; }
@@ -32,6 +35,9 @@ public class SpikyPole : MonoBehaviour{
         InitialRotation = transform.rotation;
 
         damageSource.DamageApplier = this.gameObject;
+        TimeRewindManager.Instance.TimeRewindStart += EnableSound;
+        TimeRewindManager.Instance.TimeRewindStop += EnableSound;
+        StartCoroutine(EnableSoundDelayed());
     }
 
     private void Update(){
@@ -62,5 +68,19 @@ public class SpikyPole : MonoBehaviour{
         return Mathf.Abs((time*(Speed/Displacement) + 1 )% 2 - 1) * Displacement;
     }
 
+    private void EnableSound() {
+        if (!sound.isPlaying) {
+            sound.Play();
+        }
+    }
+
+    private void DisableSound() {
+        sound.Stop();
+    }
+
+    private IEnumerator EnableSoundDelayed() {
+        yield return new WaitForSeconds(startSoundDelay);
+        EnableSound();
+    }
 
 }
