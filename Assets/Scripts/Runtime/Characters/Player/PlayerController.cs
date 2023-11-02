@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour {
     [Header("SFX")]
     [SerializeField] private AudioSource footstep;
     [SerializeField] private AudioSource land;
+    [SerializeField] private AudioSource roll;
     [SerializeField] private float footstepMinPitch;
     [SerializeField] private float footstepMaxPitch;
     [SerializeField] private float wallRunFootstepMinPitch = 1.2f;
@@ -401,6 +402,10 @@ public class PlayerController : MonoBehaviour {
 
     public void PlayLandAudio() {
         land.Play();
+    }
+
+    public void PlayRollAudio() {
+        roll.Play();
     }
 
 
