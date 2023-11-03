@@ -12,6 +12,9 @@ public class Sword : MonoBehaviour {
     [SerializeField, ReadOnly] private bool hitboxEnabled;
     [SerializeField, ReadOnly] private float attackCooldownRemainingTime;
     [field: SerializeField] public float Damage { get; private set; } = 10;
+    [SerializeField] private AudioSource whoosh1;
+    [SerializeField] private AudioSource whoosh2;
+    [SerializeField] private AudioSource whoosh3;
 
     public bool SheathingEnabled { get; set; } = true;
     public bool UnsheathingEnabled { get; set; } = true;
@@ -277,5 +280,21 @@ public class Sword : MonoBehaviour {
 
     public void PlaySwordClashVFX() {
         swordClash.Play();
+    }
+
+    public void PlaySwordWhoosh(int index) {
+        switch(index) {
+            case 1:
+                whoosh1.Play();
+                break;
+
+            case 2:
+                whoosh2.Play();
+                break;
+
+            case 3:
+                whoosh3.Play();
+                break;
+        }
     }
 }

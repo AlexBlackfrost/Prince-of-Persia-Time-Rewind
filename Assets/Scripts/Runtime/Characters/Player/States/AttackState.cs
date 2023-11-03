@@ -17,6 +17,7 @@ public class AttackState : State {
         [field: SerializeField] public float AttackPressedBufferTime { get; private set; }  = 0.3f;
         [field: SerializeField] public float RotationSpeed { get; private set; }  = 5f;
         [field: SerializeField] public float BlockableAttackAngleThreshold { get; private set; } = 100;
+        [SerializeField] public float[] PlayWeaponAudioTime = new float[] { 0.1f, 0.1f, 0.1f };
 
     }
 
@@ -38,6 +39,9 @@ public class AttackState : State {
     private HashSet<IHittable> alreadyHitObjects;
     private Transform closestAttackTarget;
 
+    private float elapsedTime = 0;
+    private bool[] playedSound;
+
     public AttackState(AttackSettings settings) : base() {
         this.settings = settings;
         mainCamera = Camera.main;
@@ -53,6 +57,8 @@ public class AttackState : State {
         comboAttackNameHashes[0] = AnimatorUtils.attack1Hash;
         comboAttackNameHashes[1] = AnimatorUtils.attack2Hash;
         comboAttackNameHashes[2] = AnimatorUtils.attack3Hash;
+        playedSound = new bool[MAX_ATTACK_COMBO];
+        
         AnimatorUtils.AnimationEnded += OnAnimationEnded;
     }
 
@@ -71,6 +77,12 @@ public class AttackState : State {
         settings.Animator.applyRootMotion = true;
         settings.Animator.SetBool(attackHash, true);
 
+        for (int i = 0; i < playedSound.Length; i++) {
+            playedSound[i] = false;
+        }
+
+        elapsedTime = 0;
+
         closestAttackTarget = null;
         if(settings.PerceptionSystem.IsEnemyInsideStrafeDetectionRadius()) {
             closestAttackTarget = settings.PerceptionSystem.CurrentDetectedEnemies[0].transform;
@@ -78,9 +90,11 @@ public class AttackState : State {
     }
 
     protected override void OnUpdate() {
+        elapsedTime += Time.deltaTime;
         UpdateAttackCombo();
         UpdateRotation();
         UpdateHitDetection();
+        PlaySounds();
     }
 
     protected override void OnExit() {
@@ -156,6 +170,14 @@ public class AttackState : State {
         }
     }
 
+    private void PlaySounds() {
+        if (!playedSound[attackIndex-1] && elapsedTime > settings.PlayWeaponAudioTime[attackIndex-1]) {
+            settings.Sword.PlaySwordWhoosh(attackIndex - 1);
+            playedSound[attackIndex - 1] = true;  
+            
+        }
+    }
+
     public void SetComboEnabled(bool enabled) {
         comboEnabled = enabled;
         if (enabled) {
@@ -209,12 +231,13 @@ public class AttackState : State {
         followedCombo = record.followedCombo;
         closestAttackTarget = record.closestAttackTarget;
         alreadyHitObjects = new HashSet<IHittable>(record.alreadyHitObjects);
+        elapsedTime = record.elapsedTime;
     }
 
     public override object RecordFieldsAndProperties() {
         IHittable[] alreadyHitObjects = new IHittable[this.alreadyHitObjects.Count];
         this.alreadyHitObjects.CopyTo(alreadyHitObjects);
-        return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo, alreadyHitObjects, closestAttackTarget);
+        return new AttackStateRecord(attackIndex, comboEnabled, rotationEnabled, followedCombo, alreadyHitObjects, closestAttackTarget, elapsedTime);
     }
 
     

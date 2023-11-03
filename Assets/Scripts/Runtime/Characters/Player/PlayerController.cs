@@ -408,6 +408,9 @@ public class PlayerController : MonoBehaviour {
         roll.Play();
     }
 
+    public void PlayWeaponAudio(int index) {
+        sword.PlaySwordWhoosh(index);
+    }
 
     #endregion
     private void Update() {
