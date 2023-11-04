@@ -412,6 +412,7 @@ public class PlayerController : MonoBehaviour {
         sword.PlaySwordWhoosh(index);
     }
 
+
     #endregion
     private void Update() {
         rootStateMachine.Update();

@@ -161,6 +161,7 @@ public class AttackState : State {
                                 Parried?.Invoke();
                             } else {
                                 damageableObject.ReceiveDamage(settings.Sword.Damage, settings.Sword.damageSource);
+                                settings.Sword.PlayHitSound();
                             }
                         }
                         

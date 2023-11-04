@@ -9923,7 +9923,7 @@ MonoBehaviour:
     PlayWeaponAudioTime:
     - 0
     - 0
-    - 1
+    - 1.15
   rollSettings:
     rollSpeed:
       serializedVersion: 2
