@@ -15,6 +15,8 @@ public class Sword : MonoBehaviour {
     [SerializeField] private AudioSource whoosh1;
     [SerializeField] private AudioSource whoosh2;
     [SerializeField] private AudioSource whoosh3;
+    [SerializeField] private AudioSource sheatheSound;
+    [SerializeField] private AudioSource unsheatheSound;
 
     public bool SheathingEnabled { get; set; } = true;
     public bool UnsheathingEnabled { get; set; } = true;
@@ -68,6 +70,7 @@ public class Sword : MonoBehaviour {
                 animator.SetFloat(AnimatorUtils.unsheatheSpeedMultiplierHash, 0);
                 animator.SetTrigger(AnimatorUtils.unsheatheHash);
                 animationCoroutine = StartCoroutine(UpdateSheatheAnimation());
+                PlaySheatheSound();
                 swordState = SwordState.Sheathing;
 
             } else if(swordState == SwordState.Unsheathing) {
@@ -91,6 +94,7 @@ public class Sword : MonoBehaviour {
                     StopCoroutine(layerTransitionCoroutine);
                 }
                 layerTransitionCoroutine = StartCoroutine(UpdateSwordLayerWeightOverTime(1, transitionSpeedIntoSwordLayer));
+                PlayUnsheatheSound();
                 swordState = SwordState.Unsheathing;
 
             } else if (swordState == SwordState.Sheathing) {
@@ -99,6 +103,7 @@ public class Sword : MonoBehaviour {
                     StopCoroutine(animationCoroutine);
                 }
                 animationCoroutine = StartCoroutine(UpdateUnsheatheAnimation());
+                PlaySheatheSound();
                 swordState = SwordState.Unsheathing;
             }
         }
@@ -296,5 +301,19 @@ public class Sword : MonoBehaviour {
                 whoosh3.Play();
                 break;
         }
+    }
+
+    private void PlaySheatheSound() {
+        if (sheatheSound.isPlaying) {
+            sheatheSound.Stop();
+        }
+        sheatheSound.Play();
+    }
+
+    private void PlayUnsheatheSound() {
+        if (unsheatheSound.isPlaying) {
+            unsheatheSound.Stop();
+        }
+        unsheatheSound.Play();
     }
 }
