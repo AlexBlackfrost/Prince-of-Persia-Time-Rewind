@@ -58,6 +58,7 @@ public class AttackState : State {
         comboAttackNameHashes[2] = AnimatorUtils.attack3Hash;
         
         AnimatorUtils.AnimationEnded += OnAnimationEnded;
+        Parried += settings.Sword.PlayParrySound;
     }
 
     protected override void OnEnter() {

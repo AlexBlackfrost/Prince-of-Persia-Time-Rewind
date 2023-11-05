@@ -28,6 +28,7 @@ public class AIAttackState : State{
         this.settings = settings;
         alreadyHitObjects = new HashSet<IHittable>();
         AnimatorUtils.AnimationEnded += OnAnimationEnded;
+        Parried += settings.Sword.PlayParrySound;
     }
 
     protected override void OnEnter() {

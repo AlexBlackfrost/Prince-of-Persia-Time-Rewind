@@ -20,6 +20,7 @@ public class Sword : MonoBehaviour {
     [SerializeField] private AudioSource unsheatheSound;
     [SerializeField] private float unsheatheSoundDelay = 0.25f;
     [SerializeField] private AudioSource hitSound;
+    [SerializeField] private AudioSource parrySound;
 
     public bool SheathingEnabled { get; set; } = true;
     public bool UnsheathingEnabled { get; set; } = true;
@@ -338,5 +339,9 @@ public class Sword : MonoBehaviour {
 
     public void PlayHitSound() {
         hitSound.Play();
+    }
+
+    public void PlayParrySound() {
+        parrySound.Play();
     }
 }

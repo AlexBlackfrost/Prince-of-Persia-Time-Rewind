@@ -32,6 +32,7 @@ public class EnemyController : MonoBehaviour{
     [SerializeField] private float footstepMinPitch;
     [SerializeField] private float footstepMaxPitch;
     [SerializeField] private AudioSource damagedCry;
+    [SerializeField] private AudioSource dieSound;
 
     private Animator animator;
     private EnemyPerceptionSystem perceptionSystem;
@@ -261,5 +262,8 @@ public class EnemyController : MonoBehaviour{
         damagedCry.Play();
     }
 
+    public void PlayDieSound() {
+        dieSound.Play();
+    }
 
 }

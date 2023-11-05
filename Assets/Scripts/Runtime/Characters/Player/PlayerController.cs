@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float wallRunFootstepMaxPitch = 1.4f;
     [SerializeField] private AudioSource damagedCry;
     [SerializeField] private float damagedCryDelay = 0.0f;
+    [SerializeField] private AudioSource dieSound;
 
 
     public InputController InputController { get; private set; }
@@ -418,6 +419,10 @@ public class PlayerController : MonoBehaviour {
 
     public void PlayDamagedCryAudio(float damage, IDamageSource damageSource) {
         damagedCry.PlayDelayed(damagedCryDelay);
+    }
+
+    public void PlayDieSound() {
+        dieSound.Play();
     }
 
 

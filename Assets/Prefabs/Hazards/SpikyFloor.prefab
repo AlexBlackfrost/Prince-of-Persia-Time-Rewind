@@ -223,11 +223,11 @@ AudioSource:
     - serializedVersion: 3
       time: 0.99572754
       value: 0
-      inSlope: -1.1287825
-      outSlope: -1.1287825
+      inSlope: -0.2368326
+      outSlope: -0.2368326
       tangentMode: 0
       weightedMode: 3
-      inWeight: 0.061488576
+      inWeight: 0.2131378
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -300,7 +300,7 @@ AudioSource:
   MinDistance: 1
   MaxDistance: 12
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 2
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -310,20 +310,20 @@ AudioSource:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: -1.2517327
+      outSlope: -1.2517327
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.33333334
+      outWeight: 0.057991512
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: -0.014377819
+      outSlope: -0.014377819
       tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
+      weightedMode: 3
+      inWeight: 0.57850075
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
