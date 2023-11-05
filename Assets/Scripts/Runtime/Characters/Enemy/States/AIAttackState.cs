@@ -16,11 +16,14 @@ public class AIAttackState : State{
         public Transform Transform { get; set; }
         public Sword Sword { get; set; }
         public Hurtbox Hurtbox { get; set; }
+        public float weaponWhooshDelay = 1;
     }
     public Action Parried;
 
     private AIAttackSettings settings;
     private HashSet<IHittable> alreadyHitObjects;
+    private int swordWhooshIndex = 2;
+
     public AIAttackState(AIAttackSettings settings) {
         this.settings = settings;
         alreadyHitObjects = new HashSet<IHittable>();
@@ -30,6 +33,7 @@ public class AIAttackState : State{
     protected override void OnEnter() {
         settings.Animator.applyRootMotion = true;
         settings.Animator.SetBool(AnimatorUtils.attackHash, true);
+        PlayWeaponWhoosh();
     }
 
     protected override void OnUpdate() {
@@ -62,7 +66,7 @@ public class AIAttackState : State{
                                 Parried?.Invoke();
                             } else {
                                 damageableObject.ReceiveDamage(settings.Sword.Damage,settings.Sword.damageSource);
-                                Debug.Log("Damaged");
+                                settings.Sword.PlayHitSound();
                             }
                         }
 
@@ -84,7 +88,7 @@ public class AIAttackState : State{
         settings.Animator.SetBool(AnimatorUtils.attackHash, false);
         settings.Sword.StartCooldown();
         alreadyHitObjects.Clear();
-
+        settings.Sword.StopSwordWhoosh(swordWhooshIndex);
         settings.Hurtbox.IsInvincible = false;
     }
 
@@ -107,5 +111,9 @@ public class AIAttackState : State{
             Debug.Log("Dark Echion hitbox Enabled code: False");
             settings.Sword.SetHitboxEnabled(Bool.False);
         }
+    }
+
+    private void PlayWeaponWhoosh() {
+        settings.Sword.PlaySwordWhoosh(swordWhooshIndex, settings.weaponWhooshDelay);
     }
 }

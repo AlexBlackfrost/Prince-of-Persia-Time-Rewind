@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float footstepMaxPitch;
     [SerializeField] private float wallRunFootstepMinPitch = 1.2f;
     [SerializeField] private float wallRunFootstepMaxPitch = 1.4f;
+    [SerializeField] private AudioSource damagedCry;
+    [SerializeField] private float damagedCryDelay = 0.0f;
 
 
     public InputController InputController { get; private set; }
@@ -53,7 +55,6 @@ public class PlayerController : MonoBehaviour {
     private Animator animator;
     private PlayerPerceptionSystem perceptionSystem;
     private PlayerTimeRewinder playerTimeRewinder;
-
 
 
     private void Awake() {
@@ -249,6 +250,7 @@ public class PlayerController : MonoBehaviour {
         strafeSettings.CharacterMovement = CharacterMovement;
 
         deadSettings.Animator = animator;
+        deadSettings.Hurtbox = hurtbox;
     }
 
 
@@ -258,6 +260,7 @@ public class PlayerController : MonoBehaviour {
 
         hurtbox.DamageReceived += health.OnDamageReceived;
         hurtbox.DamageReceived += PlayBloodVFX;
+        hurtbox.DamageReceived += PlayDamagedCryAudio;
 
         hurtbox.Parry += OnParry;
 
@@ -395,6 +398,11 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    public void PlayStrafeFootstepAudio() {
+        strafeSettings.PlayFootstepSound?.Invoke();
+    }
+
+
     public void PlayWallFootstepAudio() {
         footstep.pitch = UnityEngine.Random.Range(wallRunFootstepMinPitch, wallRunFootstepMaxPitch);
         footstep.Play();
@@ -408,8 +416,8 @@ public class PlayerController : MonoBehaviour {
         roll.Play();
     }
 
-    public void PlayWeaponAudio(int index) {
-        sword.PlaySwordWhoosh(index);
+    public void PlayDamagedCryAudio(float damage, IDamageSource damageSource) {
+        damagedCry.PlayDelayed(damagedCryDelay);
     }
 
 

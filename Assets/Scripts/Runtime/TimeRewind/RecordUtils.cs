@@ -160,16 +160,14 @@ public struct AttackStateRecord {
     public bool followedCombo;
     public IHittable[] alreadyHitObjects;
     public Transform closestAttackTarget;
-    public float elapsedTime;
 
-    public AttackStateRecord(int attackIndex, bool comboEnabled, bool rotationEnabled, bool followedCombo, IHittable[] alreadyHitObjects, Transform attackTarget, float elapsedTime) {
+    public AttackStateRecord(int attackIndex, bool comboEnabled, bool rotationEnabled, bool followedCombo, IHittable[] alreadyHitObjects, Transform attackTarget) {
         this.attackIndex = attackIndex;
         this.comboEnabled = comboEnabled;
         this.rotationEnabled = rotationEnabled;
         this.followedCombo = followedCombo;
         this.alreadyHitObjects = alreadyHitObjects;
         this.closestAttackTarget = attackTarget;
-        this.elapsedTime = elapsedTime;
     }
 }
 

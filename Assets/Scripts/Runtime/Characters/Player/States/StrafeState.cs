@@ -14,13 +14,20 @@ public class StrafeState : State {
 		public float StrafeSpeed = 8;
 		public float RotationSpeed = 8;
 		public float StrafeAnimationSmoothTime = 0.1f;
+		[SerializeField] public float minTimeBetweenFootstepSounds { get; set; } = 0.3f;
+		public Action PlayFootstepSound;
+		[field:SerializeField] public AudioSource FootstepSound { get; set; }
+		[field:SerializeField] public float FootstepMinPitch { get; set; } = 0.9f;
+		[field:SerializeField] public float FootstepMaxPitch { get; set; } = 1.1f;
     }
 
 	private StrafeSettings settings;
 	private float strafeSideAnimationVelocity;
 	private float strafeForwardAnimationVelocity;
+	private float elapsedTimeSinceLastFootstepSound;
 	public StrafeState(StrafeSettings settings) : base() {
 		this.settings = settings;
+		settings.PlayFootstepSound = PlayFootstepSound;
 	}
 
 	protected override void OnUpdate() {
@@ -30,10 +37,12 @@ public class StrafeState : State {
 
 		UpdateStrafeMovement(inputDirection, closestEnemy);
 		UpdateAnimation(inputDirection);
+		elapsedTimeSinceLastFootstepSound += Time.deltaTime;
 	}
 
 	protected override void OnEnter() {
 		settings.Animator.SetBool(AnimatorUtils.strafeHash, true);
+		elapsedTimeSinceLastFootstepSound = 0;
 	}
 
 	protected override void OnExit() {
@@ -108,9 +117,19 @@ public class StrafeState : State {
 		StrafeStateRecord record = (StrafeStateRecord)stateObjectRecord;
 		strafeSideAnimationVelocity = record.strafeSideAnimationVelocity;
 		strafeForwardAnimationVelocity = record.strafeForwardAnimationVelocity;
+		elapsedTimeSinceLastFootstepSound = 0;
 	}
 
 	public override object RecordFieldsAndProperties() {
 		return new StrafeStateRecord(strafeSideAnimationVelocity, strafeForwardAnimationVelocity);
 	}
+
+    private void PlayFootstepSound() {
+        if (elapsedTimeSinceLastFootstepSound > settings.minTimeBetweenFootstepSounds) {
+            settings.FootstepSound.pitch = UnityEngine.Random.Range(settings.FootstepMinPitch, settings.FootstepMaxPitch);
+            settings.FootstepSound.Play();
+            elapsedTimeSinceLastFootstepSound = 0;
+        }
+
+    }
 }

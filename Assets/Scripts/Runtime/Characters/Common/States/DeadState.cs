@@ -9,6 +9,7 @@ public class DeadState : State{
     [Serializable]
     public class DeadSettings {
         public Animator Animator { get; set; }
+        public Hurtbox Hurtbox { get; set; }
     }
 
     private DeadSettings settings;
@@ -19,10 +20,12 @@ public class DeadState : State{
 
     protected override void OnEnter() {
         settings.Animator.SetTrigger(AnimatorUtils.dieHash);
+        settings.Hurtbox.enabled = false;
     }
 
     protected override void OnExit() {
         settings.Animator.speed = 1;    
+        settings.Hurtbox.enabled = true;
     }
 
     private void OnDieAnimationEnded(int shortNameHash) {

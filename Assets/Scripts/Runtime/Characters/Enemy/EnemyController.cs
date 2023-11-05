@@ -27,6 +27,12 @@ public class EnemyController : MonoBehaviour{
     [Header("VFX")]
     [SerializeField] private ParticleSystem blood;
 
+    [Header("SFX")]
+    [SerializeField] private AudioSource footstep;
+    [SerializeField] private float footstepMinPitch;
+    [SerializeField] private float footstepMaxPitch;
+    [SerializeField] private AudioSource damagedCry;
+
     private Animator animator;
     private EnemyPerceptionSystem perceptionSystem;
     private RootStateMachine rootStateMachine;
@@ -88,12 +94,14 @@ public class EnemyController : MonoBehaviour{
         damagedSettings.Blood = blood;
 
         deadSettings.Animator = animator;
+        deadSettings.Hurtbox = hurtbox;
     }
 
     private void SubscribeEvents() {
         hurtbox.DamageReceived += health.OnDamageReceived;
         hurtbox.DamageReceived += enemyAI.OnDamageReceived;
         hurtbox.DamageReceived += PlayBloodVFX;
+        hurtbox.DamageReceived += PlayDamagedCry;
         hurtbox.Parry += OnParry;
     }
 
@@ -237,5 +245,21 @@ public class EnemyController : MonoBehaviour{
     private void OnParry(GameObject parriedCharacter) {
         sword.PlaySwordClashVFX();
     }
+
+    public void PlayFootstepAudio() {
+        int locomotionLayerIndex = 0;
+        if (!animator.IsInTransition(locomotionLayerIndex) ||
+            (animator.IsInTransition(locomotionLayerIndex) && animator.GetNextAnimatorStateInfo(locomotionLayerIndex).shortNameHash == AnimatorUtils.runHash)) {
+
+            footstep.pitch = UnityEngine.Random.Range(footstepMinPitch, footstepMaxPitch);
+            footstep.Play();
+        }
+    }
+
+
+    public void PlayDamagedCry(float damage, IDamageSource damageSource) {
+        damagedCry.Play();
+    }
+
 
 }

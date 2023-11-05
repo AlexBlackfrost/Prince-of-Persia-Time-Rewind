@@ -16,7 +16,9 @@ public class Sword : MonoBehaviour {
     [SerializeField] private AudioSource whoosh2;
     [SerializeField] private AudioSource whoosh3;
     [SerializeField] private AudioSource sheatheSound;
+    [SerializeField] private float sheatheSoundDelay = 0.25f;
     [SerializeField] private AudioSource unsheatheSound;
+    [SerializeField] private float unsheatheSoundDelay = 0.25f;
     [SerializeField] private AudioSource hitSound;
 
     public bool SheathingEnabled { get; set; } = true;
@@ -288,18 +290,34 @@ public class Sword : MonoBehaviour {
         swordClash.Play();
     }
 
-    public void PlaySwordWhoosh(int index) {
+    public void PlaySwordWhoosh(int index, float audioDelay) {
         switch(index) {
             case 1:
-                whoosh1.Play();
+                whoosh1.PlayDelayed(audioDelay);
                 break;
 
             case 2:
-                whoosh2.Play();
+                whoosh2.PlayDelayed(audioDelay);
                 break;
 
             case 3:
-                whoosh3.Play();
+                whoosh3.PlayDelayed(audioDelay);
+                break;
+        }
+    }
+
+    public void StopSwordWhoosh(int index) {
+        switch (index) {
+            case 1:
+                whoosh1.Stop();
+                break;
+
+            case 2:
+                whoosh2.Stop();
+                break;
+
+            case 3:
+                whoosh3.Stop();
                 break;
         }
     }
@@ -308,14 +326,14 @@ public class Sword : MonoBehaviour {
         if (sheatheSound.isPlaying) {
             sheatheSound.Stop();
         }
-        sheatheSound.Play();
+        sheatheSound.PlayDelayed(sheatheSoundDelay);
     }
 
     private void PlayUnsheatheSound() {
         if (unsheatheSound.isPlaying) {
             unsheatheSound.Stop();
         }
-        unsheatheSound.Play();
+        unsheatheSound.PlayDelayed(unsheatheSoundDelay);
     }
 
     public void PlayHitSound() {
