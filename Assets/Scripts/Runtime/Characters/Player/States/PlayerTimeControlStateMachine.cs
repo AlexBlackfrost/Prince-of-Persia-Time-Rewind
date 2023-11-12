@@ -1,15 +1,15 @@
 using Cinemachine;
 using HFSM;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
-using static UnityEngine.InputSystem.InputAction;
 
 public class PlayerTimeControlStateMachine : StateMachine {
 	[Serializable]
 	public class PlayerTimeControlSettings {
 		[field: SerializeField] public CinemachineFreeLook FreeLookCamera { get; set; }
+		[field: SerializeField] public AudioSource TimeRewindStartSound { get; set; }
+		[field: SerializeField] public AudioSource TimeRewindLoopSound { get; set; }
+		[field: SerializeField] public AudioSource TimeRewindEndSound { get; set; }
 		public CinemachineVirtualCamera timeRewindCamera;
 		public Camera Camera { get; set; }
 		public InputController InputController { get; set; }
@@ -105,7 +105,22 @@ public class PlayerTimeControlStateMachine : StateMachine {
 
 		// Sword
 		settings.Sword.OnTimeRewindStart();
-	}
+
+        // Sound
+        if (settings.TimeRewindEndSound.isPlaying) {
+            settings.TimeRewindEndSound.Stop();
+        }
+
+        if (settings.TimeRewindStartSound.isPlaying) {
+			settings.TimeRewindStartSound.Stop();
+		}
+		settings.TimeRewindStartSound.Play();
+
+        if (settings.TimeRewindLoopSound.isPlaying) {
+            settings.TimeRewindLoopSound.Stop();
+        }
+        settings.TimeRewindLoopSound.Play();
+    }
 
 	private void OnTimeRewindStop() {
 		// Animation
@@ -131,7 +146,11 @@ public class PlayerTimeControlStateMachine : StateMachine {
 		
 		// Hurtbox
 		hurtboxTimeControl.OnTimeRewindStop(previousRecord.hurtboxRecord, nextRecord.hurtboxRecord, previousRecord.deltaTime, elapsedTimeSinceLastRecord);
-	}
+
+        // Sound
+        settings.TimeRewindLoopSound.Stop();
+        settings.TimeRewindEndSound.Play();
+    }
 
     private void SavePlayerRecord() {
 		PlayerRecord playerRecord = new PlayerRecord(transformTimeControl.RecordTransformData(),
